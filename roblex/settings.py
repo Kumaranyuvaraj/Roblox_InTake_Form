@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-xo+@abed$6d*@#@%wisndtiz_xa4-%!n_$@ou52-yysgzmyh6+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['3.147.221.152', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -83,15 +83,10 @@ DATABASES = {
     'default': {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-
         'NAME': 'roblox',
-
         'USER': 'postgres',
-
         'PASSWORD': '2024',
-
-        'HOST': 'localhost',
-
+        'HOST': 'db',
         'PORT': '5432',
 
     }
@@ -142,6 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = '/app/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
