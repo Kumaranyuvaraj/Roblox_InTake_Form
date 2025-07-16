@@ -2,7 +2,7 @@
 
 echo "Building and starting the Django application with Docker..."
 
-sudo docker compose up --build -d
+sudo docker compose -f docker-compose.yml up --build -d
 
 echo "Waiting for database to be ready..."
 sleep 10
