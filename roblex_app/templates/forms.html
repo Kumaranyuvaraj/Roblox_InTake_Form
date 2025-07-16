@@ -17,7 +17,7 @@
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label>Date</label>
-                    <input type="date" name="date" class="form-control" required>
+                    <input type="date" name="date" class="form-control" required="Mandatory field">
                 </div>
             </div>
 
@@ -25,11 +25,11 @@
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label>First Name</label>
-                    <input type="text" name="gamer_first_name" class="form-control" required>
+                    <input type="text" name="gamer_first_name" class="form-control" required="Mandatory field">
                 </div>
                 <div class="col-md-4">
                     <label>Last Name</label>
-                    <input type="text" name="gamer_last_name" class="form-control" required>
+                    <input type="text" name="gamer_last_name" class="form-control" required="Mandatory field">
                 </div>
             </div>
 
@@ -37,11 +37,11 @@
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label>First Name</label>
-                    <input type="text" name="guardian_first_name" class="form-control" required>
+                    <input type="text" name="guardian_first_name" class="form-control" required="Mandatory field">
                 </div>
                 <div class="col-md-4">
                     <label>Last Name</label>
-                    <input type="text" name="guardian_last_name" class="form-control" required>
+                    <input type="text" name="guardian_last_name" class="form-control" required="Mandatory field">
                 </div>
                 <div class="mb-3">
                     <label><strong>Do you have legal custody of the gamer (if gamer is a minor)</strong></label><br>
@@ -339,136 +339,163 @@
         </form>
     </div>
 
-<script>
-    $(document).ready(function () {
-        // Toggle visibility for "Other" custody text input
-        $('#custody6').on('change', function () {
-            if ($(this).is(':checked')) {
-                $('#otherCustodyTextDiv').show();
-            } else {
-                $('#otherCustodyTextDiv').hide();
-                $('input[name="custody_other_detail"]').val('');
-            }
-        });
+    <script>
+$(document).ready(function () {
+    const arrayFields = [
+        "custody_type",
+        "complained_to_roblox",
+        "emails_to_roblox",
+        "complained_to_apple",
+        "emails_to_apple",
+        "complained_to_cc",
+        "emails_to_cc",
+        "contacted_police",
+        "emails_to_police",
+        "asked_for_photos",
+        "minor_sent_photos",
+        "predator_distributed",
+        "predator_threatened"
+    ];
 
-        // Common fields with multiple checkboxes
-        const arrayFields = [
-            "custody_type",
-            "complained_to_roblox",
-            "emails_to_roblox",
-            "complained_to_apple",
-            "emails_to_apple",
-            "complained_to_cc",
-            "emails_to_cc",
-            "contacted_police",
-            "emails_to_police",
-            "asked_for_photos",
-            "minor_sent_photos",
-            "predator_distributed",
-            "predator_threatened"
-        ];
-
-        // Submit form
-        $("#intakeForm").on("submit", function (e) {
-            e.preventDefault();
-            const formData = {};
-
-            // Collect array fields
-            arrayFields.forEach(fieldName => {
-                const selected = [];
-                $(`input[name='${fieldName}']:checked`).each(function () {
-                    selected.push($(this).val());
-                });
-                formData[fieldName] = selected;
-            });
-
-            // Collect the rest of the form data
-            $(this).serializeArray().forEach(field => {
-                if (!arrayFields.includes(field.name)) {
-                    if (field.value === "true" || field.value === "false") {
-                        formData[field.name] = field.value === "true";
-                    } else {
-                        formData[field.name] = field.value;
-                    }
-                }
-            });
-
-            console.log("calling api");
-
-            $.ajax({
-                url: "http://127.0.0.1:8000/api/intake-form/",
-                type: "POST",
-                data: JSON.stringify(formData),
-                contentType: "application/json",
-                success: function (response) {
-                    $("#responseMessage").html('<div class="alert alert-success">Form submitted successfully!</div>');
-                    console.log("Submitted:", response);
-                    document.getElementById("intakeForm").reset();
-                    $('#otherCustodyTextDiv').hide();
-                },
-                error: function (xhr) {
-                    console.error(xhr.responseJSON);
-                    $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
-                }
-            });
-        });
-
-        // PDF export
-        $("#exportBtn").on("click", function () {
-            const formData = {};
-
-            // Collect array fields
-            arrayFields.forEach(fieldName => {
-                const selected = [];
-                $(`input[name='${fieldName}']:checked`).each(function () {
-                    selected.push($(this).val());
-                });
-                formData[fieldName] = selected;
-            });
-
-            // Collect the rest of the fields
-            $("#intakeForm").serializeArray().forEach(field => {
-                if (!arrayFields.includes(field.name)) {
-                    if (field.value === "true" || field.value === "false") {
-                        formData[field.name] = field.value === "true";
-                    } else {
-                        formData[field.name] = field.value;
-                    }
-                }
-            });
-
-            generatePDF(formData);
-        });
-
-        // PDF generation
-        async function generatePDF(formData) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            let y = 10;
-            doc.setFontSize(12);
-            doc.text("Roblox Intake Form", 10, y);
-            y += 10;
-
-            for (const key in formData) {
-                if (formData.hasOwnProperty(key)) {
-                    const label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-                    const value = Array.isArray(formData[key])
-                        ? formData[key].join(", ")
-                        : formData[key] ? formData[key].toString() : "N/A";
-                    doc.text(`${label}: ${value}`, 10, y);
-                    y += 8;
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 10;
-                    }
-                }
-            }
-
-            doc.save("intake_form.pdf");
+    // Toggle for "Other"
+    $('#custody6').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#otherCustodyTextDiv').show();
+        } else {
+            $('#otherCustodyTextDiv').hide();
+            $('input[name="custody_other_detail"]').val('');
         }
     });
+
+    // ✅ Inline validation function
+    function validateFormInline() {
+        let isValid = true;
+
+        // Clear previous errors
+        $(".text-danger").remove();
+
+        // Required text inputs, dates, textareas
+        $('#intakeForm input[required], #intakeForm textarea[required], #intakeForm input[type="date"][required]').each(function () {
+            if (!$(this).val().trim()) {
+                isValid = false;
+                $(this).after('<div class="text-danger">This field is required</div>');
+            }
+        });
+
+        // Required checkbox groups
+        arrayFields.forEach(field => {
+            if ($(`input[name='${field}']:checked`).length === 0) {
+                isValid = false;
+                const container = $(`input[name='${field}']`).last().parent().parent();
+                if (container.find('.text-danger').length === 0) {
+                    container.append('<div class="text-danger">At least one option is required</div>');
+                }
+            }
+        });
+
+        // If "Other" checked, validate detail
+        if ($('#custody6').is(':checked')) {
+            const otherVal = $('input[name="custody_other_detail"]').val();
+            if (!otherVal || otherVal.trim() === "") {
+                isValid = false;
+                $('input[name="custody_other_detail"]').after('<div class="text-danger">Please specify this field</div>');
+            }
+        }
+
+        return isValid;
+    }
+
+    // ✅ On Submit
+    $("#intakeForm").on("submit", function (e) {
+        e.preventDefault();
+        if (!validateFormInline()) {
+            return;
+        }
+
+        const formData = {};
+
+        arrayFields.forEach(field => {
+            const selected = [];
+            $(`input[name='${field}']:checked`).each(function () {
+                selected.push($(this).val());
+            });
+            formData[field] = selected;
+        });
+
+        $(this).serializeArray().forEach(field => {
+            if (!arrayFields.includes(field.name)) {
+                formData[field.name] = field.value;
+            }
+        });
+
+        $.ajax({
+            url: "http://127.0.0.1:8000/api/intake-form/",
+            type: "POST",
+            data: JSON.stringify(formData),
+            contentType: "application/json",
+            success: function (response) {
+                $("#responseMessage").html('<div class="alert alert-success">Form submitted successfully!</div>');
+                document.getElementById("intakeForm").reset();
+                $('#otherCustodyTextDiv').hide();
+                $(".text-danger").remove();
+            },
+            error: function (xhr) {
+                console.error(xhr.responseJSON);
+                $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
+            }
+        });
+    });
+
+    // ✅ Export to PDF
+    $("#exportBtn").on("click", function () {
+        if (!validateFormInline()) {
+            return;
+        }
+
+        const formData = {};
+
+        arrayFields.forEach(field => {
+            const selected = [];
+            $(`input[name='${field}']:checked`).each(function () {
+                selected.push($(this).val());
+            });
+            formData[field] = selected;
+        });
+
+        $("#intakeForm").serializeArray().forEach(field => {
+            if (!arrayFields.includes(field.name)) {
+                formData[field.name] = field.value;
+            }
+        });
+
+        generatePDF(formData);
+    });
+
+    // ✅ PDF logic
+    async function generatePDF(formData) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 10;
+        doc.setFontSize(12);
+        doc.text("Roblox Intake Form", 10, y);
+        y += 10;
+
+        for (const key in formData) {
+            const label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+            const value = Array.isArray(formData[key]) ? formData[key].join(", ") : formData[key] || "N/A";
+            doc.text(`${label}: ${value}`, 10, y);
+            y += 8;
+            if (y > 270) {
+                doc.addPage();
+                y = 10;
+            }
+        }
+
+        doc.save("intake_form.pdf");
+    }
+});
 </script>
+
 
 
 </body>
