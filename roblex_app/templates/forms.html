@@ -429,7 +429,7 @@ $(document).ready(function () {
         });
 
         $.ajax({
-            url: "http://127.0.0.1:8000/api/intake-form/",
+            url: "/api/intake-form/",
             type: "POST",
             data: JSON.stringify(formData),
             contentType: "application/json",

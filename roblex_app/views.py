@@ -2,11 +2,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from roblex_app.serializers import IntakeFormSerializer
+from django.shortcuts import render
 
 # from django.http import Http404, HttpResponse
 # from django.template.loader import render_to_string
 # from weasyprint import HTML
 # from roblex_app.models import IntakeForm
+
+class IntakeFormView(APIView):
+    """
+    Serves the intake form HTML page
+    """
+    def get(self, request):
+        return render(request, 'forms.html')
 
 class IntakeFormAPIView(APIView):
     def post(self, request):
