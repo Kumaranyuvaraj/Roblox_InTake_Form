@@ -54,3 +54,5 @@ class IntakeFormSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("At least one gamertag or profile must be provided.")
         
         return data
+
+

@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+from decouple import config, Csv
+import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,12 +23,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xo+@abed$6d*@#@%wisndtiz_xa4-%!n_$@ou52-yysgzmyh6+'
+# SECRET_KEY = 'django-insecure-xo+@abed$6d*@#@%wisndtiz_xa4-%!n_$@ou52-yysgzmyh6+'
+
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['3.147.221.152', 'localhost', '127.0.0.1']
+# ALLOWED_HOSTS = ['3.147.221.152', 'localhost', '127.0.0.1']
+
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+
 
 
 # Application definition
@@ -83,14 +92,22 @@ DATABASES = {
         'NAME': 'roblox',
         'USER': 'postgres',
         'PASSWORD': '2024',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432',
 
     }
 
 }
 
+# DATABASES = {
+#     'default': dj_database_url.config(default=config('DATABASE_URL'))
+# }
+
 # CORS settings removed - not needed when serving form through Django
+
+# CORS_ALLOWED_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000","http://3.147.221.152","http://localhost:8000"]
+
+# CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", cast=Csv())
 
 
 # Password validation
