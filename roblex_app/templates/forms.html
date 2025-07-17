@@ -56,7 +56,7 @@ border: 1px solid #ccc;
         <form id="intakeForm" class="form-bg col-6">
             <div class="row" style="border-bottom: 2px solid #495057;">
                 <div class="col-2 mt-2">
-            <img src="assets/Bullock.png"></img>
+            <img src="stat/Bullock.png"></img>
             </div>
             <div class="col-10 text-left">
  <h2 class="mb-4 mt-3 px-5">Roblox Intake Form</h2>
@@ -98,13 +98,13 @@ border: 1px solid #ccc;
                      <div class="mb-3 row">   
                         <div class="col-6">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="custody_type" value="married_parent" id="custody1">
+                        <input class="form-check-input" type="radio" name="custody_type" value="married_parent" id="custody1">
                         <label class="form-check-label" for="custody1">Biological parent, married</label>
                         </div>
                     </div>
                      <div class="col-6">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="custody_type" value="divorced_parent" id="custody2">
+                        <input class="form-check-input" type="radio" name="custody_type" value="divorced_parent" id="custody2">
                         <label class="form-check-label" for="custody2">Biological parent, divorced with custody order</label>
                     </div>
                     </div>
@@ -112,28 +112,28 @@ border: 1px solid #ccc;
                        <div class="mb-3 row"> 
                         <div class="col-6">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="custody_type" value="adoptive_parent" id="custody3">
+                        <input class="form-check-input" type="radio" name="custody_type" value="adoptive_parent" id="custody3">
                         <label class="form-check-label" for="custody3">Adoptive parent(s)</label>
                         </div>
                     </div>
                     <div class="col-6">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="custody_type" value="legal_guardian" id="custody4">
+                        <input class="form-check-input" type="radio" name="custody_type" value="legal_guardian" id="custody4">
                         <label class="form-check-label" for="custody4">Legal Guardian with custody order</label>
                         </div>
                     </div>
                        </div>
-<div class="mb-3 row"> 
-                     <div class="col-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="custody_type" value="no_custody" id="custody5">
-                        <label class="form-check-label" for="custody5">Do not have legal custody</label>
-                    </div>
+                    <div class="mb-3 row"> 
+                        <div class="col-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="custody_type" value="no_custody" id="custody5">
+                            <label class="form-check-label" for="custody5">Do not have legal custody</label>
+                        </div>
                     </div>
                     
  <div class="col-6">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="custody_type" value="other" id="custody6">
+                        <input class="form-check-input" type="radio" name="custody_type" value="other" id="custody6">
                         <label class="form-check-label" for="custody6">Other</label>
                     </div>
                     </div>
@@ -161,7 +161,8 @@ border: 1px solid #ccc;
            <div class="row mt-2">
             <div class="col-6">
                 <label>Roblox Gamertag</label>
-                <input type="text" name="roblox_gamertag" class="form-control">
+                <input type="text" name="roblox_gamertag" class="form-control" id="robloxGamertag">
+                <div id="robloxValidationStatus"></div>
             </div>
             <div class="col-6">
                 <label>Discord Profile Name</label>
@@ -210,11 +211,11 @@ border: 1px solid #ccc;
             <div class="md-3 row">
                 <div class="col-6">
                 <label>Date of first known contact with sexual predator</label>
-                <input type="date" name="first_contact" class="form-control">
+                <input type="date" name="first_contact" class="form-control" required>
                 </div>
                 <div class="col-6">
                      <label>Date of last known contact with sexual predator</label>
-                <input type="date" name="last_contact" class="form-control">
+                <input type="date" name="last_contact" class="form-control" required>
                 </div>
             </div>
 
@@ -225,11 +226,11 @@ border: 1px solid #ccc;
                 <label>Did you complain about the predator to Roblox?</label>
 
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="complained_to_roblox" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="complained_to_roblox" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="complained_to_roblox" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="complained_to_roblox" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -242,11 +243,11 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Do you have emails or call logs to document the Complaint to Roblox?</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_roblox" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="emails_to_roblox" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_roblox" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="emails_to_roblox" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -256,11 +257,11 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Did you complain to Apple about the predator?</label>
                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="complained_to_apple" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="complained_to_apple" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="complained_to_apple" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="complained_to_apple" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -270,11 +271,11 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Do you have emails or call logs to document the Complaint to Apple?</label>
                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_apple" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="emails_to_apple" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_apple" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="emails_to_apple" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -284,11 +285,11 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Did you complain to any credit card company about the predator?</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="complained_to_cc" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="complained_to_cc" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="complained_to_cc" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="complained_to_cc" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -298,11 +299,11 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Do you have emails or call logs to document the Complaint to your credit card company?</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_cc" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="emails_to_cc" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_cc" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="emails_to_cc" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -321,12 +322,12 @@ border: 1px solid #ccc;
                  <div class="col-12">
                 <label>Did you contact the Police about the predator?</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="contacted_police" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="contacted_police" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="contacted_police" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="contacted_police" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -336,11 +337,11 @@ border: 1px solid #ccc;
                   <div class="col-12">
                 <label>Do you have emails or call logs to document the Complaint to the Police?</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_police" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="emails_to_police" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="emails_to_police" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="emails_to_police" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -369,11 +370,11 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Did the predator ask for photos or videos of the minor?</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="asked_for_photos" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="asked_for_photos" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="asked_for_photos" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="asked_for_photos" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
 
                 </div>
@@ -385,11 +386,11 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Did the minor provide any photos or videos to the predator?</label>
                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="minor_sent_photos" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="minor_sent_photos" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="minor_sent_photos" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="minor_sent_photos" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 </div>
@@ -400,15 +401,15 @@ border: 1px solid #ccc;
                 <label>Did the predator distribute the minor's photos or videos to others?</label>
                 
                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="predator_distributed" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="predator_distributed" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="predator_distributed" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="predator_distributed" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="predator_distributed" value="Unknown" id="robloxUnknown">
+                    <input class="form-check-input" type="radio" name="predator_distributed" value="Unknown" id="robloxUnknown">
                     <label class="form-check-label" for="robloxUnknown">Unknown</label>
                 </div>
                 </div>
@@ -419,15 +420,15 @@ border: 1px solid #ccc;
                 <div class="col-12">
                 <label>Did the predator threaten the minor with public distribution of photos or videos?</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="predator_threatened" value="Yes" id="robloxYes">
+                    <input class="form-check-input" type="radio" name="predator_threatened" value="Yes" id="robloxYes">
                     <label class="form-check-label" for="robloxYes">Yes</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="predator_threatened" value="No" id="robloxNo">
+                    <input class="form-check-input" type="radio" name="predator_threatened" value="No" id="robloxNo">
                     <label class="form-check-label" for="robloxNo">No</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="predator_threatened" value="Unknown" id="robloxUnknown">
+                    <input class="form-check-input" type="radio" name="predator_threatened" value="Unknown" id="robloxUnknown">
                     <label class="form-check-label" for="robloxUnknown">Unknown</label>
                 </div>
                 </div>
@@ -469,7 +470,8 @@ border: 1px solid #ccc;
         </form>
     </div>
 
-    <script>
+    
+<script>
 $(document).ready(function () {
     const arrayFields = [
         "custody_type",
@@ -487,6 +489,45 @@ $(document).ready(function () {
         "predator_threatened"
     ];
 
+    // ✅ Roblox Username Validation (blur event)
+    $("#robloxGamertag").on("blur", function () {
+        const username = $(this).val().trim();
+        const validRegex = /^[A-Za-z@_]+$/;
+
+        if (!username) {
+            $("#robloxValidationStatus").html('');
+            return;
+        }
+
+        if (!validRegex.test(username)) {
+            $("#robloxValidationStatus").html(
+                `<div class="text-danger mt-1">❌ Only letters, @, and _ are allowed.</div>`
+            );
+            return;
+        }
+
+        $.ajax({
+            url: "/api/validate-roblox/",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ username: username }),
+            success: function (response) {
+                $("#robloxValidationStatus").html(
+                    `<div class="text-success mt-1">✅ Valid Roblox user: ${response.displayName}</div>`
+                );
+            },
+            error: function (xhr) {
+                let message = "❌ Username not found.";
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    message = `❌ ${xhr.responseJSON.error}`;
+                }
+                $("#robloxValidationStatus").html(
+                    `<div class="text-danger mt-1">${message}</div>`
+                );
+            }
+        });
+    });
+
     // Toggle for "Other"
     $('#custody6').on('change', function () {
         if ($(this).is(':checked')) {
@@ -497,22 +538,36 @@ $(document).ready(function () {
         }
     });
 
-    // ✅ Inline validation function
+    // ✅ Inline validation
     function validateFormInline() {
         let isValid = true;
-
-        // Clear previous errors
         $(".text-danger").remove();
 
-        // Required text inputs, dates, textareas
-        $('#intakeForm input[required], #intakeForm textarea[required], #intakeForm input[type="date"][required]').each(function () {
-            if (!$(this).val().trim()) {
+       $('#intakeForm input[required], #intakeForm textarea[required], input[type="date"]').each(function () {
+            const $field = $(this);
+            const value = $field.val().trim();
+            const type = $field.attr("type");
+
+            if (!value) {
                 isValid = false;
-                $(this).after('<div class="text-danger">This field is required</div>');
+                let label = "This field is required";
+                if (type === "date") {
+                    label = "Date is mandatory";
+                }
+                $field.after(`<div class="text-danger">${label}</div>`);
+            } else if (type === "date") {
+                // Parse ISO string properly: yyyy-mm-dd (safe for HTML5 date inputs)
+                const selectedDate = new Date(value + "T00:00:00");  // Prevent timezone issues
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate.getTime() > today.getTime()) {
+                    isValid = false;
+                    $field.after('<div class="text-danger">Future dates are not allowed</div>');
+                }
             }
         });
 
-        // Required checkbox groups
         arrayFields.forEach(field => {
             if ($(`input[name='${field}']:checked`).length === 0) {
                 isValid = false;
@@ -523,7 +578,6 @@ $(document).ready(function () {
             }
         });
 
-        // If "Other" checked, validate detail
         if ($('#custody6').is(':checked')) {
             const otherVal = $('input[name="custody_other_detail"]').val();
             if (!otherVal || otherVal.trim() === "") {
@@ -534,6 +588,10 @@ $(document).ready(function () {
 
         return isValid;
     }
+
+    $("input[type='date']").each(function () {
+        this.max = new Date().toISOString().split("T")[0];
+    });
 
     // ✅ On Submit
     $("#intakeForm").on("submit", function (e) {
@@ -554,12 +612,18 @@ $(document).ready(function () {
 
         $(this).serializeArray().forEach(field => {
             if (!arrayFields.includes(field.name)) {
-                formData[field.name] = field.value;
+                if (field.name === "roblox_gamertag") {
+                    // ✅ Remove @ and _ before saving to DB
+                    formData[field.name] = field.value.replace(/[@_]/g, '');
+                } else {
+                    formData[field.name] = field.value;
+                }
             }
         });
 
+
         $.ajax({
-            url: "/api/intake-form/",
+            url: "/api/submit-validated-intake/",
             type: "POST",
             data: JSON.stringify(formData),
             contentType: "application/json",
@@ -568,6 +632,7 @@ $(document).ready(function () {
                 document.getElementById("intakeForm").reset();
                 $('#otherCustodyTextDiv').hide();
                 $(".text-danger").remove();
+                $("#robloxValidationStatus").html('');
             },
             error: function (xhr) {
                 console.error(xhr.responseJSON);
@@ -625,6 +690,7 @@ $(document).ready(function () {
     }
 });
 </script>
+
 
 
 
