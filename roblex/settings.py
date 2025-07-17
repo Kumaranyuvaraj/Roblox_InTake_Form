@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'roblox',
         'USER': 'postgres',
         'PASSWORD': '2024',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
 
     }
