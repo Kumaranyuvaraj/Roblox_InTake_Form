@@ -84,14 +84,15 @@ def validate_roblox_username(request):
     if not raw_username:
         return Response({"error": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not re.fullmatch(r"[A-Za-z@_]+", raw_username):
-        return Response({
-            "valid": False,
-            "error": "Only letters, @ and _ are allowed. No digits or special characters."
-        }, status=status.HTTP_400_BAD_REQUEST)
+    # if not re.fullmatch(r"[A-Za-z0-9@_]+", raw_username):
+    #     return Response({
+    #         "valid": False,
+    #         "error": "Only letters, @ and _ are allowed. No digits or special characters."
+    #     }, status=status.HTTP_400_BAD_REQUEST)
 
-    # ✅ Remove @ and _ before API call
-    username = re.sub(r'[@_]', '', raw_username)
+    
+    username = re.sub(r'^[^A-Za-z]+', '', raw_username)
+
 
     try:
         roblox_response = requests.post(
@@ -126,15 +127,15 @@ class SubmitIntakeIfValidAPIView(APIView):
         if serializer.is_valid():
             raw_roblox_name = serializer.validated_data.get("roblox_gamertag")
 
-            # Validate format: only letters, @ and _
-            if not re.fullmatch(r"[A-Za-z@_]+", raw_roblox_name):
-                return Response(
-                    {"error": "Only letters, @ and _ are allowed. No digits or special characters."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # # Validate format: only letters, @, _, and digits allowed
+            # if not re.fullmatch(r"[A-Za-z0-9@_]+", raw_roblox_name):
+            #     return Response(
+            #         {"error": "Only letters, numbers, @ and _ are allowed. No special characters."},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
 
-            # Remove @ and _ before sending to Roblox API
-            cleaned_name = re.sub(r'[@_]', '', raw_roblox_name)
+            # # ✅ Remove leading @, _ and digits (match frontend logic)
+            cleaned_name = re.sub(r'^[^A-Za-z]+', '', raw_roblox_name)
 
             # Validate against Roblox API
             try:
@@ -157,7 +158,7 @@ class SubmitIntakeIfValidAPIView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            #  Save to DB only if valid
+            # Save only if valid
             intake_instance = serializer.save()
             return Response({
                 "message": "Form submitted successfully.",
@@ -165,4 +166,5 @@ class SubmitIntakeIfValidAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
