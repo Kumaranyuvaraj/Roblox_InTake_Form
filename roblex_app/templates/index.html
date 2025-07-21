@@ -93,8 +93,8 @@
         .hero {
             height: 100vh;
          
-                         background: linear-gradient(45deg, rgba(84, 1, 51, 0.658), rgba(49, 104, 31, 0.477)),
-                        url('Assets/Roblox-lg1.jpg') center/cover;
+            background: linear-gradient(45deg, rgba(84, 1, 51, 0.658), rgba(49, 104, 31, 0.477)),
+                        url("{% static 'img/Roblox-lg1.jpg' %}") center/cover;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -143,7 +143,7 @@
            
         }
         .section-Lawsuit{
-            background:linear-gradient(45deg, rgba(10, 25, 47, 0.721), rgba(31, 64, 104, 0.8)), url('assets/slide_chat2.png') top/cover;
+            background:linear-gradient(45deg, rgba(10, 25, 47, 0.721), rgba(31, 64, 104, 0.8)), url("{% static 'img/slide_chat2.png' %}") top/cover;
         }
         
 /* 
@@ -154,7 +154,7 @@
             margin-top: 3rem;
         } */
         .bg-img-gaming{
-            background: url('assets/');
+            background: url('img/');
         }
 
         .content-card {
@@ -531,7 +531,7 @@
         </div>
             </div>
             <!-- <div class="col-6">
- <img src="assets/Roblox-md-2.jpeg">
+ <img src="img/Roblox-md-2.jpeg">
             </div> -->
         </div>
 
@@ -696,11 +696,11 @@
         return;
     }
 
-    const redirectUrl = "http://127.0.0.1:8000/intake-form/";
+    const redirectUrl = "/intake-form/";
 
     // ✅ First submit user details
     $.ajax({
-        url: "http://127.0.0.1:8000/api/user-details/",
+        url: "/api/user-details/",
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify({
@@ -733,7 +733,7 @@ let questionsData = [];
 
 $(document).ready(function () {
     $.ajax({
-        url: "http://127.0.0.1:8000/api/questions/",
+        url: "/api/questions/",
         type: "GET",
         success: function (response) {
             questionsData = response;
@@ -776,7 +776,7 @@ $(document).ready(function () {
         if (!selectedOptionId || !questionId) return;
 
         const promise = $.ajax({
-            url: "http://127.0.0.1:8000/api/answers/submit/",
+            url: "/api/answers/submit/",
             type: "POST",
             contentType: "application/json",
             headers: {
