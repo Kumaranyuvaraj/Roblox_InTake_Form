@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from roblex_app.models import IntakeForm
+from roblex_app.models import IntakeForm,UserDetail,Question, Option, UserAnswer
 
 class IntakeFormSerializer(serializers.ModelSerializer):
     # Required text fields
@@ -54,3 +54,27 @@ class IntakeFormSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("At least one gamertag or profile must be provided.")
         
         return data
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetail
+        fields = '__all__'
+
+
+class OptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Option
+        fields = ['id', 'text']
+
+class QuestionSerializer(serializers.ModelSerializer):
+    options = OptionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'text', 'options']
+
+class UserAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAnswer
+        fields = ['user', 'question', 'selected_option']

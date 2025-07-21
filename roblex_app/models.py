@@ -2,6 +2,7 @@ from django.db import models
 
 from django.contrib.postgres.fields import ArrayField
 
+
 class IntakeForm(models.Model):
 
     CUSTODY_CHOICES = [
@@ -129,3 +130,44 @@ class IntakeForm(models.Model):
         db_table = "intake_form"
 
 
+
+class UserDetail(models.Model):
+    ATTORNEY_CHOICES = (
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    )
+
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    cell_phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    zipcode = models.CharField(max_length=10)
+    working_with_attorney = models.CharField(max_length=3, choices=ATTORNEY_CHOICES)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
+
+
+class Question(models.Model):
+    text = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.text
+
+class Option(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
+    text = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.question.text} - {self.text}"
+
+class UserAnswer(models.Model):
+    user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'question')  # prevent duplicate answers
+
+    

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import IntakeForm
+from roblex_app.models import IntakeForm,Question, Option
 
 @admin.register(IntakeForm)
 class IntakeFormAdmin(admin.ModelAdmin):
@@ -98,3 +98,16 @@ class IntakeFormAdmin(admin.ModelAdmin):
         # Custom action - you can extend this as needed
         self.message_user(request, f"{queryset.count()} forms marked as reviewed.")
     mark_as_reviewed.short_description = "Mark selected forms as reviewed"
+
+class OptionInline(admin.TabularInline):  # or admin.StackedInline
+    model = Option
+    extra = 8  # show 8 blank options by default
+
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = [OptionInline]
+
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(Option)
+
+# admin.site.register(Question)
+# admin.site.register(Option)

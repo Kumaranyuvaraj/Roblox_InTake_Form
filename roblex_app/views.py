@@ -3,7 +3,8 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from roblex_app.serializers import IntakeFormSerializer
+from roblex_app.models import UserDetail, Question, Option, UserAnswer
+from roblex_app.serializers import IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer
 from django.shortcuts import render
 
 from rest_framework.decorators import api_view
@@ -112,12 +113,11 @@ def validate_roblox_username(request):
         else:
             return Response({
                 "valid": False,
-                "error": "Username not found"
+                "error": "Gamertag not found"
             }, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 
@@ -127,38 +127,35 @@ class SubmitIntakeIfValidAPIView(APIView):
         if serializer.is_valid():
             raw_roblox_name = serializer.validated_data.get("roblox_gamertag")
 
-            # # Validate format: only letters, @, _, and digits allowed
-            # if not re.fullmatch(r"[A-Za-z0-9@_]+", raw_roblox_name):
-            #     return Response(
-            #         {"error": "Only letters, numbers, @ and _ are allowed. No special characters."},
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
+            # Remove leading non-letter characters (@, _, digits)
+            usernames = [re.sub(r'^[^A-Za-z]+', '', name.strip()) for name in raw_roblox_name.split(",") if name.strip()]
+            print(usernames)
 
-            # # ✅ Remove leading @, _ and digits (match frontend logic)
-            cleaned_name = re.sub(r'^[^A-Za-z]+', '', raw_roblox_name)
-
-            # Validate against Roblox API
             try:
-                roblox_response = requests.post(
-                    "https://users.roblox.com/v1/usernames/users",
-                    json={"usernames": [cleaned_name], "excludeBannedUsers": False},
-                    headers={"Content-Type": "application/json"},
-                    timeout=5
-                )
-                roblox_data = roblox_response.json()
-
-                if not roblox_data.get("data"):
-                    return Response(
-                        {"error": "Invalid Roblox username. Cannot save."},
-                        status=status.HTTP_400_BAD_REQUEST
+                # Validate each username using the Roblox API
+                for username in usernames:
+                    roblox_response = requests.post(
+                        "https://users.roblox.com/v1/usernames/users",
+                        json={"usernames": [username], "excludeBannedUsers": False},
+                        headers={"Content-Type": "application/json"},
+                        timeout=5
                     )
+                    roblox_data = roblox_response.json()
+
+                    # If Roblox returns no data for username, it's invalid
+                    if "data" not in roblox_data or not roblox_data["data"]:
+                        return Response(
+                            {"error": f"Invalid Roblox username: {username}. Cannot save."},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
             except Exception as e:
                 return Response(
                     {"error": f"Roblox validation failed: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            # Save only if valid
+            # Save the intake form only if all usernames are valid
             intake_instance = serializer.save()
             return Response({
                 "message": "Form submitted successfully.",
@@ -168,3 +165,37 @@ class SubmitIntakeIfValidAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
+class UserDetailCreateView(APIView):
+    def post(self, request):
+        serializer = UserDetailSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class QuestionListAPIView(APIView):
+    def get(self, request):
+        questions = Question.objects.prefetch_related('options').all()
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Submit answer to a question
+class SubmitAnswerAPIView(APIView):
+    def post(self, request):
+        serializer = UserAnswerSerializer(data=request.data)
+        if serializer.is_valid():
+            # prevent duplicate entries
+            user = serializer.validated_data['user']
+            question = serializer.validated_data['question']
+
+            UserAnswer.objects.update_or_create(
+                user=user, question=question,
+                defaults={'selected_option': serializer.validated_data['selected_option']}
+            )
+
+            return Response({"message": "Answer submitted."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
