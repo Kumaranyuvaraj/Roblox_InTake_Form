@@ -143,6 +143,7 @@ class UserDetail(models.Model):
     email = models.EmailField()
     zipcode = models.CharField(max_length=10)
     working_with_attorney = models.CharField(max_length=3, choices=ATTORNEY_CHOICES)
+    additional_notes = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

@@ -1,0 +1,819 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Roblox Intake Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #0a192f;
+            color: #f8f9fa;
+        }
+        .primery-color{
+             background-color: #1f4068;
+        }
+        .secondary-color{
+            background-color: #012654;
+
+        }
+
+        .bg-light-opacity{
+            background: #355c9647;
+    border-radius: 10px;
+    padding: 25px 35px;
+    }
+
+    .outer-design{
+        background: #dc354591;
+    padding: 25px;
+    border-radius: 10px;
+    }
+
+  
+
+        /* Navigation */
+        .navbar {
+            background-color: rgba(10, 25, 47, 0.95);
+            padding: 1.5rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #1f4068;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            color: #64ffda;
+            text-decoration: none;
+            font-weight: 700;
+            position: absolute;
+            top:5%;
+            left: 5%;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #ccd6f6;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #64ffda;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+         
+                         background: linear-gradient(45deg, rgba(84, 1, 51, 0.658), rgba(49, 104, 31, 0.477)),
+                        url('Assets/Roblox-lg1.jpg') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 2rem;
+        }
+        div img{
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: #64ffda;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #ccd6f6;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .separator {
+            width: 60px;
+            height: 2px;
+            background-color: #64ffda;
+            margin: 2rem auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+        .section-content, .section-safeguard, .section-Lawsuit{
+        
+            padding: 0 2rem;
+           
+        }
+        .section-Lawsuit{
+            background:linear-gradient(45deg, rgba(10, 25, 47, 0.721), rgba(31, 64, 104, 0.8)), url('assets/slide_chat2.png') top/cover;
+        }
+        
+/* 
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        } */
+        .bg-img-gaming{
+            background: url('assets/');
+        }
+
+        .content-card {
+            background-color: #112240;
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+            border: 1px solid #1f4068;
+            max-width: 22%;
+            border-top: 1px solid #aaffcc;
+    border-bottom: 5px solid #aaffcc;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .content-card h3 {
+            color: #64ffda;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .content-card p {
+            color: #8892b0;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #020c1b;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid #1f4068;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+/* button style */
+
+.btn {
+  --border-color: linear-gradient(-45deg, #ffae00, #7e03aa, #00fffb);
+  --border-width: 0.125em;
+  --curve-size: 0.5em;
+  --blur: 30px;
+  --bg: #080312;
+  --color: #afffff;
+  color: var(--color);
+  cursor: pointer;
+  /* use position: relative; so that BG is only for .btn */
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-content: center;
+  padding: 0.5em 1.5em;
+  font-size: 17px;
+  border: 0;
+  text-transform: uppercase;
+  box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.6);
+  clip-path: polygon(
+    /* Top-left */ 0% var(--curve-size),
+    var(--curve-size) 0,
+    /* top-right */ 100% 0,
+    100% calc(100% - var(--curve-size)),
+    /* bottom-right 1 */ calc(100% - var(--curve-size)) 100%,
+    /* bottom-right 2 */ 0 100%
+  );
+  transition: color 250ms;
+}
+
+.btn::after,
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.btn::before {
+  background: var(--border-color);
+  background-size: 300% 300%;
+  animation: move-bg7234 5s ease infinite;
+  z-index: -2;
+}
+
+@keyframes move-bg7234 {
+  0% {
+    background-position: 31% 0%;
+  }
+
+  50% {
+    background-position: 70% 100%;
+  }
+
+  100% {
+    background-position: 31% 0%;
+  }
+}
+
+.btn::after {
+  background: var(--bg);
+  z-index: -1;
+  clip-path: polygon(
+    /* Top-left */ var(--border-width)
+      calc(var(--curve-size) + var(--border-width) * 0.5),
+    calc(var(--curve-size) + var(--border-width) * 0.5) var(--border-width),
+    /* top-right */ calc(100% - var(--border-width)) var(--border-width),
+    calc(100% - var(--border-width))
+      calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)),
+    /* bottom-right 1 */
+      calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5))
+      calc(100% - var(--border-width)),
+    /* bottom-right 2 */ var(--border-width) calc(100% - var(--border-width))
+  );
+  transition: clip-path 500ms;
+}
+
+.btn:where(:hover, :focus)::after {
+  clip-path: polygon(
+    /* Top-left */ calc(100% - var(--border-width))
+      calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)),
+    calc(100% - var(--border-width)) var(--border-width),
+    /* top-right */ calc(100% - var(--border-width)) var(--border-width),
+    calc(100% - var(--border-width))
+      calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)),
+    /* bottom-right 1 */
+      calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5))
+      calc(100% - var(--border-width)),
+    /* bottom-right 2 */
+      calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5))
+      calc(100% - var(--border-width))
+  );
+  transition: 200ms;
+}
+
+.btn:where(:hover, :focus) {
+  color: #fff;
+}
+
+.sub-heading{
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+  /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #00233f;
+            width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 8px;
+            position: relative;
+            max-height: 650px;
+            overflow-y: auto;
+            border-top:5px solid #fff;
+        }
+
+        /* Form Screens */
+        .form-screen {
+            display: none;
+        }
+
+        .form-screen.active {
+            display: block;
+        }
+
+        /* Input Styles */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Footer Buttons */
+        .form-footer {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .close-modal{
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    
+    }
+    .scroll::-webkit-scrollbar {
+  width: 10px;
+}
+ 
+.scroll::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 20px;
+}
+
+.scroll::-webkit-scrollbar-track {
+  background: #ddd;
+  border-radius: 20px;
+}
+
+    .check-bx{
+        display: flex;
+        width: 15px;
+    justify-items: flex-start;
+    vertical-align: top;
+    }
+
+    .btn-primary {
+    background: #51d094 !important;
+    }
+
+    </style>
+
+    <body>
+          <!-- <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="logo px-4">Logo Here</a>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#cases">Cases</a>
+                <a href="#resources">Resources</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav> -->
+
+    <section class="hero">
+      
+        <a href="#" class="logo  d-flex justify-content-left">Logo Here</a>
+        <div class="hero-content">
+              
+
+            <h1>Kids Hooked on Games? It’s No Accident...</h1>
+            <div class="separator"></div>
+            <p>gaming companies Use manipulation tactics to keep children glued to their screens</p>
+
+          <div class="sub-heading outer-design"> Does Your Child Game More Than 2 hrs Per Day?</div>
+            <div class="row mt-4">
+                <div class=" d-flex justify-content-center">
+                    <button class="btn px-5 mx-3" id="openModal" >Yes</button>
+                    <button class="btn px-5 mx-3" id="openModal2">No</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+ 
+    <div class="section-content primary-color">
+        <div class="row px-4 py-5">
+            <div class="col-6">
+                <img src="{% static 'img/gamer-3.jpg' %}">
+            </div>
+            <div class="col-6">
+      <h4>  85% OF KIDS & TEENS UNDER 18 ARE ADDICTED TO GAMING </h4>
+   
+      <div><p>That's millions of vulnerable children worldwide whose minds are being exploited by video game companies for profit. <strong>It's time to hold the companies responsible accountable.</strong></p><p></p><p>If your child's gaming habits have spiraled out of control, we can help you take legal action against gaming companies using manipulation tactics to keep children glued to their screens.</p></div>
+   
+    </div>
+</div>
+    </div>
+    <div class="section-safeguard secondary-color">
+        <div class="row px-4 py-5">
+             <marquee class="text-center font-large py-3"><h1 style="color: #64ffda;">Life-Altering Issues Caused By Gaming Addiction</h1></marquee>
+             
+                 <div class="col justify-content-center ">
+                       <main class="">
+        <div class="content-grid row">
+            <div class="content-card col-3 mx-3">
+                <h3 class="text-center">Mental Health</h3>
+                <img src="{% static 'img/Mental_Health.jpg' %}" alt="Mental Health">
+                <p class="py-4 text-white text-center">ADHD/ADD, anxiety, depression, irritability, psychological distress.</p>
+            </div>
+            <div class="content-card col-3 mx-3">
+                <h3 class="text-center">Physical Health</h3>
+                <img src="{% static 'img/physical.jpg' %}"  alt="Physical">
+                <p class="py-4 text-white text-center">Eye strain, repetitive strain injuries, and sedentary lifestyle diseases</p>
+            </div>
+            <div class="content-card col-3 mx-3">
+                <h3 class="text-center">Daily Life</h3>
+                <img src="{% static 'img/daily_life.jpg' %}" alt="Daily Life">
+                <p class="py-4 text-white text-center">Escapism, poor school performance, sleep deprivation, and social isolation.</p>
+            </div>
+             <div class="content-card col-3 mx-3">
+                <h3 class="text-center">Withdrawal Symptoms</h3>
+                <img src="{% static 'img/Aggression.jpg' %}" alt="Aggregation">
+                <p class="py-4 text-white text-center">Aggression, gamer's rage, and disengagement from daily activities.</p>
+            </div>
+        </div>
+    </main>
+                 </div>    
+</div>
+    </div>
+
+    <div class="section-Lawsuit py-5">
+        <div class="row px-4 py-5 bg-img-gaming">
+            <div class="col-12">
+               <div id="" class="text-center">
+                <p>Get The Possible Compensation You Deserve</p>
+                <h1 class=""><strong>Help Create A Safer Gaming Environment For Children</strong></h1>
+                <div class="" data-animation-class=""><div>
+                    <p>Gaming companies' neglect of addiction and related injuries demands justice and accountability.</p>
+                    <p></p>
+                    <p>Our legal team will assess your eligibility for the lawsuit to help secure compensation for your child's professional help.</p>
+                </div>
+                <button class="" id="openModal3">Click To Sign Up</button>
+            </div>
+        </div>
+            </div>
+            <!-- <div class="col-6">
+ <img src="assets/Roblox-md-2.jpeg">
+            </div> -->
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <p>
+            DISCLAIMER This website is for informational purposes only. This is a paid legal advertisement. It does not constitute legal advice, and no attorney-client relationship is formed. The accuracy and completeness of the information cannot be guaranteed. Users should consult with an attorney for advice on their specific legal issues. This information does not constitute medical advice and it should not be relied upon as such. Always consult a doctor before changing any medical regimen. We are not responsible for any actions taken based on the information provided on this site. We strive to help you find information to fight for your rights.
+        </p>
+        <p>All rights reserved Copyright © 2024 Litigation Notification |<a href="privacyandpolicy.html"> Privacy Policy </a>| <a href="termsandcondition.html">Terms & Conditions</a></p>
+    </footer>
+
+    <!-- modal popup code -->
+      <div class="modal-overlay" id="modal">
+        <div class="modal-content scroll">
+         <div class="row">
+            <div class="col-11"></div>
+            <button class="col-1 close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <!-- Screen 1 -->
+            <div class="form-screen active" id="screen1">
+                <div class="mt-3">
+                    <label>Within the last 5 weeks, how many hours per day is spent playing Minecraft, Call Of Duty, Fortnite, Roblox or Grand Theft Auto? *</label>
+                    <select id="question_5" class="question-dropdown" data-question-text="Within the last 5 weeks, how many hours per day is spent playing Minecraft, Call Of Duty, Fortnite, Roblox or Grand Theft Auto? *"></select>
+
+                </div>
+               
+
+                   <div class="mt-3">
+                    <label> What harm has the gamer suffered from? *</label>
+                    <select id="question_6" class="question-dropdown" data-question-text="What harm has the gamer suffered from? *"></select>
+                </div>
+                <div class="mt-3">
+                    <label>What treatment was received as a result of playing video games? *</label>
+                    <select id="question_7" class="question-dropdown" data-question-text="What treatment was received as a result of playing video games? *"></select>
+
+                </div>
+                 <div class="mt-3">
+                    <label>Age of gamer? *</label>
+                    <select id="question_8" class="question-dropdown" data-question-text="Age of gamer? *"></select>
+
+                </div>
+                <div class="form-footer">
+                    <button type="button" class="btn-primary" onclick="showScreen(2)">Next</button>
+                </div>
+            </div>
+
+            <!-- Screen 2 -->
+            <div class="form-screen" id="screen2">
+                <div class="input-group">
+                <label>First Name:</label>
+                <input type="text" id="first_name" required>
+            </div>
+            <div class="input-group">
+                <label>Last Name:</label>
+                <input type="text" id="last_name" required>
+            </div>
+            <div class="input-group">
+                <label>Cell Phone:</label>
+                <input type="tel" id="cell_phone" required>
+            </div>
+            <div class="input-group">
+                <label>Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="input-group">
+                <label>Zip Code:</label>
+                <input type="text" id="zipcode" required>
+            </div>
+            <div class="input-group">
+                <label>Are you currently working with an attorney for this case?</label>
+                <select id="working_with_attorney" required>
+                    <option value="">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+                 <div class="mt-3">
+                    <label class="form-label">Additional Notes (optional)</label>
+                    <input type="text" id="additional_notes">
+                </div>
+                <div class="input-group d-flex">
+                    <div class="row">
+                        <input type="checkbox" id="consent_checkbox" class="col-1 check-bx">
+                        <label style="font-size: 11px;" class="col-11">
+                            By selecting Submit and completing this form I confirm that I am over 18...
+                        </label>
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <button type="button" class="btn-secondary" onclick="showScreen(1)">Back</button>
+                    <button type="button" class="btn-primary" onclick="submitForm()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal popup end -->
+
+ <script>
+    // Read CSRF token from the meta tag and add it to every AJAX request
+    function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    
+    const csrftoken = getCookie('csrftoken');
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    document.getElementById('openModal').addEventListener('click', () => {
+        document.getElementById('modal').style.display = 'block';
+    });
+
+    function showScreen(screenNumber) {
+        document.querySelectorAll('.form-screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        document.getElementById(`screen${screenNumber}`).classList.add('active');
+    }
+
+   function submitForm() {
+    const first_name = $("#first_name").val().trim();
+    const last_name = $("#last_name").val().trim();
+    const cell_phone = $("#cell_phone").val().trim();
+    const email = $("#email").val().trim();
+    const zipcode = $("#zipcode").val().trim();
+    const working_with_attorney = $("#working_with_attorney").val();
+    const consent = $("#consent_checkbox").is(":checked");
+    const additional_notes = $("#additional_notes").val().trim();
+
+    if (!first_name || !last_name || !cell_phone || !email || !zipcode || !working_with_attorney) {
+        alert("Please fill all required fields.");
+        return;
+    }
+
+    if (!consent) {
+        alert("You must agree to the terms before submitting.");
+        return;
+    }
+
+    const redirectUrl = "http://127.0.0.1:8000/intake-form/";
+
+    // ✅ First submit user details
+    $.ajax({
+        url: "http://127.0.0.1:8000/api/user-details/",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            first_name,
+            last_name,
+            cell_phone,
+            email,
+            zipcode,
+            working_with_attorney,
+            additional_notes
+        }),
+        success: function (response) {
+            const userId = response.id;
+
+            // ✅ Then submit answers, and after that redirect
+            submitAnswers(userId, function () {
+                alert("All submitted!");
+                window.location.href = redirectUrl;  // 🔁 Redirect here
+            });
+        },
+        error: function (xhr) {
+            console.error(xhr.responseJSON);
+            alert("Error submitting the form. Check console.");
+        }
+    });
+}
+
+    // $("#userForm")[0].reset();
+let questionsData = [];
+
+$(document).ready(function () {
+    $.ajax({
+        url: "http://127.0.0.1:8000/api/questions/",
+        type: "GET",
+        success: function (response) {
+            questionsData = response;
+
+            $(".question-dropdown").each(function () {
+                const $select = $(this);
+                const questionText = $select.data("question-text").trim();
+
+                const matchingQuestion = response.find(q => q.text.trim() === questionText);
+
+                if (matchingQuestion) {
+                    $select.attr("data-question-id", matchingQuestion.id);
+                    $select.append(`<option value="">-- Select --</option>`);
+
+                    matchingQuestion.options.forEach(opt => {
+                        $select.append(`<option value="${opt.id}">${opt.text}</option>`);
+                    });
+                } else {
+                    console.warn(`No matching question found for: ${questionText}`);
+                }
+            });
+        },
+        error: function () {
+            alert("Failed to load questions.");
+        }
+    });
+});
+
+
+
+
+    function submitAnswers(userId, callback) {
+    const promises = [];
+
+    $(".question-dropdown").each(function () {
+        const $select = $(this);
+        const questionId = $select.data("question-id");
+        const selectedOptionId = $select.val();
+
+        if (!selectedOptionId || !questionId) return;
+
+        const promise = $.ajax({
+            url: "http://127.0.0.1:8000/api/answers/submit/",
+            type: "POST",
+            contentType: "application/json",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+            },
+            data: JSON.stringify({
+                user: userId,
+                question: questionId,
+                selected_option: selectedOptionId
+            }),
+            success: function () {
+                console.log(`Answer submitted for Question ID ${questionId}`);
+            },
+            error: function (xhr) {
+                console.error(`Failed to submit answer for Question ID ${questionId}:`, xhr.responseJSON);
+            }
+        });
+
+        promises.push(promise);
+    });
+
+    // ✅ Wait for all answer submissions to complete, then call callback
+    $.when(...promises).done(function () {
+        if (typeof callback === "function") {
+            callback();  // Now we redirect
+        }
+    });
+}
+    </script>
+
+
+    </body>
+</html>
+
+
+<!-- <button id="openModal" class="btn-primary">Yes</button> -->
+
+   
+
+   

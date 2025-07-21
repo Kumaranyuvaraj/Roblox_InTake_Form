@@ -753,7 +753,8 @@ color: red;
         contentType: "application/json",
         data: JSON.stringify({ username }),
         success: function () {
-            $statusDiv.html(`<div class="text-success"></div>`);
+            const message = xhr.responseJSON?.error || "Gamertag found.";
+            $statusDiv.html(`<div class="text-success">${message}</div>`);
             robloxValidationStatus[$input.index()] = true;
         },
         error: function (xhr) {

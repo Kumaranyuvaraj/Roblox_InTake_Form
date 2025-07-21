@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from roblex_app.models import UserDetail, Question, Option, UserAnswer
 from roblex_app.serializers import IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
 from rest_framework.decorators import api_view
 
@@ -16,10 +16,28 @@ from rest_framework.decorators import api_view
 
 class IntakeFormView(APIView):
     """
-    Serves the intake form HTML page
+    Handles GET to show the form, and POST to process or redirect
     """
     def get(self, request):
         return render(request, 'forms.html')
+
+    def post(self, request):
+        # After submission, redirect back to form
+        return redirect('')  # assuming you have this URL name
+
+class LandingPage(APIView):
+    """
+    Serves the landing page form HTML page
+    """
+    def get(self, request):
+        return render(request, 'Home.html')
+    
+class IndexPage(APIView):
+    """
+    Serves the index page form HTML page
+    """
+    def get(self, request):
+        return render(request, 'index.html')
 
 class IntakeFormAPIView(APIView):
     def post(self, request):
@@ -175,8 +193,6 @@ class UserDetailCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
-
 class QuestionListAPIView(APIView):
     def get(self, request):
         questions = Question.objects.prefetch_related('options').all()

@@ -60,6 +60,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetail
         fields = '__all__'
+        extra_kwargs = {
+            'additional_notes': {'required': False},
+        }
 
 
 class OptionSerializer(serializers.ModelSerializer):
