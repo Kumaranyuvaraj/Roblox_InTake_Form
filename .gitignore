@@ -159,7 +159,6 @@ db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
-static/
 
 # Django migrations (optional - uncomment if you want to ignore migrations)
 # */migrations/*.py
