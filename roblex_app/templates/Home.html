@@ -87,10 +87,8 @@
         /* Hero Section */
         .hero {
             height: 100vh;
-            /* background: linear-gradient(45deg, rgba(10, 25, 47, 0.9), rgba(31, 64, 104, 0.8)),
-                        url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f') center/cover; */
-                         background: linear-gradient(45deg, rgba(10, 25, 47, 0.9), rgba(31, 64, 104, 0.8)),
-                        url('img/Roblox-banner.jpg') center/cover;
+            background: linear-gradient(45deg, rgba(10, 25, 47, 0.9), rgba(31, 64, 104, 0.8)),
+                url("{% static 'img/Roblox-banner.jpg' %}") center/cover;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -139,7 +137,7 @@
            
         }
         .section-Lawsuit{
-            background:linear-gradient(45deg, rgba(10, 25, 47, 0.721), rgba(31, 64, 104, 0.8)), url('img/Justice_image.png') top/cover;
+            background: linear-gradient(45deg, rgba(10, 25, 47, 0.721), rgba(31, 64, 104, 0.8)), url("{% static 'img/Justice_image.png' %}") top/cover;
         }
         
 
