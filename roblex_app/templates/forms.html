@@ -77,11 +77,18 @@
         width: 10rem;
     }
 
+    .btn-plus:focus{
+        background:#04c15f;
+        border: 1px solid #000000;
+        /* padding-bottom: ; */
+    }
+
     .btn-submit:hover {
         background: #64686b;
         color: #fff;
         width: 10rem;
     }
+
 
     .form-check-label {
         font-weight: 400;
@@ -190,9 +197,11 @@ color: red;
 
 .rb-err-msg{
     position: absolute;
-    left: -713px;
+    /* left: -713px; */
     top: 16px;
 }
+
+
 
 </style>
 
@@ -489,9 +498,9 @@ color: red;
 
                     <div class="row mb-3 pt-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did you complain about the predator to Roblox?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative  rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="complained_to_roblox" value="Yes"
                                             id="robloxYes">
@@ -514,9 +523,9 @@ color: red;
 
                     <div class="row mb-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to Roblox?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="emails_to_roblox" value="Yes"
                                             id="robloxYes_1">
@@ -534,9 +543,9 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did you complain to Apple about the predator?</label>
-                                 <div class="d-flex gap-4 position-relative">
+                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="complained_to_apple" value="Yes"
                                             id="robloxNo_3">
@@ -554,9 +563,9 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to Apple?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="emails_to_apple" value="Yes"
                                             id="robloxNo_5">
@@ -574,9 +583,9 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did you complain to any credit card company about the predator?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="complained_to_cc" value="Yes"
                                             id="robloxNo_7">
@@ -594,9 +603,9 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to your credit card company?</label>
-                                 <div class="d-flex gap-4 position-relative">
+                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="emails_to_cc" value="Yes"
                                             id="robloxNo_9">
@@ -614,9 +623,9 @@ color: red;
 
                     <div class="md-3 row mt-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did you contact the Police about the predator?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="contacted_police" value="Yes"
                                             id="robloxNo_11">
@@ -635,9 +644,9 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to the Police?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="emails_to_police" value="Yes"
                                             id="robloxNo_13">
@@ -655,9 +664,9 @@ color: red;
 
                     <div class="md-3 row mt-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did the predator ask for photos or videos of the minor?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="asked_for_photos" value="Yes"
                                             id="robloxNo_15">
@@ -677,9 +686,9 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did the minor provide any photos or videos to the predator?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="minor_sent_photos" value="Yes"
                                             id="robloxNo_17">
@@ -697,9 +706,9 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did the predator distribute the minor's photos or videos to others?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="predator_distributed" value="Yes"
                                             id="robloxNo_19">
@@ -724,9 +733,9 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between position-relative">
                                 <label>Did the predator threaten the minor with public distribution of photos or videos?</label>
-                                <div class="d-flex gap-4 position-relative">
+                                <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="predator_threatened" value="Yes"
                                             id="robloxNo_22">
@@ -751,7 +760,7 @@ color: red;
                     
 
                     <span class="pt-4 row">
-                       <div class="col-12 d-flex justify-content-center">
+                       <div class="col-12 d-flex justify-content-center pb-3">
                             <button type="submit" class="btn btn-submit mt-3">Submit</button>
                         </div>
                         <!-- <div class="col-6">
@@ -932,8 +941,8 @@ $(document).ready(function () {
         radioFields.forEach(field => {
             const selected = $(`input[name="${field}"]:checked`);
             if (selected.length === 0) {
-                const container = $(`input[name="${field}"]`).last().closest('.form-check').parent();
-                container.append('<div class="text-danger rb-err-msg">Please select an option</div>');
+                const container = $(`input[name="${field}"]`).last().closest('.rb-group').parent();
+                container.append('<div class="text-danger rb-err-msg ">Please select an option</div>');
                 isValid = false;
             }
         });
