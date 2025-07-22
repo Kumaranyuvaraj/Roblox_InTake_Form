@@ -1,4 +1,5 @@
 import re
+from django.http import JsonResponse
 import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -215,3 +216,8 @@ class SubmitAnswerAPIView(APIView):
 
             return Response({"message": "Answer submitted."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_client_ip(request):
+    ip = request.META.get('HTTP_X_FORWARDED_FOR', '') or request.META.get('REMOTE_ADDR', '')
+    return JsonResponse({"ip": ip})

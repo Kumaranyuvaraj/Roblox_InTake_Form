@@ -3,7 +3,7 @@ from django.urls import path
 from roblex_app.views import IntakeFormAPIView, IntakeFormView,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
 QuestionListAPIView, SubmitAnswerAPIView,LandingPage,IndexPage
 
-from .views import validate_roblox_username
+from .views import validate_roblox_username,get_client_ip
 
 # from roblex_app.views import generate_pdf
 
@@ -19,4 +19,6 @@ urlpatterns = [
     path('api/user-details/', UserDetailCreateView.as_view(), name='user-details-create'),
     path('api/questions/', QuestionListAPIView.as_view(), name='question-list'),
     path('api/answers/submit/', SubmitAnswerAPIView.as_view(), name='submit-answer'),
+
+    path('get-ip', get_client_ip, name='get_client_ip'),
 ]

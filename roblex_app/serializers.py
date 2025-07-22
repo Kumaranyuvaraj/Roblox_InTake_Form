@@ -19,6 +19,9 @@ class IntakeFormSerializer(serializers.ModelSerializer):
     discovery_info = serializers.CharField(required=True)
     custody_other_detail = serializers.CharField(required=False, allow_blank=True)
 
+    first_contact = serializers.DateField(input_formats=["%m-%d-%Y"])
+    last_contact = serializers.DateField(input_formats=["%m-%d-%Y"])
+
     # Multiple checkbox (array) fields
     custody_type = serializers.ListField(child=serializers.CharField(), required=False)
     complained_to_roblox = serializers.ListField(child=serializers.CharField(), required=False)
@@ -39,12 +42,14 @@ class IntakeFormSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        # Validate contact dates
-        if data.get("first_contact") and data.get("last_contact"):
-            if data["first_contact"] > data["last_contact"]:
+    # Validate contact dates
+        first_contact = data.get("first_contact")
+        last_contact = data.get("last_contact")
+        if first_contact and last_contact:
+            if first_contact > last_contact:
                 raise serializers.ValidationError("First contact date cannot be after last contact date.")
-        
-        # Require at least one gamertag
+
+    # Require at least one gamertag
         if not any([
             data.get("roblox_gamertag"),
             data.get("discord_profile"),
@@ -52,8 +57,9 @@ class IntakeFormSerializer(serializers.ModelSerializer):
             data.get("ps_gamertag")
         ]):
             raise serializers.ValidationError("At least one gamertag or profile must be provided.")
-        
+
         return data
+
 
 
 class UserDetailSerializer(serializers.ModelSerializer):

@@ -450,9 +450,10 @@
                         <button class="btn px-5 mx-3" id="openModal" >
                             Yes
                         </button>
-                        <button class="btn px-5 mx-3" >
-                             <a href="{% url 'index-form-page' %}">No</a>
-                        </button>
+                        <a href="{% url 'index-form-page' %}" class="btn px-5 mx-3">No</a>
+
+
+
                     </div>
                 </div>
 
@@ -689,11 +690,11 @@ Another proposed lawsuit states that Roblox is “built on the exploitation of c
         return;
     }
 
-    const redirectUrl = "http://127.0.0.1:8000/intake-form/";
+    const redirectUrl = "intake-form/";
 
     // ✅ First submit user details
     $.ajax({
-        url: "http://127.0.0.1:8000/api/user-details/",
+        url: "/api/user-details/",
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify({
@@ -725,7 +726,7 @@ let questionsData = [];
 
 $(document).ready(function () {
     $.ajax({
-        url: "http://127.0.0.1:8000/api/questions/",
+        url: "/api/questions/",
         type: "GET",
         success: function (response) {
             questionsData = response;
@@ -768,7 +769,7 @@ $(document).ready(function () {
         if (!selectedOptionId || !questionId) return;
 
         const promise = $.ajax({
-            url: "http://127.0.0.1:8000/api/answers/submit/",
+            url: "/api/answers/submit/",
             type: "POST",
             contentType: "application/json",
             headers: {
