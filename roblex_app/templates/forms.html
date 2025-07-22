@@ -980,15 +980,15 @@ $(document).ready(function () {
 //     takeScreenshotPDF(); // Proceed to capture after IP is fetched
 //   });
 
-function takeScreenshotPDF() {
+    function takeScreenshotPDF(callback) {
     const form = document.querySelector("#intakeForm");
 
-    // ✅ Ensure all radio buttons are checked visually
     document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        if (radio.checked) radio.setAttribute("checked", "checked");
+        if (radio.checked) {
+            radio.setAttribute("checked", "checked");
+        }
     });
 
-    // ✅ Clone the form to avoid DOM changes
     const clonedForm = form.cloneNode(true);
     clonedForm.style.position = 'absolute';
     clonedForm.style.top = '0';
@@ -996,13 +996,12 @@ function takeScreenshotPDF() {
     clonedForm.style.width = '800px';
     clonedForm.style.zIndex = '-9999';
 
-    // ✅ Inject hidden IP and timestamp just for PDF
     const metaInfoDiv = document.createElement("div");
     metaInfoDiv.style.fontSize = "10px";
     metaInfoDiv.style.color = "#555";
     metaInfoDiv.style.marginTop = "20px";
     // metaInfoDiv.innerText = `Client IP: ${clientIP} | Submitted at (Local): ${localTimestamp}`;
-    // clonedForm.appendChild(metaInfoDiv);
+    clonedForm.appendChild(metaInfoDiv);
 
     document.body.appendChild(clonedForm);
 
@@ -1031,9 +1030,13 @@ function takeScreenshotPDF() {
         }
 
         pdf.save("roblox_intake_form_full.pdf");
-        clonedForm.remove(); // Clean up
+        clonedForm.remove();
+
+        // ✅ Call the callback (e.g. redirect)
+        if (typeof callback === "function") callback();
     });
 }
+
 
 
     $("#intakeForm").on("submit", function (e) {
@@ -1065,31 +1068,36 @@ function takeScreenshotPDF() {
         });
 
         $.ajax({
-            url: "/api/submit-validated-intake/",
-            type: "POST",
-            data: JSON.stringify(formData),
-            contentType: "application/json",
-            success: function () {
-            $("#responseMessage").html('<div class="alert alert-success">Form submitted successfully!</div>');
-            takeScreenshotPDF();
+        url: "/api/submit-validated-intake/",
+        type: "POST",
+        data: JSON.stringify(formData),
+        contentType: "application/json",
+        success: function () {
+            // $("#responseMessage").html('<div class="alert alert-success">Form submitted successfully!</div>');
 
-            setTimeout(() => {
-                document.getElementById("intakeForm").reset(); // reset form
-                $('#otherCustodyTextDiv').hide(); // hide conditional field
-                $(".text-danger").remove(); // clear validation messages
-                // $('#inputContainer').empty(); // remove added Roblox tag inputs
-                $('.robloxValidationStatus').html(''); // clear Roblox validation
-                // robloxValidationStatus = {}; // reset validation tracking
-            }, 1000);
+            // 🧠 First generate the PDF, then confirm + redirect
+            takeScreenshotPDF(() => {
+                setTimeout(() => {
+                    document.getElementById("intakeForm").reset(); // reset form
+                    $('#otherCustodyTextDiv').hide(); // hide conditional field
+                    $(".text-danger").remove(); // clear validation messages
+                    $('.robloxValidationStatus').html(''); // clear Roblox validation
+                }, 1000);
 
-            // window.location.href = "http://127.0.0.1:8000/"
-            },
+                // ✅ Ask for confirmation AFTER PDF generation
+                const userConfirmed = confirm("Do you want to go to the landing page now?");
+                if (userConfirmed) {
+                    window.location.href = "/";
+                }
+            });
+        },
 
-            error: function (xhr) {
-                console.error(xhr.responseJSON);
-                $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
-            }
-        });
+        error: function (xhr) {
+            console.error(xhr.responseJSON);
+            $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
+        }
+    });
+
     });
 
     $("#exportBtn").on("click", function () {
