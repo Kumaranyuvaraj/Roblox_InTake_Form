@@ -55,8 +55,9 @@
         background: #04c15f;
         font-size: 14px;
         font-weight: 600;
-        margin-top: 30px !important;
+        /* margin-top: 30px !important; */
         padding: 8px 24px;
+        
     }
 
     .btn-plus:hover {
@@ -64,7 +65,7 @@
         background: #ccc;
         font-size: 14px;
         font-weight: 600;
-        margin-top: 30px !important;
+        /* margin-top: 30px !important; */
         padding: 8px 24px;
     }
     .remove-btn{
@@ -235,11 +236,11 @@ color: red;
 
                     <label class="pt-4 pb-2"> Gamers Name </label>
                     <div class="row mb-3">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
                             <label class="form-check-label">First Name</label>
                             <input type="text" name="gamer_first_name" class="form-control" placeholder="Enter Gamers First Name" required>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12 col-md-6 mt-3 mt-md-0">
                             <label class="form-check-label">Last Name</label>
                             <input type="text" name="gamer_last_name" class="form-control" placeholder="Enter Gamers Last Name" required>
                         </div>
@@ -247,28 +248,28 @@ color: red;
 
                     <label class="pb-2"> Parent or Legal Guardian's Name </label>
                     <div class="row ">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
                             <label class="form-check-label">First Name</label>
                             <input type="text" name="guardian_first_name" class="form-control"  placeholder="Enter Parent First Name" required>
                         </div>
-                        <div class="col-6">
-                            <label class="form-check-label">Last Name</label>
+                        <div class="col-12 col-md-6">
+                            <label class="form-check-label mt-3 mt-md-0">Last Name</label>
                             <input type="text" name="guardian_last_name" class="form-control" placeholder="Enter Parent Last Name" required>
                         </div>
                         <div class="row mt-3">
                             <div class="col-12">
                                 <label class="pb-2">Do you have legal custody of the gamer (if gamer is a minor)</label><br>
                             </div>
-                            <div class="mb-3 row">
-                                <div class="col-6">
-                                    <div class="form-check">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="custody_type"
                                             value="married_parent" id="custody1">
                                         <label class="form-check-label" for="custody1">Biological parent, married</label>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="form-check">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="custody_type"
                                             value="divorced_parent" id="custody2">
                                         <label class="form-check-label" for="custody2">Biological parent, divorced with
@@ -276,16 +277,16 @@ color: red;
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3 row">
-                                <div class="col-6">
-                                    <div class="form-check">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="custody_type"
                                             value="adoptive_parent" id="custody3">
                                         <label class="form-check-label" for="custody3">Adoptive parent(s)</label>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="form-check">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="custody_type"
                                             value="legal_guardian" id="custody4">
                                         <label class="form-check-label" for="custody4">Legal Guardian with custody
@@ -293,17 +294,17 @@ color: red;
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3 row">
-                                <div class="col-6">
-                                    <div class="form-check">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="custody_type"
                                             value="no_custody" id="custody5">
                                         <label class="form-check-label" for="custody5">Do not have legal custody</label>
                                     </div>
                                 </div>
 
-                            <div class="col-6">
-                                    <div class="form-check">
+                            <div class="col-12 col-md-6">
+                                    <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="custody_type" value="other" id="custody6">
                                         <label class="form-check-label" for="custody6">Other</label>
                                     </div>
@@ -330,29 +331,31 @@ color: red;
 
 
                     <div class="row mt-2">
-                        <div class="col-6">
-                            <label class="position-relative">Roblox Gamertag 
-                                <span class="px-1">(Gamertag start with @ symbol)
-                                    <span class="info-icon"> 
-                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                                            width="16" height="16" viewBox="0 0 24 24">
-                                            <path
-                                                d="M 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 C 24 5.371094 18.628906 0 12 0 Z M 12 2 C 17.523438 2 22 6.476563 22 12 C 22 17.523438 17.523438 22 12 22 C 6.476563 22 2 17.523438 2 12 C 2 6.476563 6.476563 2 12 2 Z M 12 5.8125 C 11.816406 5.8125 11.664063 5.808594 11.5 5.84375 C 11.335938 5.878906 11.183594 5.96875 11.0625 6.0625 C 10.941406 6.15625 10.851563 6.285156 10.78125 6.4375 C 10.710938 6.589844 10.6875 6.769531 10.6875 7 C 10.6875 7.226563 10.710938 7.40625 10.78125 7.5625 C 10.851563 7.71875 10.941406 7.84375 11.0625 7.9375 C 11.183594 8.03125 11.335938 8.085938 11.5 8.125 C 11.664063 8.164063 11.816406 8.1875 12 8.1875 C 12.179688 8.1875 12.371094 8.164063 12.53125 8.125 C 12.691406 8.085938 12.816406 8.03125 12.9375 7.9375 C 13.058594 7.84375 13.148438 7.71875 13.21875 7.5625 C 13.289063 7.410156 13.34375 7.226563 13.34375 7 C 13.34375 6.769531 13.289063 6.589844 13.21875 6.4375 C 13.148438 6.285156 13.058594 6.15625 12.9375 6.0625 C 12.816406 5.96875 12.691406 5.878906 12.53125 5.84375 C 12.371094 5.808594 12.179688 5.8125 12 5.8125 Z M 10.78125 9.15625 L 10.78125 18.125 L 13.21875 18.125 L 13.21875 9.15625 Z">
-                                            </path>
-                                        </svg>
-                                    
-                                    </span>
-                                    <div class="modal-overlay">
-                                        <div class="modal-content">
-                                            <!-- <span class="close-btn">&times;</span> -->
-                                            <img src="{% static 'img/roblox_game_img.jpg' %}" alt="roblox_gamer image">
-                                            <!-- <img src="../../roblex_app/static/img/roblox_game_img.jpg" alt="roblox_gamer image" class="game-info-img"> -->
-                                            
-                                        </div>
-                                    </div>
-
+                        <div class="col-12">
+                        <label class="position-relative">Roblox Gamertag 
+                            <span class="px-1">(Gamertag start with @ symbol)
+                                <span class="info-icon"> 
+                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                        width="16" height="16" viewBox="0 0 24 24">
+                                        <path
+                                            d="M 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 C 24 5.371094 18.628906 0 12 0 Z M 12 2 C 17.523438 2 22 6.476563 22 12 C 22 17.523438 17.523438 22 12 22 C 6.476563 22 2 17.523438 2 12 C 2 6.476563 6.476563 2 12 2 Z M 12 5.8125 C 11.816406 5.8125 11.664063 5.808594 11.5 5.84375 C 11.335938 5.878906 11.183594 5.96875 11.0625 6.0625 C 10.941406 6.15625 10.851563 6.285156 10.78125 6.4375 C 10.710938 6.589844 10.6875 6.769531 10.6875 7 C 10.6875 7.226563 10.710938 7.40625 10.78125 7.5625 C 10.851563 7.71875 10.941406 7.84375 11.0625 7.9375 C 11.183594 8.03125 11.335938 8.085938 11.5 8.125 C 11.664063 8.164063 11.816406 8.1875 12 8.1875 C 12.179688 8.1875 12.371094 8.164063 12.53125 8.125 C 12.691406 8.085938 12.816406 8.03125 12.9375 7.9375 C 13.058594 7.84375 13.148438 7.71875 13.21875 7.5625 C 13.289063 7.410156 13.34375 7.226563 13.34375 7 C 13.34375 6.769531 13.289063 6.589844 13.21875 6.4375 C 13.148438 6.285156 13.058594 6.15625 12.9375 6.0625 C 12.816406 5.96875 12.691406 5.878906 12.53125 5.84375 C 12.371094 5.808594 12.179688 5.8125 12 5.8125 Z M 10.78125 9.15625 L 10.78125 18.125 L 13.21875 18.125 L 13.21875 9.15625 Z">
+                                        </path>
+                                    </svg>
+                                
                                 </span>
-                            </label>
+                                <div class="modal-overlay">
+                                    <div class="modal-content">
+                                        <!-- <span class="close-btn">&times;</span> -->
+                                        <img src="{% static 'img/roblox_game_img.jpg' %}" alt="roblox_gamer image">
+                                        <!-- <img src="../../roblex_app/static/img/roblox_game_img.jpg" alt="roblox_gamer image" class="game-info-img"> -->
+                                        
+                                    </div>
+                                </div>
+
+                            </span>
+                        </label>
+                        </div>
+                        <div class="col-9 col-md-6">
                             <input type="text" name="roblox_gamertag" class="form-control roblox-gamertag" placeholder="Enter Roblox Gamertag">
                             <div class="robloxValidationStatus"></div>
 
@@ -361,26 +364,26 @@ color: red;
                         </div>
 
 
-                        <div class=" col-3">
-                            <button type="button" class="btn btn-plus mt-4" onclick="addInputField()" title="Add another Tag">Add another Tag</button>
+                        <div class=" col-3 col-md-3">
+                            <button type="button" class="btn btn-plus text-nowrap" onclick="addInputField()" title="Add another Tag">Add another Tag</button>
                         </div>
+                        
                         <div class="row">
 
-                            <div id="inputContainer"  class="col-8"></div>
+                            <div id="inputContainer"  class="col-12 col-md-8"></div>
 
 
                         </div>
-
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6"> 
                             <label>Discord Profile Name</label>
                             <input type="text" name="discord_profile" class="form-control" placeholder="Enter Discord Profile Name">
                         </div>
                           </div>
                           <div class="row mt-3">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
 
                             <label>Xbox Gamertag (if applicable)
                                 <button type="button" class="btn btn-ico" data-toggle="tooltip" data-placement="bottom"
@@ -404,7 +407,7 @@ color: red;
 
                     </div>
                     <div class="row mt-2">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
                             <label>PlayStation Gamertag (if applicable)</label>
                             <input type="text" name="ps_gamertag" class="form-control" placeholder="Enter PlayStation Gamertag">
                         </div>
