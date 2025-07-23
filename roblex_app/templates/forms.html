@@ -4,6 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Intake Form</title>
 
     <!-- html2canvas must come first -->
@@ -43,6 +44,13 @@
     .input-group {
         flex-wrap: nowrap !important;
     }
+
+    .input-group .text-danger {
+        position: absolute;
+        top: 0px;
+        left: 0;
+        z-index: 1;
+    }
     .input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
     margin-left: calc(var(--bs-border-width) * -2);
     }
@@ -51,11 +59,15 @@
         font-weight: 600;
     }
 
+    .btn{
+    text-wrap: nowrap;
+}
+
     .btn-plus {
         background: #04c15f;
         font-size: 14px;
         font-weight: 600;
-        margin-top: 30px !important;
+        /* margin-top: 30px !important; */
         padding: 8px 24px;
     }
 
@@ -64,7 +76,7 @@
         background: #ccc;
         font-size: 14px;
         font-weight: 600;
-        margin-top: 30px !important;
+        /* margin-top: 30px !important; */
         padding: 8px 24px;
     }
     .remove-btn{
@@ -112,7 +124,7 @@
         }
 
         /* Modal styling */
-        .modal-overlay {
+        .modal-overlay-image {
             display: none;
             position: fixed;
             top: 16%;
@@ -125,7 +137,7 @@
             align-items: center;
         }
 
-        .modal-content {
+        .modal-content-image {
             max-width: 80%;
             max-height: 80%;
             position: relative;
@@ -148,8 +160,8 @@
         }
 
         /* Show modal on hover */
-        .info-icon:hover + .modal-overlay,
-        .modal-overlay:hover {
+        .info-icon:hover + .modal-overlay-image,
+        .modal-overlay-image:hover {
             display: flex;
         }
         .Heading-color{
@@ -196,11 +208,52 @@ color: red;
 }
 
 .rb-err-msg{
+    position: unset;
+    
+}
+
+.text-danger {
+    font-size: 14px;
+}
+.modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center; align-items: center;
+}
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    text-align: center;
+}
+.close-btn {
+    margin-top: 15px;
+    background-color: #495057;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.tick-icon {
+    display: block;
+    margin: 0 auto;
+    width: 60px;
+    height: auto;
+}
+
+@media (min-width: 768px) {
+ .rb-err-msg{
     position: absolute;
     /* left: -713px; */
     top: 16px;
+    }
 }
-
 
 
 </style>
@@ -235,11 +288,11 @@ color: red;
 
                     <label class="pt-4 pb-2"> Gamers Name </label>
                     <div class="row mb-3">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
                             <label class="form-check-label">First Name</label>
                             <input type="text" name="gamer_first_name" class="form-control" placeholder="Enter Gamers First Name" required>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
                             <label class="form-check-label">Last Name</label>
                             <input type="text" name="gamer_last_name" class="form-control" placeholder="Enter Gamers Last Name" required>
                         </div>
@@ -247,11 +300,11 @@ color: red;
 
                     <label class="pb-2"> Parent or Legal Guardian's Name </label>
                     <div class="row ">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
                             <label class="form-check-label">First Name</label>
                             <input type="text" name="guardian_first_name" class="form-control"  placeholder="Enter Parent First Name" required>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
                             <label class="form-check-label">Last Name</label>
                             <input type="text" name="guardian_last_name" class="form-control" placeholder="Enter Parent Last Name" required>
                         </div>
@@ -330,39 +383,40 @@ color: red;
 
 
                     <div class="row mt-2">
-                        <div class="col-6">
-                            <label class="position-relative">Roblox Gamertag 
-                                <span class="px-1">(Gamertag start with @ symbol)
-                                    <span class="info-icon"> 
-                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                                            width="16" height="16" viewBox="0 0 24 24">
-                                            <path
-                                                d="M 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 C 24 5.371094 18.628906 0 12 0 Z M 12 2 C 17.523438 2 22 6.476563 22 12 C 22 17.523438 17.523438 22 12 22 C 6.476563 22 2 17.523438 2 12 C 2 6.476563 6.476563 2 12 2 Z M 12 5.8125 C 11.816406 5.8125 11.664063 5.808594 11.5 5.84375 C 11.335938 5.878906 11.183594 5.96875 11.0625 6.0625 C 10.941406 6.15625 10.851563 6.285156 10.78125 6.4375 C 10.710938 6.589844 10.6875 6.769531 10.6875 7 C 10.6875 7.226563 10.710938 7.40625 10.78125 7.5625 C 10.851563 7.71875 10.941406 7.84375 11.0625 7.9375 C 11.183594 8.03125 11.335938 8.085938 11.5 8.125 C 11.664063 8.164063 11.816406 8.1875 12 8.1875 C 12.179688 8.1875 12.371094 8.164063 12.53125 8.125 C 12.691406 8.085938 12.816406 8.03125 12.9375 7.9375 C 13.058594 7.84375 13.148438 7.71875 13.21875 7.5625 C 13.289063 7.410156 13.34375 7.226563 13.34375 7 C 13.34375 6.769531 13.289063 6.589844 13.21875 6.4375 C 13.148438 6.285156 13.058594 6.15625 12.9375 6.0625 C 12.816406 5.96875 12.691406 5.878906 12.53125 5.84375 C 12.371094 5.808594 12.179688 5.8125 12 5.8125 Z M 10.78125 9.15625 L 10.78125 18.125 L 13.21875 18.125 L 13.21875 9.15625 Z">
-                                            </path>
-                                        </svg>
-                                    
-                                    </span>
-                                    <div class="modal-overlay">
-                                        <div class="modal-content">
-                                            <!-- <span class="close-btn">&times;</span> -->
-                                            <img src="{% static 'img/roblox_game_img.jpg' %}" alt="roblox_gamer image">
-                                            <!-- <img src="../../roblex_app/static/img/roblox_game_img.jpg" alt="roblox_gamer image" class="game-info-img"> -->
-                                            
-                                        </div>
-                                    </div>
-
+                        <label class="position-relative">Roblox Gamertag 
+                            <span class="px-1">(Gamertag start with @ symbol)
+                                <span class="info-icon"> 
+                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                        width="16" height="16" viewBox="0 0 24 24">
+                                        <path
+                                            d="M 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 C 24 5.371094 18.628906 0 12 0 Z M 12 2 C 17.523438 2 22 6.476563 22 12 C 22 17.523438 17.523438 22 12 22 C 6.476563 22 2 17.523438 2 12 C 2 6.476563 6.476563 2 12 2 Z M 12 5.8125 C 11.816406 5.8125 11.664063 5.808594 11.5 5.84375 C 11.335938 5.878906 11.183594 5.96875 11.0625 6.0625 C 10.941406 6.15625 10.851563 6.285156 10.78125 6.4375 C 10.710938 6.589844 10.6875 6.769531 10.6875 7 C 10.6875 7.226563 10.710938 7.40625 10.78125 7.5625 C 10.851563 7.71875 10.941406 7.84375 11.0625 7.9375 C 11.183594 8.03125 11.335938 8.085938 11.5 8.125 C 11.664063 8.164063 11.816406 8.1875 12 8.1875 C 12.179688 8.1875 12.371094 8.164063 12.53125 8.125 C 12.691406 8.085938 12.816406 8.03125 12.9375 7.9375 C 13.058594 7.84375 13.148438 7.71875 13.21875 7.5625 C 13.289063 7.410156 13.34375 7.226563 13.34375 7 C 13.34375 6.769531 13.289063 6.589844 13.21875 6.4375 C 13.148438 6.285156 13.058594 6.15625 12.9375 6.0625 C 12.816406 5.96875 12.691406 5.878906 12.53125 5.84375 C 12.371094 5.808594 12.179688 5.8125 12 5.8125 Z M 10.78125 9.15625 L 10.78125 18.125 L 13.21875 18.125 L 13.21875 9.15625 Z">
+                                        </path>
+                                    </svg>
+                                
                                 </span>
-                            </label>
+                                <div class="modal-overlay-image">
+                                    <div class="modal-content-image">
+                                        <!-- <span class="close-btn">&times;</span> -->
+                                        <img src="{% static 'img/roblox_game_img.jpg' %}" alt="roblox_gamer image">
+                                        <!-- <img src="../../roblex_app/static/img/roblox_game_img.jpg" alt="roblox_gamer image" class="game-info-img"> -->
+                                        
+                                    </div>
+                                </div>
+
+                            </span>
+                        </label>
+
+
+
+
+                        <div class="col-6">
                             <input type="text" name="roblox_gamertag" class="form-control roblox-gamertag" placeholder="Enter Roblox Gamertag">
                             <div class="robloxValidationStatus"></div>
-
-
-
                         </div>
 
 
                         <div class=" col-3">
-                            <button type="button" class="btn btn-plus mt-4" onclick="addInputField()" title="Add another Tag">Add another Tag</button>
+                            <button type="button" class="btn btn-plus" onclick="addInputField()" title="Add another Tag">Add another Tag</button>
                         </div>
                         <div class="row">
 
@@ -373,14 +427,14 @@ color: red;
 
                     </div>
 
-                    <div class="row mt-3">
+                    <div class="row mt-4">
                         <div class="col-6">
                             <label>Discord Profile Name (if applicable)</label>
                             <input type="text" name="discord_profile" class="form-control" placeholder="Enter Discord Profile Name">
                         </div>
                           </div>
                           <div class="row mt-3">
-                        <div class="col-6">
+                          <div class="col-12 col-md-6">
 
                             <label>Xbox Gamertag (if applicable)
                                 <button type="button" class="btn btn-ico" data-toggle="tooltip" data-placement="bottom"
@@ -398,17 +452,13 @@ color: red;
                         </div>
                         </div>
 
-                  
-
                     <div class="row mt-2">
-
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
                             <label>PlayStation Gamertag (if applicable)</label>
                             <input type="text" name="ps_gamertag" class="form-control" placeholder="Enter PlayStation Gamertag">
                         </div>
                     </div>
+                
 
 
 
@@ -418,7 +468,7 @@ color: red;
                                 role playing in
                                 Roblox, etc) including methods of communication.How did the predator groom the
                                 minor?</label>
-                            <textarea name="description_predators" class="form-control" rows="2" required placeholder="Enter Brief Description of Sexual Predator's"></textarea>
+                            <textarea name="description_predators" class="form-control" rows="2" placeholder="Enter Brief Description of Sexual Predator's"></textarea>
                         </div>
                     </div>
                     <div class="mb-3 row">
@@ -492,13 +542,13 @@ color: red;
                                 describe how you discovered the predator's conduct (did the minor child tell you, you found
                                 evidence, etc.).
                             </label>
-                            <textarea name="discovery_info" class="form-control" required placeholder=" parents/guardians-Describe app roximate date you discovered the predator's conduct"></textarea>
+                            <textarea name="discovery_info" class="form-control" placeholder=" parents/guardians-Describe app roximate date you discovered the predator's conduct"></textarea>
                         </div>
                     </div>
 
                     <div class="row mb-3 pt-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did you complain about the predator to Roblox?</label>
                                 <div class="d-flex gap-4 position-relative  rb-group">
                                     <div class="form-check">
@@ -523,7 +573,7 @@ color: red;
 
                     <div class="row mb-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to Roblox?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -543,7 +593,7 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did you complain to Apple about the predator?</label>
                                  <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -563,7 +613,7 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to Apple?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -583,7 +633,7 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did you complain to any credit card company about the predator?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -603,7 +653,7 @@ color: red;
 
                     <div class="mb-3 row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to your credit card company?</label>
                                  <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -623,7 +673,7 @@ color: red;
 
                     <div class="md-3 row mt-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did you contact the Police about the predator?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -644,7 +694,7 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Do you have emails or call logs to document the Complaint to the Police?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -664,7 +714,7 @@ color: red;
 
                     <div class="md-3 row mt-3">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did the predator ask for photos or videos of the minor?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -686,7 +736,7 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did the minor provide any photos or videos to the predator?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -706,7 +756,7 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did the predator distribute the minor's photos or videos to others?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -733,7 +783,7 @@ color: red;
 
                     <div class="md-3 row mt-2">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between position-relative">
+                            <div class="d-md-flex justify-content-between position-relative">
                                 <label>Did the predator threaten the minor with public distribution of photos or videos?</label>
                                 <div class="d-flex gap-4 position-relative rb-group">
                                     <div class="form-check">
@@ -759,18 +809,20 @@ color: red;
 
                     
 
-                    <span class="pt-4 row">
-                       <div class="col-12 d-flex justify-content-center pb-3">
-                            <button type="submit" class="btn btn-submit mt-3">Submit</button>
+                       
+                        <div class="col-12 d-flex justify-content-center pb-3">
+                            <form id="myForm">
+                                <button type="submit" class="btn btn-submit mt-3">Submit</button>
+                            </form> 
                         </div>
                         <!-- <div class="col-6">
                     <button type="button" id="exportBtn" class="btn btn-success mt-3">Export to PDF</button>
                     </div> -->
-                    </span>
+                    
 
                     <div id="responseMessage" class="mt-3"></div>
                   </div>
-                </form>
+               
             <!-- <div class="col-2"></div> -->
 <!-- 
         </div> -->
@@ -779,6 +831,8 @@ color: red;
 
  
  <script>
+
+    
 
     
 $(document).ready(function () {
@@ -795,14 +849,13 @@ $(document).ready(function () {
     const textFields = [
         "gamer_first_name", "gamer_last_name",
         "guardian_first_name", "guardian_last_name",
-        "roblox_gamertag", "discord_profile",
-        "xbox_gamertag", "ps_gamertag",
+        "roblox_gamertag", 
         "custody_other_detail"
     ];
     const textareaFields = [
-        "description_predators", "description_medical_psychological",
+        "description_medical_psychological",
         "description_economic_loss", "cc_names", "police_details",
-        "other_complaints", "in_person_meeting", "additional_info", "discovery_info"
+        "other_complaints", "in_person_meeting", "additional_info"
     ];
     const radioFields = [
         "custody_type", "complained_to_roblox", "emails_to_roblox",
@@ -811,6 +864,8 @@ $(document).ready(function () {
         "asked_for_photos", "minor_sent_photos", "predator_distributed",
         "predator_threatened"
     ];
+
+   
 
     let robloxValidationStatus = {};
 
@@ -869,22 +924,22 @@ $(document).ready(function () {
         $(".text-danger").remove();
 
         // ✅ Date fields
-        // dateFields.forEach(field => {
-        //     const input = $(`input[name="${field}"]`);
-        //     const value = input.val();
-        //     if (!value) {
-        //         isValid = false;
-        //         input.after('<div class="text-danger">This field is required</div>');
-        //     } else {
-        //         const selectedDate = new Date(value + "T00:00:00");
-        //         const today = new Date();
-        //         today.setHours(0, 0, 0, 0);
-        //         if (selectedDate > today) {
-        //             isValid = false;
-        //             input.after('<div class="text-danger">Future dates are not allowed</div>');
-        //         }
-        //     }
-        // });
+        dateFields.forEach(field => {
+            const input = $(`input[name="${field}"]`);
+            const value = input.val();
+            if (!value) {
+                isValid = false;
+                input.after('<div class="text-danger">This field is required</div>');
+            } else {
+                const selectedDate = new Date(value + "T00:00:00");
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (selectedDate > today) {
+                    isValid = false;
+                    input.after('<div class="text-danger">Future dates are not allowed</div>');
+                }
+            }
+        });
 
        // Initialize Flatpickr with MM-DD-YYYY format
         flatpickr("#first_contact", {
@@ -950,7 +1005,7 @@ $(document).ready(function () {
         if ($('#custody6').is(':checked')) {
             const otherText = $(`input[name="custody_other_detail"]`);
             if (!otherText.val().trim()) {
-                otherText.after('<div class="text-danger">Please specify</div>');
+                // otherText.after('<div class="text-danger">Please specify</div>');
                 isValid = false;
             }
         }
@@ -968,60 +1023,79 @@ $(document).ready(function () {
         return radioData;
     }
 
-//     let clientIP = '';
-// let localTimestamp = '';
+    let clientIP = '';
+    let localTimestamp = '';
 
-// // Fetch IP and timestamp before capturing
-// fetch('/get-ip')
-//   .then(res => res.json())
-//   .then(data => {
-//     clientIP = data.ip;
-//     localTimestamp = new Date().toLocaleString(); // e.g., "07/22/2025, 3:45:10 PM"
-//     takeScreenshotPDF(); // Proceed to capture after IP is fetched
-//   });
+    function fetchIPAndTimestamp(callback) {
+        fetch('/get-ip')
+            .then(res => res.json())
+            .then(data => {
+            clientIP = data.ip;
+            localTimestamp = new Date().toISOString();   // Local time
+                if (typeof callback === "function") callback();
+            })
+            .catch(() => {
+                clientIP = "Unavailable";
+                localTimestamp = new Date().toLocaleString();
+                if (typeof callback === "function") callback();
+            });
+    }
+
 
     function takeScreenshotPDF(callback) {
     const form = document.querySelector("#intakeForm");
 
+    // ✅ Preserve radio button states
     document.querySelectorAll('input[type="radio"]').forEach(radio => {
         if (radio.checked) {
             radio.setAttribute("checked", "checked");
         }
     });
 
+    // ✅ Clone form to avoid affecting live form
     const clonedForm = form.cloneNode(true);
-    clonedForm.style.position = 'absolute';
+    clonedForm.style.position = 'fixed';
     clonedForm.style.top = '0';
     clonedForm.style.left = '0';
     clonedForm.style.width = '800px';
     clonedForm.style.zIndex = '-9999';
+    clonedForm.style.backgroundColor = 'white';
 
+    // ✅ Add hidden IP + timestamp info (will appear in PDF only)
     const metaInfoDiv = document.createElement("div");
     metaInfoDiv.style.fontSize = "10px";
-    metaInfoDiv.style.color = "#555";
-    metaInfoDiv.style.marginTop = "20px";
-    // metaInfoDiv.innerText = `Client IP: ${clientIP} | Submitted at (Local): ${localTimestamp}`;
+    metaInfoDiv.style.color = "#333";
+    metaInfoDiv.style.marginTop = "10px";
+    metaInfoDiv.innerText = `Client IP: ${clientIP}`;
     clonedForm.appendChild(metaInfoDiv);
+
+    const metaInfoDiv_1= document.createElement("div");
+    metaInfoDiv_1.style.fontSize = "10px";
+    metaInfoDiv_1.style.color = "#333";
+    metaInfoDiv_1.style.marginTop = "10px";
+    metaInfoDiv_1.innerText = `Submitted at: ${localTimestamp}`;
+    clonedForm.appendChild(metaInfoDiv_1);
 
     document.body.appendChild(clonedForm);
 
     html2canvas(clonedForm, {
         scale: 2,
-        scrollY: -window.scrollY,
+        scrollY: 0,
+        scrollX: 0,
         useCORS: true,
-        windowWidth: document.body.scrollWidth,
-        windowHeight: document.body.scrollHeight
+        backgroundColor: "#fff",
+        windowWidth: clonedForm.scrollWidth,
+        windowHeight: clonedForm.scrollHeight
     }).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
 
-        const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
         let position = 0;
-        const pageHeight = pdf.internal.pageSize.height;
+        const pageHeight = pdf.internal.pageSize.getHeight();
 
         while (position < pdfHeight) {
             pdf.addImage(imgData, 'PNG', 0, -position, pdfWidth, pdfHeight);
@@ -1030,10 +1104,17 @@ $(document).ready(function () {
         }
 
         pdf.save("roblox_intake_form_full.pdf");
+
+        const pdfData = pdf.output('datauristring'); // ✅ Base64 PDF data
         clonedForm.remove();
 
-        // ✅ Call the callback (e.g. redirect)
-        if (typeof callback === "function") callback();
+        if (typeof callback === "function") {
+            callback(pdfData);  // ✅ Send base64 to callback
+        }
+    }).catch(err => {
+        console.error("PDF generation error:", err);
+        alert("Something went wrong while generating the PDF.");
+        if (typeof callback === "function") callback(null);
     });
 }
 
@@ -1067,36 +1148,40 @@ $(document).ready(function () {
             }
         });
 
-        $.ajax({
-        url: "/api/submit-validated-intake/",
-        type: "POST",
-        data: JSON.stringify(formData),
-        contentType: "application/json",
-        success: function () {
-            // $("#responseMessage").html('<div class="alert alert-success">Form submitted successfully!</div>');
 
-            // 🧠 First generate the PDF, then confirm + redirect
-            takeScreenshotPDF(() => {
+        fetchIPAndTimestamp(() => {
+        takeScreenshotPDF((pdfData) => {
+        $.ajax({
+            url: "/api/submit-validated-intake/",
+            type: "POST",
+            data: JSON.stringify({
+                ...formData,
+                client_ip: clientIP,
+                submitted_at: localTimestamp,
+                pdf_data: pdfData
+            }),
+            contentType: "application/json",
+            success: function () {
                 setTimeout(() => {
-                    document.getElementById("intakeForm").reset(); // reset form
-                    $('#otherCustodyTextDiv').hide(); // hide conditional field
-                    $(".text-danger").remove(); // clear validation messages
-                    $('.robloxValidationStatus').html(''); // clear Roblox validation
+                    document.getElementById("intakeForm").reset();
+                    $('#otherCustodyTextDiv').hide();
+                    $(".text-danger").remove();
+                    $('.robloxValidationStatus').html('');
                 }, 1000);
 
-                // ✅ Ask for confirmation AFTER PDF generation
-                const userConfirmed = confirm("Do you want to go to the landing page now?");
-                if (userConfirmed) {
+                const confirmed = confirm("Do you want to go to the landing page?");
+                if (confirmed) {
                     window.location.href = "/";
                 }
-            });
-        },
-
-        error: function (xhr) {
-            console.error(xhr.responseJSON);
-            $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
-        }
+            },
+            error: function (xhr) {
+                console.error(xhr.responseJSON);
+                $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
+            }
+        });
     });
+});
+
 
     });
 

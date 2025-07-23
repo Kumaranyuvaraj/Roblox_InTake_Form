@@ -1,3 +1,4 @@
+import json
 import re
 from django.http import JsonResponse
 import requests
@@ -9,6 +10,10 @@ from roblex_app.serializers import IntakeFormSerializer, UserDetailSerializer,Qu
 from django.shortcuts import render,redirect
 
 from rest_framework.decorators import api_view
+
+import base64
+from django.core.files.base import ContentFile
+from django.utils import timezone
 
 # from django.http import Http404, HttpResponse
 # from django.template.loader import render_to_string
@@ -139,19 +144,16 @@ def validate_roblox_username(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 class SubmitIntakeIfValidAPIView(APIView):
     def post(self, request):
-        serializer = IntakeFormSerializer(data=request.data)
-        if serializer.is_valid():
-            raw_roblox_name = serializer.validated_data.get("roblox_gamertag")
+        data = request.data 
 
-            # Remove leading non-letter characters (@, _, digits)
+        serializer = IntakeFormSerializer(data=data)
+        if serializer.is_valid():
+            raw_roblox_name = serializer.validated_data.get("roblox_gamertag", "")
             usernames = [re.sub(r'^[^A-Za-z]+', '', name.strip()) for name in raw_roblox_name.split(",") if name.strip()]
-            print(usernames)
 
             try:
-                # Validate each username using the Roblox API
                 for username in usernames:
                     roblox_response = requests.post(
                         "https://users.roblox.com/v1/usernames/users",
@@ -160,28 +162,45 @@ class SubmitIntakeIfValidAPIView(APIView):
                         timeout=5
                     )
                     roblox_data = roblox_response.json()
-
-                    # If Roblox returns no data for username, it's invalid
                     if "data" not in roblox_data or not roblox_data["data"]:
                         return Response(
                             {"error": f"Invalid Roblox username: {username}. Cannot save."},
                             status=status.HTTP_400_BAD_REQUEST
                         )
-
             except Exception as e:
                 return Response(
                     {"error": f"Roblox validation failed: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            # Save the intake form only if all usernames are valid
             intake_instance = serializer.save()
+
+            # Handle additional fields
+            client_ip = data.get("client_ip")
+            submitted_at = data.get("submitted_at") or timezone.now()
+            pdf_data = data.get("pdf_data")
+
+            intake_instance.client_ip = client_ip
+            intake_instance.submitted_at = submitted_at
+
+            if pdf_data:
+                try:
+                    format, pdfstr = pdf_data.split(';base64,')
+                    file_content = ContentFile(base64.b64decode(pdfstr), name='intake.pdf')
+                    intake_instance.pdf_file = file_content
+                except Exception as e:
+                    return Response({"error": f"Failed to decode PDF: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+            intake_instance.save()
+
             return Response({
                 "message": "Form submitted successfully.",
                 "data": IntakeFormSerializer(intake_instance).data
             }, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 

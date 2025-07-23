@@ -124,7 +124,12 @@ class IntakeForm(models.Model):
     in_person_meeting = models.TextField(max_length=200,null=True,blank=False)
     additional_info = models.TextField(max_length=200,null=True,blank=False)
     discovery_info = models.TextField(max_length=200,null=True,blank=False)
+
+    client_ip = models.GenericIPAddressField(null=True, blank=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    pdf_file = models.FileField(upload_to='pdfs/', null=True, blank=True)  
     created_at = models.DateTimeField(auto_now_add=True)
+    
 
     class Meta:
         db_table = "intake_form"

@@ -8,7 +8,7 @@ class IntakeFormSerializer(serializers.ModelSerializer):
     guardian_first_name = serializers.CharField(required=True)
     guardian_last_name = serializers.CharField(required=True)
     # question = serializers.CharField(required=True)
-    description_predators = serializers.CharField(required=True)
+    description_predators = serializers.CharField(required=False, allow_blank=True)
     description_medical_psychological = serializers.CharField(required=True)
     description_economic_loss = serializers.CharField(required=True)
     cc_names = serializers.CharField(required=True)
@@ -16,7 +16,7 @@ class IntakeFormSerializer(serializers.ModelSerializer):
     other_complaints = serializers.CharField(required=True)
     in_person_meeting = serializers.CharField(required=True)
     additional_info = serializers.CharField(required=True)
-    discovery_info = serializers.CharField(required=True)
+    discovery_info = serializers.CharField(required=False, allow_blank=True)
     custody_other_detail = serializers.CharField(required=False, allow_blank=True)
 
     first_contact = serializers.DateField(input_formats=["%m-%d-%Y"])
