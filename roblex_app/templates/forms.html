@@ -1105,7 +1105,7 @@ $(document).ready(function () {
 
         pdf.save("roblox_intake_form_full.pdf");
 
-        const pdfData = pdf.output('datauristring'); // ✅ Base64 PDF data
+        const pdfData = pdf.output('dataurlstring'); // ✅ Base64 PDF data
         clonedForm.remove();
 
         if (typeof callback === "function") {
