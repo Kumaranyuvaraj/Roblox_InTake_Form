@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   web:
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python -m debugpy --listen 0.0.0.0:5678 --wait-for-client manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
       - static_volume:/app/static
