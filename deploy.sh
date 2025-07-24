@@ -12,7 +12,7 @@ sleep 5
 sudo docker compose exec web python manage.py migrate
 
 echo "Django application is now running!"
-echo "You can access it at: http://3.147.221.152"
+echo "You can access it at: roblox.nextkeylitigation.com"
 echo ""
 echo "To stop the application, run: docker compose down"
 echo "To view logs, run: docker compose logs -f"
