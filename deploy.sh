@@ -7,7 +7,7 @@ sudo docker compose -f docker-compose.yml up --build -d
 sudo docker compose exec web python manage.py collectstatic --noinput
 
 echo "Waiting for database to be ready..."
-sleep 10
+sleep 5
 
 sudo docker compose exec web python manage.py migrate
 

@@ -5,8 +5,8 @@ services:
     build: .
     expose:
       - "8000"
-    environment:
-      - DEBUG=1
+    env_file:
+      - .env
     depends_on:
       - db
     volumes:
@@ -22,13 +22,15 @@ services:
       - static_volume:/app/static
     depends_on:
       - web
+    environment:
+      - NGINX_SERVER_NAME=${NGINX_SERVER_NAME}
 
   db:
     image: postgres:13
     environment:
-      POSTGRES_DB: roblox
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2024
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:

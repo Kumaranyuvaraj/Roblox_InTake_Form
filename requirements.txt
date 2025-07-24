@@ -30,3 +30,4 @@ weasyprint==65.1
 webencodings==0.5.1
 zopfli==0.2.3.post1
 requests==2.31.0
+python-decouple==3.8
