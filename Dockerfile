@@ -10,6 +10,17 @@ RUN apt-get update \
         postgresql-client \
         build-essential \
         libpq-dev \
+        libcairo2-dev \
+        libpango-1.0-0 \
+        libpangocairo-1.0-0 \
+        libgdk-pixbuf2.0-0 \
+        libffi-dev \
+        libxml2-dev \
+        libxslt-dev \
+        libglib2.0-0 \
+        libgobject-2.0-0 \
+        libjpeg-dev \
+        zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/
