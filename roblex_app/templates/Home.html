@@ -6,13 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Intake Form</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="../static/css/style.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
+   
 
     <body>
           <!-- <nav class="navbar">
@@ -27,10 +33,11 @@
         </div>
     </nav> -->
 
-<section class="hero">
+    <section class="hero">
       
         <a href="" class="logo  d-flex justify-content-left">
-            <img src="{% static 'img/theme.svg' %}" alt="Logo" style="width: 260px; height: auto;">
+            <img src="{% static 'img/theme.svg' %}" alt="Logo">
+            <!-- <img src="../static/img/theme.svg" alt="Logo" > -->
         </a>
         <div class="hero-content">
               
@@ -46,34 +53,39 @@
                     <div class="step-icon">
                         <img src="{% static 'img/icon-prequalify.svg' %}" alt="Prequalify">
                     </div>
-                    <small class="pt-2 pb-1">Step 1</small>
-                    <h4>Prequalify</h4>
-                    <p>Briefly explain what happened during the troubling Roblox encounter.</p>
+                    <div>
+                        <small class="pt-2 pb-1">Step 1</small>
+                        <h4>Prequalify</h4>
+                        <p>Briefly explain what happened during the troubling Roblox encounter.</p>
+                    </div>
                 </div>
                 <div class="steps">
                     <div class="step-icon">
-                        <img src="../static/img/icon-retainer.svg" alt="Prequalify">
+                        <img src="{% static 'img/icon-retainer.svg' %}" alt="Prequalify">
                     </div>
-                    <small class="pt-2 pb-1">Step 2</small>
-                    <h4>Retainer</h4>
-                    <p>We’ll provide a simple agreement so we can move forward.</p>
+                    <div>
+                        <small class="pt-2 pb-1">Step 2</small>
+                        <h4>Retainer</h4>
+                        <p>We’ll provide a simple agreement so we can move forward.</p>
+                    </div>
                 </div>
                 <div class="steps">
                     <div class="step-icon">
-                        <img src="../static/img/icon-intake.svg" alt="Prequalify">
+                        <img src="{% static 'img/icon-intake.svg' %}" alt="Prequalify">
                     </div>
-                    <small class="pt-2 pb-1">Step 3</small>
-                    <h4>Intake</h4>
-                    <p>Complete a quick intake form to understand how we can best help.</p>
+                    <div>
+                        <small class="pt-2 pb-1">Step 3</small>
+                        <h4>Intake</h4>
+                        <p>Complete a quick intake form to understand how we can best help.</p>
+                    </div>
                 </div>
                 
             </div>
-            <div class="row mt-4">
+            <div class="row mt-4" id="fixBtnRow">
                 <div class=" d-flex justify-content-center">
                     <!-- <button class="btn px-5 mx-3" id="openModal" >Yes</button> -->
-                    <button class="home-btn" id="openModal" >Yes, I need help</button>
-                    <!-- <a href="{% url 'index-form-page' %}" class="btn px-5 mx-3">No</a> -->
-                    <a href="{% url 'index-form-page' %}" class="home-btn">No, all good</a>
+                    <button class="home-btn" id="openModal" >Check Prequalification</button>
+                    <!-- <a href="{% url 'index-form-page' %}" class="home-btn">No, all good</a> -->
                 </div>
             </div>
 
@@ -147,7 +159,7 @@
             
                 </div>    
                  <div class=" col-12 col-md-4 text-center ">
-                    <!-- <img src="{% static 'img/Roblox-md-3.jpeg' %} alt="Roblox Safeguards Image"> -->
+                    <!-- <img src="{% static 'img/Roblox-md-3.jpeg' %}"> -->
                     <img src="{% static 'img/Roblox-md-3.jpeg' %}" alt="Roblox Safeguards Image">
                  </div>    
 </div>
@@ -158,7 +170,7 @@
             <div class="col-12">
                 <h4>What Is the Roblox Sexual Abuse Lawsuit About?</h4>
                 <p>Parents across the U.S. are filing lawsuits against Roblox, accusing the company of failing to protect children from sexual exploitation and financial abuse. These legal actions argue that the platform’s safeguards are inadequate, and children are paying the price.</p>
-                <div class=" d-flex justify-content-between">
+                <div class=" d-block d-md-flex justify-content-between">
                     <div class=" lawsuit-box">
                         <h4>Key Allegations</h4>
                         <ul>
@@ -190,7 +202,7 @@
                 <p>DISCLAIMER</p>
         
                   <p>This website is for informational purposes only and is a paid legal advertisement. It does not constitute legal advice, nor does it create an attorney-client relationship. While we strive for accuracy, we cannot guarantee the completeness of the information provided. Always consult a licensed attorney for guidance on your specific legal situation. This website also does not offer medical advice; consult a physician before changing any medical regimen. We are not liable for actions taken based on the information presented here. Our mission is to help you access information that supports your rights.</p>
-                     <p class="pt-2"> © 2024 All rights reserved.</p>
+                     <p class="pt-2"> © 2025 All rights reserved. NextKey Litigation.</p>
             </div>
         </div>
         
@@ -210,16 +222,15 @@
         
     </footer>
 
-
     <!-- modal popup code -->
       <div class="modal-overlay" id="modal">
         <div class="modal-content scroll">
-          <div class="row justify-content-end">
-            <div class="col-11"></div>
-             <button class="col-12 close-modal" onclick="closeModal()">&times;</button>
+            <div class="row justify-content-end">
+                <button class="col-12 close-modal" onclick="closeModal()">&times;</button>
             </div>
             <!-- Screen 1 -->
             <div class="form-screen active px-3" id="screen1">
+                <h4 class="model-title">Tell Us What Happened</h4>
                <div class="input-group">
                     <label>What best describes the troubling actions?</label>
                     <select id="question_3" class="question-dropdown" data-question-text="What best describes the troubling actions?"></select>
@@ -229,55 +240,80 @@
                     <label>Did the child and predator first meet on Roblox?</label>
                     <select id="question_4" class="question-dropdown" data-question-text="Did the child and predator first meet on Roblox?"></select>
                 </div>
+                <div class="input-group">
+                     <label>Within the last 5 weeks, how many hours per day is spent playing Minecraft, Call Of Duty, Fortnite, Roblox or Grand Theft Auto? *</label>
+                    <select id="question_5" class="question-dropdown" data-question-text="Within the last 5 weeks, how many hours per day is spent playing Minecraft, Call Of Duty, Fortnite, Roblox or Grand Theft Auto? *"></select>
+
+                </div>
+                <div class="input-group">
+                    <label> What harm has the gamer suffered from? *</label>
+                    <select id="question_6" class="question-dropdown" data-question-text="What harm has the gamer suffered from? *"></select>
+                </div>
+                <div class="input-group">
+                    <label>What treatment was received as a result of playing video games? *</label>
+                    <select id="question_7" class="question-dropdown" data-question-text="What treatment was received as a result of playing video games? *"></select>
+
+                </div>
+                <div class="mt-3">
+                    <label>Date of Birth of gamer? *</label>
+                    <input type="text" id="gamer_dob" class="form-control" placeholder="MM-DD-YYYY" required>
+                </div>
 
                  <div class="form-footer">
-                    <button type="button" class="btn-primary" onclick="showScreen(2)">Next</button>
+                    <button type="button" class="btn-blue" onclick="showScreen(2)">Next</button>
+                </div>
+            </div>
+            <!-- Screen 2 -->
+            <div class="form-screen px-3" id="screen2"> 
+                <div class="input-group">
+                    <label>First Name:</label>
+                    <input type="text" id="first_name" required>
+                </div>
+                <div class="input-group">
+                    <label>Last Name:</label>
+                    <input type="text" id="last_name" required>
+                </div>
+                <div class="input-group">
+                    <label>Cell Phone:</label>
+                    <input type="tel" id="cell_phone" required>
+                </div>
+                <div class="input-group">
+                    <label>Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="input-group">
+                    <label>Zip Code:</label>
+                    <input type="text" id="zipcode" required>
+                </div>
+                <div class="input-group">
+                    <label>Are you currently working with an attorney for this case?</label>
+                    <select id="working_with_attorney" required>
+                        <option value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Additional Notes (optional)</label>
+                    <input type="text" id="additional_notes">
+                </div>
+                <div class="input-group d-flex">
+                    <div class="d-flex align-items-start gap-1">
+                        <input type="checkbox" id="consent_checkbox" class="check-bx">
+                        <label for="consent_checkbox" style="font-size: 12px; padding-top: 2px;" class="">
+                            By selecting Submit and completing this form I confirm that I am over 18...
+                        </label>
+                    </div>
+                </div>
+                <div class="form-footer ">
+                    <button type="button" class="btn-blue-outline" onclick="showScreen(1)">Back</button>
+                    <button type="button" class="btn-blue" onclick="submitForm()">Submit</button>
                 </div>
             </div>
 
-            <!-- Screen 2 -->
-           <div class="form-screen px-3" id="screen2"> 
-            <div class="input-group">
-                <label>First Name:</label>
-                <input type="text" id="first_name" required>
-            </div>
-            <div class="input-group">
-                <label>Last Name:</label>
-                <input type="text" id="last_name" required>
-            </div>
-            <div class="input-group">
-                <label>Cell Phone:</label>
-                <input type="tel" id="cell_phone" required>
-            </div>
-            <div class="input-group">
-                <label>Email:</label>
-                <input type="email" id="email" required>
-            </div>
-            <div class="input-group">
-                <label>Zip Code:</label>
-                <input type="text" id="zipcode" required>
-            </div>
-            <div class="input-group">
-                <label>Are you currently working with an attorney for this case?</label>
-                <select id="working_with_attorney" required>
-                    <option value="">Select</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
-            </div>
-            <div class="input-group d-flex">
-                <div class="d-flex align-items-end gap-1">
-                    <input type="checkbox" id="consent_checkbox" class="check-bx">
-                    <label style="font-size: 11px;" class="">
-                        By selecting Submit and completing this form I confirm that I am over 18...
-                    </label>
-                </div>
-            </div>
-            <div class="form-footer">
-                <button type="button" class="btn-secondary" onclick="showScreen(1)">Back</button>
-                <button type="button" class="btn-primary" onclick="submitForm()">Submit</button>
-            </div>
-</div>
+
+
+    
 
         </div>
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -288,6 +324,17 @@
     </div>
 
     <!-- modal popup end -->
+
+    
+<div id="customModal" class="modal">
+  <div class="modal-content">
+    <img id="modalIcon" class="icon" src="" alt="icon" />
+    <p id="modalMessage"></p>
+    <!-- <span class="close-btn" onclick="closeCustomModal()">&times;</span> -->
+    <button class="btn-blue" onclick="closeCustomModal()">OK</button>
+  </div>
+</div>
+
 
  <script>
     // Read CSRF token from the meta tag and add it to every AJAX request
@@ -324,9 +371,20 @@
     }
 
     document.getElementById('openModal').addEventListener('click', () => {
-        document.getElementById('modal').style.display = 'block';
+        document.getElementById('modal').style.display = 'flex';
     });
 
+    // Modal Control
+    // document.getElementById('openModal2').addEventListener('click', () => {
+    //     document.getElementById('modal').style.display = 'block';
+    // });
+
+    const modalBtn2 = document.getElementById('openModal2');
+    if (modalBtn2) {
+        modalBtn2.addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'block';
+        });
+    }
     function showScreen(screenNumber) {
         document.querySelectorAll('.form-screen').forEach(screen => {
             screen.classList.remove('active');
@@ -334,161 +392,507 @@
         document.getElementById(`screen${screenNumber}`).classList.add('active');
     }
 
-    
+    // ------------------------------
+    // Show m-d-Y to the user, submit/store as Y-m-d.
+    // maxDate prevents future dates.
+     flatpickr("#gamer_dob", {
+        altInput: true,
+        altFormat: "m-d-Y",   // what the user sees
+        dateFormat: "Y-m-d",  // what .val() returns
+        maxDate: "today",
+        allowInput: true
+    });
+
+    function parseDobString(d) {
+        if (!d) return null;
+
+        // ISO: 1998-07-30
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+            return new Date(d + "T00:00:00");
+        }
+
+        // US: 07-30-1998
+        if (/^\d{2}-\d{2}-\d{4}$/.test(d)) {
+            const [mm, dd, yyyy] = d.split("-");
+            return new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
+        }
+
+        return null;
+    }
+
+    function calcAge(dob) {
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const m = today.getMonth() - dob.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+        return age;
+    }
+    // ------------------------------
+
     function submitForm() {
-    const first_name = $("#first_name").val().trim();
-    const last_name = $("#last_name").val().trim();
-    const cell_phone = $("#cell_phone").val().trim();
-    const email = $("#email").val().trim();
-    const zipcode = $("#zipcode").val().trim();
-    const working_with_attorney = $("#working_with_attorney").val();
-    const consent = $("#consent_checkbox").is(":checked");
+        const first_name = $("#first_name").val().trim();
+        const last_name = $("#last_name").val().trim();
+        const cell_phone = $("#cell_phone").val().trim();
+        const email = $("#email").val().trim();
+        const zipcode = $("#zipcode").val().trim();
+        const working_with_attorney = $("#working_with_attorney").val();
+        const consent = $("#consent_checkbox").is(":checked");
+        const additional_notes = $("#additional_notes").val().trim();
 
-    if (!first_name || !last_name || !cell_phone || !email || !zipcode || !working_with_attorney) {
-        alert("Please fill all required fields.");
-        return;
-    }
+        if (!first_name || !last_name || !cell_phone || !email || !zipcode || !working_with_attorney) {
+            showModal("Please fill all required fields.");
+            return;
+        }
 
-    if (!consent) {
-        alert("You must agree to the terms before submitting.");
-        return;
-    }
+        if (!consent) {
+            showModal("You must agree to the terms before submitting.");
+            return;
+        }
 
-    const redirectUrl = "intake-form/";
+        const redirectUrl = "/intake-form/";
 
-    // ✅ Step 1: Submit user details
-    $.ajax({
-        url: "/api/user-details/",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({
-            first_name,
-            last_name,
-            cell_phone,
-            email,
-            zipcode,
-            working_with_attorney
-        }),
-        success: function (response) {
-            const userId = response.id;
+        // ✅ Step 1: Submit user details
+        $.ajax({
+            url: "/api/user-details/",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                first_name,
+                last_name,
+                cell_phone,
+                email,
+                zipcode,
+                working_with_attorney,
+                additional_notes
+            }),
+            success: function (response) {
+                const userId = response.id;
 
-            // ✅ Step 2: Store first/last name for prepopulation
-            sessionStorage.setItem("guardian_first_name", first_name);
-            sessionStorage.setItem("guardian_last_name", last_name);
+                //  submitAnswers(userId, function () {
+                //     showModal("All submitted!", "success");
+                //     window.location.href = redirectUrl;  // 🔁 Redirect here
+                // });
 
-            // ✅ Step 3: Send thank you email
-            const emailFormData = new FormData();
-            emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
-            emailFormData.append("to_email", email);
-            emailFormData.append("subject", "Thank you for your submission");
-            emailFormData.append("body", `Hi ${first_name},\n\nThank you for submitting your details. We’ll review and get back to you shortly.\n\nRegards,\nSupport Team`);
+                // ✅ Step 2: Store first/last name for prepopulation
+                sessionStorage.setItem("guardian_first_name", first_name);
+                sessionStorage.setItem("guardian_last_name", last_name);
 
-            $.ajax({
-                url: "/send-email/",
-                type: "POST",
-                data: emailFormData,
-                processData: false,
-                contentType: false,
-                success: function () {
-                    // ✅ Step 4: Submit additional answers (if needed)
-                    submitAnswers(userId, function () {
-                        const confirmed = confirm("Your details have been submitted. Do you want to proceed to the Intake Form?");
-                        if (confirmed) {
-                            window.location.href = redirectUrl;
+                // ✅ Step 3: Determine eligibility from DOB
+                const dobValue = $("#gamer_dob").val()?.trim();
+                if (!dobValue) {
+                    alert("Please enter the gamer's Date of Birth.");
+                    return;
+                }
+
+                // Parse DOB and calculate age using helper functions
+                const dob = parseDobString(dobValue);
+                if (!dob || isNaN(dob.getTime())) {
+                    alert("Please enter DOB in MM-DD-YYYY format.");
+                    return;
+                }
+                const age = calcAge(dob);
+
+                // Find "Age of gamer" question and matching option
+                const ageQuestion = questionsData.find(q =>
+                    q.text.toLowerCase().includes("age of gamer")
+                );
+
+                let matchedOption = null;
+                if (ageQuestion) {
+                    ageQuestion.options.forEach(opt => {
+                        const text = opt.text.trim();
+                        if (text.includes("+")) {
+                            const min = parseInt(text);
+                            if (age >= min) matchedOption = opt;
+                        } else if (text.includes("-")) {
+                            const [min, max] = text.split("-").map(Number);
+                            if (age >= min && age <= max) matchedOption = opt;
                         }
                     });
-                },
-                error: function (xhr) {
-                    const err = xhr.responseJSON?.error || "Error sending confirmation email.";
-                    alert("Submission succeeded but email failed: " + err);
                 }
-            });
-        },
-        error: function (xhr) {
-            console.error(xhr.responseJSON);
-            alert("Error submitting the form.");
-        }
-    });
+
+                if (!matchedOption) {
+                    alert("No matching age group found for the entered DOB.");
+                    return;
+                }
+
+                // ✅ Step 4: Determine templateType dynamically
+                let templateType = "";
+                if (!matchedOption.is_eligible) {
+                    templateType = "rejected";
+                } else if (!matchedOption.requires_parental_signature) {
+                    templateType = "eligible_no_parent";
+                } else {
+                    templateType = "eligible_with_parent";
+                }
+
+                // ✅ Step 5: Fetch template from backend API
+                $.ajax({
+                    url: `/api/email-template/${templateType}/`,
+                    type: "GET",
+                    success: function (template) {
+                        // Replace placeholder with user name
+                        const subject = template.subject;
+                        const body = template.body.replace("[User First Name]", first_name);
+
+                        // ✅ Step 6: Send Email via /send-email/
+                        const emailFormData = new FormData();
+                        emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
+                        emailFormData.append("to_email", email);
+                        emailFormData.append("subject", subject);
+                        emailFormData.append("body", body);
+
+                        $.ajax({
+                            url: "/send-email/",
+                            type: "POST",
+                            data: emailFormData,
+                            processData: false,
+                            contentType: false,
+                            success: function () {
+                                // ✅ Step 7: Submit additional answers & redirect if needed
+                                submitAnswers(userId, function (redirectUrl) {
+                                    if (redirectUrl) {
+                                        window.location.href = redirectUrl;
+                                    }
+                                });
+                            },
+                            error: function (xhr) {
+                                const err = xhr.responseJSON?.error || "Error sending confirmation email.";
+                                alert("Submission succeeded but email failed: " + err);
+                            }
+                        });
+                    },
+                    error: function () {
+                        alert("Could not fetch email template. Please try again.");
+                    }
+                });
+            },
+            error: function (xhr) {
+                console.error(xhr.responseJSON);
+                alert("Error submitting the form.");
+            }
+        });
+    }
+
+    function showModal(message, type = "info") {
+    const iconSources = {
+            success: "{% static 'img/tick.jpg' %}",
+            error: "{% static 'img/error.jpg' %}",
+            info: "{% static 'img/info.jpg' %}"
+        };
+
+        $("#modalMessage").text(message);
+        $("#modalIcon").attr("src", iconSources[type] || iconSources.info);
+
+        $("#customModal").fadeIn();
+        $("#customModal").css("display", "flex");  
+    }
+
+
+
+function closeCustomModal() {
+  $("#customModal").fadeOut();
 }
 
 
     // $("#userForm")[0].reset();
 let questionsData = [];
 
-$(document).ready(function () {
-    $.ajax({
-        url: "/api/questions/",
-        type: "GET",
-        success: function (response) {
-            questionsData = response;
+    $(document).ready(function () {
+        $.ajax({
+            url: "/api/questions/",
+            type: "GET",
+            success: function (response) {
+                questionsData = response;
 
-            $(".question-dropdown").each(function () {
-                const $select = $(this);
-                const questionText = $select.data("question-text").trim();
+                $(".question-dropdown").each(function () {
+                    const $select = $(this);
+                    const questionText = $select.data("question-text").trim();
 
-                const matchingQuestion = response.find(q => q.text.trim() === questionText);
+                    const matchingQuestion = response.find(q => q.text.trim() === questionText);
 
-                if (matchingQuestion) {
-                    $select.attr("data-question-id", matchingQuestion.id);
-                    $select.append(`<option value="">-- Select --</option>`);
+                    if (matchingQuestion) {
+                        $select.attr("data-question-id", matchingQuestion.id);
+                        $select.append(`<option value="">-- Select --</option>`);
 
-                    matchingQuestion.options.forEach(opt => {
-                        $select.append(`<option value="${opt.id}">${opt.text}</option>`);
-                    });
-                } else {
-                    console.warn(`No matching question found for: ${questionText}`);
-                }
-            });
-        },
-        error: function () {
-            alert("Failed to load questions.");
-        }
+                        matchingQuestion.options.forEach(opt => {
+                            $select.append(`<option value="${opt.id}">${opt.text}</option>`);
+                        });
+                    } else {
+                        console.warn(`No matching question found for: ${questionText}`);
+                    }
+                });
+            },
+            error: function () {
+                alert("Failed to load questions.");
+            }
+        });
     });
-});
 
 
 
 
     function submitAnswers(userId, callback) {
     const promises = [];
+    const csrf = (typeof getCookie === "function") ? getCookie("csrftoken") : null;
 
+    // --- 1) Prepare DOB → age → age option (dynamic from questionsData) ---
+    const dobValue = $("#gamer_dob").val()?.trim();
+    let matchedAgeOption = null;  // the Option object chosen for DOB
+    let ageQuestion = null;       // the Question object for "Age of gamer?"
+
+    // Find age question from questionsData (once)
+    if (Array.isArray(questionsData) && questionsData.length) {
+        ageQuestion = questionsData.find(q => (q.text || "").toLowerCase().includes("age of gamer"));
+    }
+
+    // Helper to try matching by min_age/max_age if present; otherwise parse "18-20" / "26+"
+    function matchOptionByAge(options, age) {
+        // Prefer min_age / max_age when provided
+        const withRange = options.filter(o => (o.min_age !== undefined && o.min_age !== null) || (o.max_age !== undefined && o.max_age !== null));
+        if (withRange.length) {
+            for (const opt of withRange) {
+                const min = (opt.min_age != null) ? Number(opt.min_age) : -Infinity;
+                const max = (opt.max_age != null) ? Number(opt.max_age) : Infinity;
+                if (age >= min && age <= max) return opt;
+            }
+            return null;
+        }
+        // Fallback: parse text labels
+        for (const opt of options) {
+            const t = (opt.text || "").trim();
+            if (!t) continue;
+            if (t.includes("+")) {
+                // e.g., "26+"
+                const min = parseInt(t, 10);
+                if (!isNaN(min) && age >= min) return opt;
+            } else if (t.includes("-")) {
+                // e.g., "18-20"
+                const [minStr, maxStr] = t.split("-").map(s => s.trim());
+                const min = parseInt(minStr, 10);
+                const max = parseInt(maxStr, 10);
+                if (!isNaN(min) && !isNaN(max) && age >= min && age <= max) return opt;
+            }
+        }
+        return null;
+    }
+
+    // Compute age & find matching option from DOB (if DOB provided and ageQuestion exists)
+    if (dobValue && ageQuestion) {
+        const dob = new Date(dobValue);
+        if (!isNaN(dob.getTime())) {
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+
+            matchedAgeOption = matchOptionByAge(ageQuestion.options || [], age);
+            if (!matchedAgeOption) {
+                alert("No matching age range found for this date of birth.");
+            }
+        } else {
+            alert("Invalid DOB format. Please use a valid date.");
+        }
+    }
+
+    // --- 2) Save ALL other dropdown answers (and override age Q with matchedAgeOption if present) ---
     $(".question-dropdown").each(function () {
         const $select = $(this);
-        const questionId = $select.data("question-id");
+        const questionId = Number($select.data("question-id"));
         const selectedOptionId = $select.val();
+        const questionText = ($select.data("question-text") || "").trim();
 
-        if (!selectedOptionId || !questionId) return;
+        if (!questionId) return;
 
-        const promise = $.ajax({
-            url: "/api/answers/submit/",
-            type: "POST",
-            contentType: "application/json",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken"),
-            },
-            data: JSON.stringify({
-                user: userId,
-                question: questionId,
-                selected_option: selectedOptionId
-            }),
-            success: function () {
-                console.log(`Answer submitted for Question ID ${questionId}`);
-            },
-            error: function (xhr) {
-                console.error(`Failed to submit answer for Question ID ${questionId}:`, xhr.responseJSON);
+        // If this is the Age question, we override with the DOB-matched option (when available).
+        if (ageQuestion && questionId === Number(ageQuestion.id)) {
+            if (matchedAgeOption && matchedAgeOption.id) {
+                const p = $.ajax({
+                    url: "/api/answers/submit/",
+                    type: "POST",
+                    contentType: "application/json",
+                    headers: csrf ? { "X-CSRFToken": csrf } : {},
+                    data: JSON.stringify({
+                        user: userId,
+                        question: questionId,
+                        selected_option: matchedAgeOption.id
+                    })
+                }).fail(xhr => {
+                    console.error(`Failed to submit age answer for Question ID ${questionId}:`, xhr.responseJSON || xhr.responseText);
+                });
+                promises.push(p);
+            } else {
+                // If no match, and user picked a value manually, you may choose to save it;
+                // but since you said DOB should drive it, we skip saving the manual selection.
+                // If you want to save manual selection as a fallback, uncomment the block below:
+                /*
+                if (selectedOptionId) {
+                    const p = $.ajax({
+                        url: "/api/answers/submit/",
+                        type: "POST",
+                        contentType: "application/json",
+                        headers: csrf ? { "X-CSRFToken": csrf } : {},
+                        data: JSON.stringify({
+                            user: userId,
+                            question: questionId,
+                            selected_option: selectedOptionId
+                        })
+                    }).fail(xhr => {
+                        console.error(`Failed to submit manual age selection for Question ID ${questionId}:`, xhr.responseJSON || xhr.responseText);
+                    });
+                    promises.push(p);
+                }
+                */
             }
-        });
+            return; // handled age question
+        }
 
-        promises.push(promise);
-    });
-
-    // ✅ Wait for all answer submissions to complete, then call callback
-    $.when(...promises).done(function () {
-        if (typeof callback === "function") {
-            callback();  // Now we redirect
+        // Normal questions (non-age): save if user selected something
+        if (selectedOptionId) {
+            const p = $.ajax({
+                url: "/api/answers/submit/",
+                type: "POST",
+                contentType: "application/json",
+                headers: csrf ? { "X-CSRFToken": csrf } : {},
+                data: JSON.stringify({
+                    user: userId,
+                    question: questionId,
+                    selected_option: selectedOptionId
+                })
+            }).fail(xhr => {
+                console.error(`Failed to submit answer for Question ID ${questionId}:`, xhr.responseJSON || xhr.responseText);
+            });
+            promises.push(p);
         }
     });
+
+    // If there is no visible "Age of gamer?" dropdown on the page (you removed it),
+    // but we still have a matchedAgeOption from DOB, submit it explicitly.
+    if (matchedAgeOption && ageQuestion) {
+        const alreadyQueued = promises.some(req =>
+            // Not trivial to inspect $.ajax object; we’ll assume not duplicated if no dropdown existed.
+            false
+        );
+        if (!alreadyQueued) {
+            const p = $.ajax({
+                url: "/api/answers/submit/",
+                type: "POST",
+                contentType: "application/json",
+                headers: csrf ? { "X-CSRFToken": csrf } : {},
+                data: JSON.stringify({
+                    user: userId,
+                    question: ageQuestion.id,
+                    selected_option: matchedAgeOption.id
+                })
+            }).fail(xhr => {
+                console.error(`Failed to submit DOB-derived age answer for Question ID ${ageQuestion.id}:`, xhr.responseJSON || xhr.responseText);
+            });
+            promises.push(p);
+        }
+    }
+
+    // --- 3) After ALL answers saved, apply eligibility logic from the matched age option ---
+    $.when.apply($, promises).done(function () {
+        // If no DOB or no matched option, we still saved other answers; just stop here
+        if (!dobValue) {
+            alert("Please enter the gamer's Date of Birth to evaluate eligibility.");
+            if (typeof callback === "function") callback(null);
+            return;
+        }
+        if (!ageQuestion) {
+            alert("Age question data not found. Please refresh and try again.");
+            if (typeof callback === "function") callback(null);
+            return;
+        }
+        if (!matchedAgeOption) {
+            // Already alerted earlier that no matching range was found
+            if (typeof callback === "function") callback(null);
+            return;
+        }
+
+        // Use DB flags on the matched option
+        
+                // Show Modal function integrated with Continue button option
+        function showModal(message, withContinueBtn = false) {
+            const modal = document.getElementById('customModal');
+
+            // Dynamically update modal content with message and button
+            const footer = modal.querySelector('.modal-content');
+            footer.innerHTML = `
+                <p id="modalMessage">${message}</p>
+                ${withContinueBtn
+                    ? `<button id="modal-continue-btn" class="btn-blue">Continue</button>` 
+                    : `<button class="btn-blue" onclick="closeCustomModal()">OK</button>`}
+            `;
+
+            $("#customModal").fadeIn();
+        }
+
+        // Main eligibility check and redirection logic
+        const ageOptionData = matchedAgeOption;
+
+        if (!ageOptionData.is_eligible) {
+            // Show error and stop
+            showModal("Thank you for your interest. Based on the information provided, your case does not currently meet the eligibility criteria for a Roblox minor gamer claim. We appreciate your time. If circumstances change, feel free to revisit this form.", "error");
+            if (typeof callback === "function") callback(null);
+            return;
+        }
+
+        if (ageOptionData.requires_parental_signature) {
+            // Show modal with "Continue" button
+            showModal("Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer form.", "success", true);
+
+            // Attach event AFTER modal is fully rendered
+            setTimeout(() => {
+                const continueBtn = document.getElementById('modal-continue-btn');
+                if (continueBtn) {
+                    continueBtn.addEventListener('click', () => {
+                        // Close modal
+                        closeCustomModal();
+
+                        // Redirect directly
+                        if (ageOptionData.redirect_to_retainer) {
+                            window.location.href = "/retainer-form/";
+                        } else if (typeof callback === "function") {
+                            callback("/retainer-form/");
+                        }
+                    });
+                } else {
+                    console.error("Continue button not found!");
+                }
+            }, 200);
+
+        } else {
+            // If no parental signature needed, redirect directly
+            showModal("You are eligible for the retainer form.");
+            setTimeout(() => {
+                if (ageOptionData.redirect_to_retainer) {
+                    window.location.href = "/retainer-form/";
+                } else if (typeof callback === "function") {
+                    callback("/retainer-form/");
+                }
+            }, 1500); // small delay so user sees the message
+        }
+
+
+
+        // // Default: stay on the same page
+        // if (typeof callback === "function") callback(null);
+    });
 }
+
+window.addEventListener("scroll", function () {
+        const button = document.getElementById("fixBtnRow");
+        const heroSection = document.querySelector(".hero");
+
+        if (window.scrollY > heroSection.offsetHeight) {
+            button.classList.add("fixed-btn");
+        } else {
+            button.classList.remove("fixed-btn");
+        }
+    });
+
+
 
     </script>
 
