@@ -165,6 +165,10 @@ class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='options')
     text = models.CharField(max_length=255)
 
+    is_eligible = models.BooleanField(default=False)
+    requires_parental_signature = models.BooleanField(default=False)
+    redirect_to_retainer = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.question.text} - {self.text}"
 
@@ -174,6 +178,39 @@ class UserAnswer(models.Model):
     selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('user', 'question')  # prevent duplicate answers
+        unique_together = ('user', 'question')
+
+class EmailTemplate(models.Model):
+    TEMPLATE_TYPES = [
+        ('rejected', 'Rejected (>20 years)'),
+        ('eligible_no_parent', 'Eligible (18-20, no parent signature)'),
+        ('eligible_with_parent', 'Eligible (<=17, parent signature required)')
+    ]
+
+    name = models.CharField(max_length=50, choices=TEMPLATE_TYPES, unique=True)
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+
+    def __str__(self):
+        return self.get_name_display()
+
+
+class EmailLog(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('sent', 'Sent'),
+        ('failed', 'Failed'),
+    ]
+
+    from_email = models.EmailField()
+    to_email = models.EmailField()
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    error_message = models.TextField(blank=True, null=True)
+    attachment = models.FileField(upload_to='attachments/', blank=True, null=True)
+    template = models.ForeignKey(EmailTemplate, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     

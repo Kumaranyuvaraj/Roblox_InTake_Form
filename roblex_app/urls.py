@@ -1,9 +1,9 @@
 from django.urls import path
 
 from roblex_app.views import IntakeFormAPIView, IntakeFormView,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
-QuestionListAPIView, SubmitAnswerAPIView,LandingPage,IndexPage
+QuestionListAPIView, SubmitAnswerAPIView,LandingPage,IndexPage,SendEmailAPIView,EmailTemplateAPIView
 
-from .views import validate_roblox_username,get_client_ip
+from .views import validate_roblox_username,get_client_ip,email_view,retainer_form
 
 # from roblex_app.views import generate_pdf
 
@@ -21,4 +21,12 @@ urlpatterns = [
     path('api/answers/submit/', SubmitAnswerAPIView.as_view(), name='submit-answer'),
 
     path('get-ip', get_client_ip, name='get_client_ip'),
+
+    path('send-email/', SendEmailAPIView.as_view(), name='send-email'),#Rest API
+    path('send-email-form/', email_view, name='send-email-form'),
+
+    path('api/email-template/<str:template_type>/',EmailTemplateAPIView.as_view(),name='email-template'),
+   
+
+    path('retainer-form/', retainer_form, name='retainer-form'),
 ]

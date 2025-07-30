@@ -47,7 +47,7 @@
 
     .input-group .text-danger {
         position: absolute;
-        top: 0px;
+        top: 37px;
         left: 0;
         z-index: 1;
     }
@@ -829,12 +829,23 @@ color: red;
 
     <!-- </div> -->
 
- 
  <script>
+  // ✅ Prefill guardian names from sessionStorage
+  window.onload = function () {
+    const firstName = sessionStorage.getItem("guardian_first_name");
+    const lastName = sessionStorage.getItem("guardian_last_name");
 
-    
+    if (firstName) {
+      const guardianFirst = document.querySelector("input[name='guardian_first_name']");
+      if (guardianFirst) guardianFirst.value = firstName;
+    }
 
-    
+    if (lastName) {
+      const guardianLast = document.querySelector("input[name='guardian_last_name']");
+      if (guardianLast) guardianLast.value = lastName;
+    }
+  };
+
 $(document).ready(function () {
     const csrfToken = $('meta[name=csrf-token]').attr('content');
     $.ajaxSetup({

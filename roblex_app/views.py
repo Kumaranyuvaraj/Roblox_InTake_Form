@@ -3,10 +3,11 @@ import re
 from django.http import JsonResponse
 import requests
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from roblex_app.models import UserDetail, Question, Option, UserAnswer
-from roblex_app.serializers import IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer
+from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer,EmailLog
+from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer,EmailLogSerializer
 from django.shortcuts import render,redirect
 
 from rest_framework.decorators import api_view
@@ -14,6 +15,15 @@ from rest_framework.decorators import api_view
 import base64
 from django.core.files.base import ContentFile
 from django.utils import timezone
+import uuid
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 # from django.http import Http404, HttpResponse
 # from django.template.loader import render_to_string
@@ -186,12 +196,14 @@ class SubmitIntakeIfValidAPIView(APIView):
             if pdf_data:
                 try:
                     format, pdfstr = pdf_data.split(';base64,')
-                    file_content = ContentFile(base64.b64decode(pdfstr), name='intake.pdf')
+                    file_name = f"intake_{uuid.uuid4().hex[:8]}.pdf"
+                    file_content = ContentFile(base64.b64decode(pdfstr), name=file_name)
                     intake_instance.pdf_file = file_content
                 except Exception as e:
                     return Response({"error": f"Failed to decode PDF: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
             intake_instance.save()
+
 
             return Response({
                 "message": "Form submitted successfully.",
@@ -240,3 +252,100 @@ class SubmitAnswerAPIView(APIView):
 def get_client_ip(request):
     ip = request.META.get('HTTP_X_FORWARDED_FOR', '') or request.META.get('REMOTE_ADDR', '')
     return JsonResponse({"ip": ip})
+
+
+
+class SendEmailAPIView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        from_email = request.data.get("from_email")
+        to_email = request.data.get("to_email")
+        subject = request.data.get("subject")
+        body = request.data.get("body")
+        uploaded_file = request.FILES.get("attachment")
+
+        if not all([from_email, to_email, subject, body]):
+            return Response({"error": "Missing required fields."}, status=400)
+
+        # Save initial log entry
+        email_log = EmailLog.objects.create(
+            from_email=from_email,
+            to_email=to_email,
+            subject=subject,
+            body=body,
+            status="pending"
+        )
+
+        try:
+            # Email setup
+            smtp_host = "smtp.gmail.com"
+            smtp_port = 587
+            smtp_user = "kumaranyuvaraj007@gmail.com"
+            smtp_pass = "mbvy xtup tlmx towr"
+
+            msg = MIMEMultipart()
+            msg['From'] = from_email
+            msg['To'] = to_email
+            msg['Subject'] = subject
+            msg.attach(MIMEText(body, 'plain'))
+
+            if uploaded_file:
+                file_bytes = uploaded_file.read()
+
+                # Attach to email
+                part = MIMEApplication(file_bytes, Name=uploaded_file.name)
+                part['Content-Disposition'] = f'attachment; filename="{uploaded_file.name}"'
+                msg.attach(part)
+
+                # Save file in database
+                email_log.attachment.save(uploaded_file.name, ContentFile(file_bytes))
+
+            # Send email
+            server = smtplib.SMTP(smtp_host, smtp_port)
+            server.starttls()
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(from_email, [to_email], msg.as_string())
+            server.quit()
+
+            email_log.status = "sent"
+            email_log.save()
+
+            return Response({"message": "Email sent successfully."}, status=200)
+
+        except Exception as e:
+            email_log.status = "failed"
+            email_log.error_message = str(e)
+            email_log.save()
+            return Response({"error": str(e)}, status=500)
+
+
+class EmailTemplateAPIView(APIView):
+    def get(self, request, template_type):
+        try:
+            # Directly use template_type from the URL
+            template = EmailTemplate.objects.filter(name=template_type).first()
+
+            if not template:
+                return Response(
+                    {"error": f"Template '{template_type}' not found."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            return Response({
+                "subject": template.subject,
+                "body": template.body
+            })
+
+        except Exception as e:
+            return Response(
+                {"error": f"Internal server error: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+def email_view(request):
+    return render(request, 'email.html')
+
+def retainer_form(request):
+    return render(request,'retainer_form.html')

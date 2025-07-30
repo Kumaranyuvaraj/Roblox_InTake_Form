@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from roblex_app.models import IntakeForm,UserDetail,Question, Option, UserAnswer
+from roblex_app.models import EmailLog, EmailTemplate, IntakeForm,UserDetail,Question, Option, UserAnswer
 
 class IntakeFormSerializer(serializers.ModelSerializer):
     # Required text fields
@@ -71,19 +71,33 @@ class UserDetailSerializer(serializers.ModelSerializer):
         }
 
 
+
 class OptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Option
-        fields = ['id', 'text']
+        fields = ['id', 'text', 'is_eligible', 'requires_parental_signature', 'redirect_to_retainer']
 
 class QuestionSerializer(serializers.ModelSerializer):
-    options = OptionSerializer(many=True, read_only=True)
-
+    options = OptionSerializer(many=True)
+    
     class Meta:
         model = Question
         fields = ['id', 'text', 'options']
+
 
 class UserAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAnswer
         fields = ['user', 'question', 'selected_option']
+
+
+
+class EmailLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailLog
+        fields = '__all__'
+
+class EmailTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailTemplate
+        fields = ['name', 'subject', 'body']
