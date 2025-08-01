@@ -150,6 +150,8 @@ class UserDetail(models.Model):
     working_with_attorney = models.CharField(max_length=3, choices=ATTORNEY_CHOICES)
     gamer_dob = models.DateField(null=True, blank=True)
     additional_notes = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -234,6 +236,88 @@ class EmailLog(models.Model):
     attachment = models.FileField(upload_to='attachments/', blank=True, null=True)
     template = models.ForeignKey(EmailTemplate, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class DocumentTemplate(models.Model):
+    """Maps legal document types to DocuSeal template IDs"""
+    TEMPLATE_TYPES = [
+        ('retainer_minor', 'Retainer Agreement - Minor (with parent signature)'),
+        ('retainer_adult', 'Retainer Agreement - Adult (18-20)'),
+        ('intake_supplemental', 'Supplemental Intake Document'),
+    ]
+    
+    name = models.CharField(max_length=50, choices=TEMPLATE_TYPES, unique=True)
+    docuseal_template_id = models.IntegerField()  # Template ID from DocuSeal
+    description = models.TextField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.get_name_display()
+
+
+class DocumentSubmission(models.Model):
+    """Tracks document signing submissions"""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('sent', 'Sent to Signer'),
+        ('opened', 'Opened by Signer'),
+        ('completed', 'Completed'),
+        ('declined', 'Declined'),
+        ('expired', 'Expired'),
+        ('archived', 'Archived'),
+    ]
+    
+    user_detail = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='document_submissions')
+    intake_form = models.ForeignKey(IntakeForm, on_delete=models.CASCADE, null=True, blank=True)
+    document_template = models.ForeignKey(DocumentTemplate, on_delete=models.CASCADE)
+    
+    # DocuSeal integration fields
+    docuseal_submission_id = models.IntegerField(unique=True)
+    docuseal_submitter_id = models.IntegerField()
+    docuseal_slug = models.CharField(max_length=100)  # Unique signing URL slug
+    
+    # Status tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    sent_at = models.DateTimeField(null=True, blank=True)
+    opened_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    declined_at = models.DateTimeField(null=True, blank=True)
+    
+    # Document URLs (populated after completion)
+    signed_document_url = models.URLField(max_length=500, blank=True, null=True)
+    audit_log_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    # Metadata
+    decline_reason = models.TextField(blank=True, null=True)
+    external_id = models.CharField(max_length=100, unique=True)  # Your app's unique ID
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user_detail} - {self.document_template.name} ({self.status})"
+
+
+class DocumentWebhookEvent(models.Model):
+    """Logs all webhook events from DocuSeal"""
+    EVENT_TYPES = [
+        ('form.viewed', 'Form Viewed'),
+        ('form.started', 'Form Started'),
+        ('form.completed', 'Form Completed'),
+        ('form.declined', 'Form Declined'),
+        ('submission.created', 'Submission Created'),
+        ('submission.completed', 'Submission Completed'),
+        ('submission.expired', 'Submission Expired'),
+    ]
+    
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPES)
+    document_submission = models.ForeignKey(DocumentSubmission, on_delete=models.CASCADE, related_name='webhook_events')
+    webhook_data = models.JSONField()  # Store full webhook payload
+    processed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.event_type} - {self.document_submission}"
 
 
     

@@ -1,6 +1,7 @@
 from datetime import date
 import json
 import re
+import traceback
 from django.http import JsonResponse
 import requests
 from rest_framework.views import APIView
@@ -9,6 +10,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer,EmailLog
 from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer
+from django.conf import settings
+from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer,EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
+from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer,EmailLogSerializer, DocumentTemplateSerializer, DocumentSubmissionSerializer, DocumentWebhookEventSerializer
 from django.shortcuts import render,redirect
 
 from rest_framework.decorators import api_view
@@ -16,6 +20,7 @@ from rest_framework.decorators import api_view
 import base64
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 import uuid
 
 import smtplib
@@ -391,3 +396,369 @@ def retainer_form(request):
 
 def thanks(request):
     return render(request, 'thankyou.html')
+
+# ====================
+# DocuSeal API Views
+# ====================
+
+class CreateDocumentSubmissionAPIView(APIView):
+
+    
+    def post(self, request):
+        try:
+            # Extract required parameters
+            user_detail_id = request.data.get('user_detail_id')
+            template_type = request.data.get('template_type', 'retainer_agreement')
+            email_template_type = request.data.get('email_template_type', 'eligible_no_parent')  # Default for eligible users
+            
+            if not user_detail_id:
+                return Response(
+                    {"error": "user_detail_id is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get user details
+            try:
+                user_detail = UserDetail.objects.get(id=user_detail_id)
+            except UserDetail.DoesNotExist:
+                return Response(
+                    {"error": "User detail not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get document template
+            try:
+                doc_template = DocumentTemplate.objects.get(name=template_type)
+            except DocumentTemplate.DoesNotExist:
+                return Response(
+                    {"error": f"Document template '{template_type}' not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get email template for custom message
+            email_template = None
+            try:
+                email_template = EmailTemplate.objects.get(name=email_template_type)
+            except EmailTemplate.DoesNotExist:
+                print(f"Warning: Email template '{email_template_type}' not found, will use default DocuSeal message")
+            
+            # Prepare DocuSeal API request
+            docuseal_url = f"{settings.NEXTKEYSIGN_BASE_URL}/api/submissions"
+            
+            # Build submitter data
+            submitter_data = {
+                "template_id": doc_template.docuseal_template_id,
+                "submitters": [
+                    {
+                        "name": f"{user_detail.first_name} {user_detail.last_name}",
+                        "email": user_detail.email,
+                        "values": {
+                            "Name": f"{user_detail.first_name} {user_detail.last_name}",
+                            "Current Date": timezone.now().strftime("%Y-%m-%d")
+                        },
+                        "role": "First Party"
+                    }
+                ],
+                "send_email": True,
+                "completed_redirect_url": f"{request.build_absolute_uri('/')}?signed=success",
+                "declined_redirect_url": f"{request.build_absolute_uri('/')}?signed=declined"
+            }
+            
+            # Add custom message if email template exists
+            if email_template:
+                # Replace placeholder in email body with user's first name
+                custom_body = email_template.body.replace('[User First Name]', user_detail.first_name)
+                
+                submitter_data["message"] = {
+                    "subject": email_template.subject,
+                    "body": custom_body
+                }
+                
+                print(f"Using custom email message: Subject='{email_template.subject}' for user {user_detail.email}")
+            else:
+                print(f"No email template found, using default DocuSeal message for user {user_detail.email}")
+            
+            # Make API call to DocuSeal
+            headers = {
+                "X-Auth-Token": settings.NEXTKEYSIGN_API_TOKEN,
+                "Content-Type": "application/json"
+            }
+
+
+            response = requests.post(docuseal_url, json=submitter_data, headers=headers)
+            
+            if response.status_code in [200, 201]:
+                docuseal_response = response.json()
+                
+                # DocuSeal API returns an array of submitters directly
+                if isinstance(docuseal_response, list) and len(docuseal_response) > 0:
+                    first_submitter = docuseal_response[0]
+                else:
+                    print(f"DocuSeal API response validation failed: Expected array with submitters")
+                    print(f"Full response: {docuseal_response}")
+                    
+                    return Response(
+                        {"error": "Document service returned invalid response format"},
+                        status=status.HTTP_503_SERVICE_UNAVAILABLE
+                    )
+                
+                # Validate required DocuSeal data from submitter object
+                submission_id = first_submitter.get('submission_id')
+                submitter_id = first_submitter.get('id')
+                submitter_slug = first_submitter.get('slug', '')
+                
+                if not submission_id or not submitter_id:
+                    error_msg = f"Invalid DocuSeal response - missing required data: submission_id={submission_id}, submitter_id={submitter_id}"
+                    print(f"DocuSeal API response validation failed: {error_msg}")
+                    print(f"Full response: {docuseal_response}")
+                    
+                    return Response(
+                        {"error": f"Document service returned invalid data: {error_msg}"},
+                        status=status.HTTP_503_SERVICE_UNAVAILABLE
+                    )
+                
+                # Generate unique external ID
+                external_id = f"roblox_intake_{user_detail.id}_{timezone.now().strftime('%Y%m%d_%H%M%S')}"
+                
+                # Create document submission record
+                submission = DocumentSubmission.objects.create(
+                    user_detail=user_detail,
+                    document_template=doc_template,
+                    docuseal_submission_id=submission_id,
+                    docuseal_submitter_id=submitter_id,
+                    docuseal_slug=submitter_slug,
+                    status='pending',
+                    external_id=external_id
+                )
+                
+                # Build signing URL
+                signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{submitter_slug}"
+                
+                # Log the creation
+                print(f"Created document submission {submission.id} for user {user_detail.email}")
+                
+                return Response({
+                    "submission_url": signing_url,
+                    "submission_id": submission_id,
+                    "status": "pending",
+                    "external_id": external_id
+                }, status=status.HTTP_201_CREATED)
+            
+            else:
+                # DocuSeal API error
+                error_msg = response.text
+                print(f"DocuSeal API error: {response.status_code} - {error_msg}")
+                
+                return Response(
+                    {"error": f"Document service error: {error_msg}"},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE
+                )
+                
+        except Exception as e:
+            print(f"Error creating document submission: {str(e)}")
+            return Response(
+                {"error": f"Internal server error: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class DocumentWebhookAPIView(APIView):
+    def post(self, request):
+        try:
+            webhook_data = request.data
+            
+            # Extract event type and timestamp
+            event_type = webhook_data.get('event_type')
+            webhook_timestamp = webhook_data.get('timestamp')
+            
+            # Convert webhook timestamp to Django timezone
+            webhook_datetime = None
+            if webhook_timestamp:
+                webhook_datetime = parse_datetime(webhook_timestamp)
+            
+            # Extract submission or submitter data based on event type
+            data = webhook_data.get('data', {})
+            
+            # Determine submission ID based on event type
+            submission_id = None
+            submitter_id = None
+            
+            if event_type and event_type.startswith('form.'):
+                # Form webhook - data contains submitter info
+                submission_id = data.get('submission_id')
+                submitter_id = data.get('id')
+            elif event_type and event_type.startswith('submission.'):
+                # Submission webhook - data contains submission info
+                submission_id = data.get('id')
+                submitter_id = None
+            else:
+                return Response({"status": "ok"}, status=status.HTTP_200_OK)
+            
+            if not submission_id:
+                return Response({"error": "No submission ID in webhook"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Find corresponding submission
+            try:
+                submission = DocumentSubmission.objects.get(docuseal_submission_id=submission_id)
+            except DocumentSubmission.DoesNotExist:
+                return Response({"status": "ok"}, status=status.HTTP_200_OK)
+            
+            # Log webhook event for debugging and audit trail
+            DocumentWebhookEvent.objects.create(
+                event_type=event_type,
+                document_submission=submission,
+                webhook_data=webhook_data,
+                processed=False
+            )
+            
+            # Update status based on event type
+            updated = False
+            
+            if event_type == 'submission.completed':
+                submission.status = 'completed'
+                
+                # Use webhook timestamp or current time
+                submission.completed_at = webhook_datetime or timezone.now()
+                updated = True
+                
+                # Extract audit log URL from submission data
+                audit_log_url = data.get('audit_log_url')
+                if audit_log_url:
+                    submission.audit_log_url = audit_log_url
+                
+                # Extract document URLs from documents array
+                documents = data.get('documents', [])
+                if documents and len(documents) > 0:
+                    submission.signed_document_url = documents[0].get('url')
+                    
+            elif event_type == 'form.completed':
+                # Single party completed form
+                submission.status = 'completed'
+                
+                # Use timestamp from webhook data - check multiple locations
+                completed_at = data.get('completed_at')
+                if completed_at:
+                    submission.completed_at = parse_datetime(completed_at)
+                else:
+                    submission.completed_at = webhook_datetime or timezone.now()
+                
+                updated = True
+                
+                # Extract document URLs - check both direct and nested submission
+                documents = data.get('documents', [])
+                
+                if not documents:
+                    # Check nested submission object
+                    nested_submission = data.get('submission', {})
+                    
+                    if nested_submission.get('combined_document_url'):
+                        submission.signed_document_url = nested_submission['combined_document_url']
+                    elif nested_submission.get('audit_log_url'):
+                        submission.audit_log_url = nested_submission['audit_log_url']
+                elif len(documents) > 0:
+                    submission.signed_document_url = documents[0].get('url')
+                
+                # Extract audit log URL from multiple possible locations
+                audit_log_url = data.get('audit_log_url')
+                if not audit_log_url:
+                    nested_submission = data.get('submission', {})
+                    audit_log_url = nested_submission.get('audit_log_url')
+                
+                if audit_log_url:
+                    submission.audit_log_url = audit_log_url
+                    
+            elif event_type == 'form.declined':
+                submission.status = 'declined'
+                
+                # Use timestamp from webhook data
+                declined_at = data.get('declined_at')
+                if declined_at:
+                    submission.declined_at = parse_datetime(declined_at)
+                else:
+                    submission.declined_at = webhook_datetime or timezone.now()
+                
+                # Extract decline reason if provided
+                decline_reason = data.get('decline_reason')
+                if decline_reason:
+                    submission.decline_reason = decline_reason
+                updated = True
+                
+            elif event_type == 'submission.expired':
+                submission.status = 'expired'
+                updated = True
+                
+            elif event_type == 'form.viewed':
+                # Update opened status and timestamp
+                if submission.status in ['pending', 'sent']:
+                    submission.status = 'opened'
+                
+                # Use timestamp from webhook data
+                opened_at = data.get('opened_at')
+                if opened_at and not submission.opened_at:
+                    submission.opened_at = parse_datetime(opened_at)
+                elif not submission.opened_at:
+                    submission.opened_at = webhook_datetime or timezone.now()
+                
+                updated = True
+                
+            elif event_type == 'form.started':
+                # Similar to form.viewed
+                if submission.status in ['pending', 'sent']:
+                    submission.status = 'opened'
+                
+                if not submission.opened_at:
+                    submission.opened_at = webhook_datetime or timezone.now()
+                
+                updated = True
+                    
+            elif event_type == 'submission.created':
+                # Update to sent status and set sent_at timestamp
+                if submission.status == 'pending':
+                    submission.status = 'sent'
+                    
+                    # Extract sent_at from submitters array
+                    submitters = data.get('submitters', [])
+                    if submitters and len(submitters) > 0:
+                        sent_at = submitters[0].get('sent_at')
+                        if sent_at:
+                            submission.sent_at = parse_datetime(sent_at)
+                        else:
+                            submission.sent_at = webhook_datetime or timezone.now()
+                    else:
+                        submission.sent_at = webhook_datetime or timezone.now()
+                    
+                    updated = True
+                    
+            elif event_type == 'submission.archived':
+                submission.status = 'archived'
+                updated = True
+            
+            # Save submission if updated
+            if updated:
+                submission.save()
+            
+            # Mark webhook as processed
+            webhook_event = DocumentWebhookEvent.objects.filter(
+                document_submission=submission, 
+                event_type=event_type
+            ).last()
+            if webhook_event:
+                webhook_event.processed = True
+                webhook_event.save()
+            
+            return Response({"status": "ok"}, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {"error": f"Webhook processing error: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def get_client_ip(self, request):
+        """Extract client IP address from request"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            return x_forwarded_for.split(',')[0]
+        return request.META.get('REMOTE_ADDR')
