@@ -134,21 +134,21 @@ USE_TZ = True
 STATIC_URL = config('STATIC_URL', default='/static/')
 STATIC_ROOT = config('STATIC_ROOT', default='/app/static/')
 
-# # Security settings for production
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# USE_TZ = True
+# Security settings for production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_TZ = True
 
-# CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
 
-# # Security headers (only enable in production)
-# if not DEBUG:
-#     SECURE_SSL_REDIRECT = False  # Cloudflare handles SSL termination
-#     SECURE_HSTS_SECONDS = 31536000
-#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-#     SECURE_HSTS_PRELOAD = True
-#     SECURE_CONTENT_TYPE_NOSNIFF = True
-#     SECURE_BROWSER_XSS_FILTER = True
-#     X_FRAME_OPTIONS = 'DENY'
+# Security headers (only enable in production)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = False  # Cloudflare handles SSL termination
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
 
 
 MEDIA_URL = '/media/'
