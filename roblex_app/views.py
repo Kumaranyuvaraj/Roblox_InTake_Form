@@ -1,3 +1,4 @@
+from datetime import date
 import json
 import re
 from django.http import JsonResponse
@@ -7,7 +8,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer,EmailLog
-from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer,EmailLogSerializer
+from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer
 from django.shortcuts import render,redirect
 
 from rest_framework.decorators import api_view
@@ -213,10 +214,6 @@ class SubmitIntakeIfValidAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
 class UserDetailCreateView(APIView):
     def post(self, request):
         serializer = UserDetailSerializer(data=request.data)
@@ -349,3 +346,48 @@ def email_view(request):
 
 def retainer_form(request):
     return render(request,'retainer_form.html')
+
+# class EligibilityAPIView(APIView):
+#     def post(self, request):
+#         dob_str = request.data.get("dob")  # expect "YYYY-MM-DD"
+#         if not dob_str:
+#             return Response({"error": "Date of birth is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             dob = date.fromisoformat(dob_str)
+#         except ValueError:
+#             return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         today = date.today()
+#         age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+#         # Find the first matching rule (you can order by priority if needed)
+#         rule = None
+#         for r in AgeEligibilityRule.objects.all():
+#             if r.matches(age):
+#                 rule = r
+#                 break
+
+#         if not rule:
+#             return Response({"error": "No matching eligibility rule."}, status=status.HTTP_404_NOT_FOUND)
+
+#         if not rule.is_eligible:
+#             template_type = "rejected"
+#         elif rule.requires_parental_signature:
+#             template_type = "eligible_with_parent"
+#         else:
+#             template_type = "eligible_no_parent"
+
+#         payload = {
+#             "age": age,
+#             "is_eligible": rule.is_eligible,
+#             "requires_parental_signature": rule.requires_parental_signature,
+#             "redirect_to_retainer": rule.redirect_to_retainer,
+#             "template_type": template_type,
+#         }
+#         serializer = EligibilityResultSerializer(payload)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+def thanks(request):
+    return render(request, 'thankyou.html')

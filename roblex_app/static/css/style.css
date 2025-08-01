@@ -9,6 +9,9 @@ body {
     background-color: #0a192f;
     color: #f8f9fa;
 }
+.font-popins {
+    font-family: 'Poppins', sans-serif;
+}
 
 .primery-color {
     background-color: #1f4068;
@@ -475,7 +478,7 @@ div img {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     z-index: 1000;
 }
 
@@ -503,7 +506,10 @@ div img {
 .form-screen.active {
     display: block;
 }
-
+.form-screen .form-control{
+    font-size: 0.875rem;
+    --bs-border-radius: 0.3rem;
+}
 /* Input Styles */
 .input-group {
     margin-bottom: 15px;
@@ -518,9 +524,9 @@ select {
     width: 100%;
     padding: 6px;
     margin-top: 5px;
-    border: 1px solid #254b8f;
+    border: 1px solid #254b8f !important;
     /* background: #122f65; */
-    border-radius: 4px;
+    border-radius: 4px !important;
     /* color: #fff; */
 }
 
@@ -538,7 +544,7 @@ input:-webkit-autofill:active {
     margin-top: 20px;
     display: flex;
     gap: 10px;
-    justify-content: center;
+    justify-content: flex-end;
 }
 
 button {
@@ -577,7 +583,7 @@ button {
     padding-bottom: 15px;
     color: #1F4068;
     margin-bottom: 20px;
-
+    font-family: 'poppins', sans-serif;
 }
 
 .close-modal {
@@ -690,7 +696,7 @@ button {
 #customModal .modal-content {
     border-top: 5px solid #1f4068;
     background: white;
-    padding: 20px;
+    padding: 30px;
     border-radius: 8px;
     text-align: left;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
@@ -699,7 +705,7 @@ button {
     align-items: center;
     /* flex-direction: row; */
     gap: 17px;
-    width: 400px;
+    width: 500px;
     /* position: absolute; */
     /* right: 30px; */
     /* top: -20px; */

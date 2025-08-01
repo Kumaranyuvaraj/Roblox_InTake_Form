@@ -101,3 +101,11 @@ class EmailTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailTemplate
         fields = ['name', 'subject', 'body']
+
+
+# class EligibilityResultSerializer(serializers.Serializer):
+#     age = serializers.IntegerField()
+#     is_eligible = serializers.BooleanField()
+#     requires_parental_signature = serializers.BooleanField()
+#     redirect_to_retainer = serializers.BooleanField()
+#     template_type = serializers.CharField()

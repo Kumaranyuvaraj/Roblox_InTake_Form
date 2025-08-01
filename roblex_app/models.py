@@ -148,10 +148,33 @@ class UserDetail(models.Model):
     email = models.EmailField()
     zipcode = models.CharField(max_length=10)
     working_with_attorney = models.CharField(max_length=3, choices=ATTORNEY_CHOICES)
+    gamer_dob = models.DateField(null=True, blank=True)
     additional_notes = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+# class AgeEligibilityRule(models.Model):
+#     min_age = models.PositiveSmallIntegerField(null=True, blank=True)  # inclusive
+#     max_age = models.PositiveSmallIntegerField(null=True, blank=True)  # inclusive; null means no upper bound
+#     is_eligible = models.BooleanField(default=False)
+#     requires_parental_signature = models.BooleanField(default=False)
+#     redirect_to_retainer = models.BooleanField(default=False)
+
+#     class Meta:
+#         ordering = ['min_age']  
+
+#     def matches(self, age: int) -> bool:
+#         if self.min_age is not None and age < self.min_age:
+#             return False
+#         if self.max_age is not None and age > self.max_age:
+#             return False
+#         return True
+
+#     def __str__(self):
+#         upper = f"{self.max_age}" if self.max_age is not None else "+"
+#         return f"{self.min_age or 0}-{upper}: eligible={self.is_eligible}, parental={self.requires_parental_signature}"
+
     
 
 
