@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from roblex_app.models import EmailLog, EmailTemplate, IntakeForm,UserDetail,Question, Option, UserAnswer
+from roblex_app.models import EmailLog, EmailTemplate, IntakeForm,UserDetail,Question, Option, UserAnswer, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
 
 class IntakeFormSerializer(serializers.ModelSerializer):
     # Required text fields
@@ -101,3 +101,27 @@ class EmailTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailTemplate
         fields = ['name', 'subject', 'body']
+
+
+class DocumentTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentTemplate
+        fields = ['id', 'name', 'docuseal_template_id', 'description', 'is_active']
+
+
+class DocumentSubmissionSerializer(serializers.ModelSerializer):
+    user_detail = UserDetailSerializer(read_only=True)
+    document_template = DocumentTemplateSerializer(read_only=True)
+    
+    class Meta:
+        model = DocumentSubmission
+        fields = ['id', 'user_detail', 'document_template', 'docuseal_submission_id', 
+                 'docuseal_submitter_id', 'docuseal_slug', 'status', 'sent_at', 'opened_at', 
+                 'completed_at', 'declined_at', 'signed_document_url', 'audit_log_url', 
+                 'decline_reason', 'external_id', 'created_at', 'updated_at']
+
+
+class DocumentWebhookEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentWebhookEvent
+        fields = ['id', 'event_type', 'document_submission', 'webhook_data', 'processed', 'created_at']

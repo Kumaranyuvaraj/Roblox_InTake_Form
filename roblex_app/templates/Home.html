@@ -17,10 +17,90 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token }}">
+    
+    <style>
+        #documentStatusBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+            min-height: 60px;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            padding: 20px;
+            margin: 0;
+            border-radius: 0;
+            text-align: center;
+            border: none;
+            width: 100%;
+        }
+        
+        #documentStatusBanner.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        #documentStatusBanner.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        #documentStatusBanner #statusTitle {
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
+        
+        #documentStatusBanner #statusMessage {
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        #documentStatusBanner .container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        #documentStatusBanner .btn-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        #documentStatusBanner .btn-close:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
    
 
     <body>
+    <!-- Success/Decline Message Banner -->
+    <div id="documentStatusBanner" style="display: none;">
+        <div class="container">
+            <h4 id="statusTitle"></h4>
+            <p id="statusMessage"></p>
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+        </div>
+    </div>
+
           <!-- <nav class="navbar">
         <div class="nav-content">
             <a href="#" class="logo px-4">Logo Here</a>
@@ -534,46 +614,54 @@
                     templateType = "eligible_with_parent";
                 }
 
-                // ✅ Step 5: Fetch template from backend API
-                $.ajax({
-                    url: `/api/email-template/${templateType}/`,
-                    type: "GET",
-                    success: function (template) {
-                        // Replace placeholder with user name
-                        const subject = template.subject;
-                        const body = template.body.replace("[User First Name]", first_name);
+                // ✅ Step 5: Handle based on eligibility
+                if (!matchedOption.is_eligible) {
+                    // Send rejection email template
+                    $.ajax({
+                        url: `/api/email-template/${templateType}/`,
+                        type: "GET",
+                        success: function (template) {
+                            // Replace placeholder with user name
+                            const subject = template.subject;
+                            const body = template.body.replace("[User First Name]", first_name);
 
-                        // ✅ Step 6: Send Email via /send-email/
-                        const emailFormData = new FormData();
-                        emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
-                        emailFormData.append("to_email", email);
-                        emailFormData.append("subject", subject);
-                        emailFormData.append("body", body);
+                            // Send rejection email
+                            const emailFormData = new FormData();
+                            emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
+                            emailFormData.append("to_email", email);
+                            emailFormData.append("subject", subject);
+                            emailFormData.append("body", body);
 
-                        $.ajax({
-                            url: "/send-email/",
-                            type: "POST",
-                            data: emailFormData,
-                            processData: false,
-                            contentType: false,
-                            success: function () {
-                                // ✅ Step 7: Submit additional answers & redirect if needed
-                                submitAnswers(userId, function (redirectUrl) {
-                                    if (redirectUrl) {
-                                        window.location.href = redirectUrl;
-                                    }
-                                });
-                            },
-                            error: function (xhr) {
-                                const err = xhr.responseJSON?.error || "Error sending confirmation email.";
-                                alert("Submission succeeded but email failed: " + err);
-                            }
-                        });
-                    },
-                    error: function () {
-                        alert("Could not fetch email template. Please try again.");
-                    }
-                });
+                            $.ajax({
+                                url: "/send-email/",
+                                type: "POST",
+                                data: emailFormData,
+                                processData: false,
+                                contentType: false,
+                                success: function () {
+                                    showModal("Thank you for your interest. Based on the information provided, your case does not currently meet the eligibility criteria.", "error");
+                                },
+                                error: function (xhr) {
+                                    const err = xhr.responseJSON?.error || "Error sending email.";
+                                    showModal("Error: " + err, "error");
+                                }
+                            });
+                        },
+                        error: function () {
+                            showModal("Could not process request. Please try again.", "error");
+                        }
+                    });
+                } else {
+                    // Eligible - proceed to document signing workflow
+                    // Store user detail ID for document creation
+                    sessionStorage.setItem('user_detail_id', userId);
+                    
+                    // Proceed with answers submission and document creation
+                    submitAnswers(userId, function (redirectUrl) {
+                        // After answers are submitted, trigger document creation
+                        // This will be handled by the submitAnswers callback
+                    });
+                }
             },
             error: function (xhr) {
                 console.error(xhr.responseJSON);
@@ -606,7 +694,106 @@ function closeCustomModal() {
     // $("#userForm")[0].reset();
 let questionsData = [];
 
+    /**
+     * Check URL parameters for document signing status and show appropriate message
+     */
+    function checkDocumentSigningStatus() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const signed = urlParams.get('signed');
+        
+        console.log('Checking document signing status:', signed);
+        console.log('Full URL:', window.location.href);
+        
+        if (signed === 'success') {
+            console.log('Showing success message');
+            showDocumentStatusMessage(
+                'success',
+                '🎉 Document Successfully Signed!',
+                'Thank you for completing the retainer agreement. We have received your signed document and will be in touch with you shortly regarding the next steps in your case.'
+            );
+        } else if (signed === 'declined') {
+            console.log('Showing declined message');
+            showDocumentStatusMessage(
+                'warning',
+                '📋 Document Signing Declined',
+                'You have declined to sign the retainer agreement. If you change your mind or have any questions, please feel free to contact us. You can restart the process at any time.'
+            );
+        }
+        
+        // Clear the URL parameter to avoid showing the message again on refresh
+        if (signed) {
+            console.log('Clearing URL parameter');
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }
+    
+    /**
+     * Show document status message banner
+     */
+    function showDocumentStatusMessage(type, title, message) {
+        console.log('showDocumentStatusMessage called with:', { type, title, message });
+        
+        const banner = document.getElementById('documentStatusBanner');
+        const titleElement = document.getElementById('statusTitle');
+        const messageElement = document.getElementById('statusMessage');
+        
+        console.log('Banner element:', banner);
+        console.log('Title element:', titleElement);
+        console.log('Message element:', messageElement);
+        
+        if (!banner || !titleElement || !messageElement) {
+            console.error('Required elements not found');
+            return;
+        }
+        
+        // Set content
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        // Remove existing type classes and add new one
+        banner.className = '';
+        banner.classList.add(type);
+        
+        // Show the banner with animation
+        banner.style.display = 'block';
+        
+        // Use setTimeout to trigger opacity transition after element is shown
+        setTimeout(() => {
+            banner.style.opacity = '1';
+        }, 50);
+        
+        console.log('Banner classes:', banner.className);
+        console.log('Banner style display:', banner.style.display);
+        console.log('Banner should now be visible');
+        
+        // Auto-hide after 15 seconds
+        setTimeout(() => {
+            banner.style.opacity = '0';
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 500);
+        }, 15000);
+        
+        // Smooth scroll to top to ensure user sees the message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Handle manual close button
+        const closeBtn = banner.querySelector('.btn-close');
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                banner.style.opacity = '0';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 500);
+            };
+        }
+    }
+
     $(document).ready(function () {
+        // Check for document signing status in URL parameters
+        checkDocumentSigningStatus();
+        
         $.ajax({
             url: "/api/questions/",
             type: "GET",
@@ -848,7 +1035,7 @@ let questionsData = [];
 
         if (ageOptionData.requires_parental_signature) {
             // Show modal with "Continue" button
-            showModal("Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer form.", "success", true);
+            showModal("Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer agreement signing.", "success", true);
 
             // Attach event AFTER modal is fully rendered
             setTimeout(() => {
@@ -858,9 +1045,9 @@ let questionsData = [];
                         // Close modal
                         closeCustomModal();
 
-                        // Redirect directly
+                        // Create document submission for signing
                         if (ageOptionData.redirect_to_retainer) {
-                            window.location.href = "/retainer-form/";
+                            createDocumentSubmission('retainer_agreement', 'eligible_with_parent');
                         } else if (typeof callback === "function") {
                             callback("/retainer-form/");
                         }
@@ -871,11 +1058,11 @@ let questionsData = [];
             }, 200);
 
         } else {
-            // If no parental signature needed, redirect directly
-            showModal("You are eligible for the retainer form.");
+            // If no parental signature needed, create document submission
+            showModal("You are eligible for the retainer agreement. Preparing document for signing...");
             setTimeout(() => {
                 if (ageOptionData.redirect_to_retainer) {
-                    window.location.href = "/retainer-form/";
+                    createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
                 } else if (typeof callback === "function") {
                     callback("/retainer-form/");
                 }
@@ -947,8 +1134,136 @@ window.addEventListener("scroll", function () {
         });
     });
 
-
-
+    // ====================
+    // DocuSeal Integration Functions
+    // ====================
+    
+    /**
+     * Create a document submission and redirect to signing URL
+     * @param {string} templateType - Type of document template ('retainer_agreement', etc.)
+     * @param {string} emailTemplateType - Type of email template to use for custom message ('eligible_no_parent', 'eligible_with_parent')
+     */
+    function createDocumentSubmission(templateType = 'retainer_agreement', emailTemplateType = null) {
+        // Show loading state
+        showModal("Preparing your document for signing...", "info");
+        
+        // Get user detail ID from form (you may need to store this differently)
+        const userDetailId = getCurrentUserDetailId();
+        
+        if (!userDetailId) {
+            showModal("Error: User information not found. Please complete the contact details first.", "error");
+            return;
+        }
+        
+        // Map template types to DocumentTemplate names in database
+        let dbTemplateName = '';
+        let finalEmailTemplateType = emailTemplateType; // Use passed parameter if provided
+        
+        if (templateType === 'retainer_agreement') {
+            // Check if parental signature is required based on age
+            const dobValue = $("#gamer_dob").val()?.trim();
+            if (dobValue) {
+                const dob = parseDobString(dobValue);
+                if (dob && !isNaN(dob.getTime())) {
+                    const age = calcAge(dob);
+                    // Under 18 requires parent signature
+                    if (age < 18) {
+                        dbTemplateName = 'retainer_minor';
+                        if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_with_parent';
+                    } else {
+                        dbTemplateName = 'retainer_adult';
+                        if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_no_parent';
+                    }
+                } else {
+                    dbTemplateName = 'retainer_minor'; // Default to minor if DOB is invalid
+                    if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_with_parent';
+                }
+            } else {
+                dbTemplateName = 'retainer_minor'; // Default to minor if no DOB
+                if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_with_parent';
+            }
+        } else {
+            dbTemplateName = templateType;
+            if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_no_parent'; // Default
+        }
+        
+        // Prepare API request
+        const requestData = {
+            user_detail_id: userDetailId,
+            template_type: dbTemplateName,
+            email_template_type: finalEmailTemplateType
+        };
+        
+        // Make API call to create document submission
+        $.ajax({
+            url: '/api/create-document-submission/',
+            type: 'POST',
+            data: JSON.stringify(requestData),
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            success: function(response) {
+                console.log('Document submission created:', response);
+                
+                // Close current modal
+                closeCustomModal();
+                
+                if (response.submission_url) {
+                    // Show success message and redirect
+                    showModal("Document prepared successfully! You will be redirected to sign the retainer agreement.", "success");
+                    
+                    setTimeout(() => {
+                        // Redirect to DocuSeal signing URL
+                        window.location.href = response.submission_url;
+                    }, 2000);
+                } else {
+                    showModal("Error: Could not generate signing URL. Please try again.", "error");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error creating document submission:', error);
+                console.error('Response:', xhr.responseText);
+                
+                let errorMessage = "An error occurred while preparing your document.";
+                
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                }
+                
+                showModal(errorMessage, "error");
+            }
+        });
+    }
+    
+    /**
+     * Get current user detail ID
+     * This function should return the user_detail_id from the session or form
+     * You may need to modify this based on how you store user information
+     */
+    function getCurrentUserDetailId() {
+        // Option 1: From localStorage if you store it there
+        const userDetailId = localStorage.getItem('user_detail_id');
+        if (userDetailId) {
+            return parseInt(userDetailId);
+        }
+        
+        // Option 2: From a hidden form field
+        const hiddenField = document.getElementById('user_detail_id');
+        if (hiddenField && hiddenField.value) {
+            return parseInt(hiddenField.value);
+        }
+        
+        // Option 3: From session storage
+        const sessionId = sessionStorage.getItem('user_detail_id');
+        if (sessionId) {
+            return parseInt(sessionId);
+        }
+        
+        // If no user detail ID found, you may need to create one first
+        console.warn('No user detail ID found. User may need to complete contact details first.');
+        return null;
+    }
 
     </script>
 
