@@ -857,3 +857,171 @@ button {
         font-size: 1rem;
     }
 }
+
+
+.center{
+    width: 50%; /* or a fixed pixel value */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.top-margin{
+    margin-top: 20%;
+}
+
+
+.congrats-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgb(21 57 106 / 79%);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .congrats-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+
+            width: 650px;
+            height: 450px;
+        }
+
+
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            animation: firework 1s ease-out;
+        }
+
+        @keyframes firework {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(20); opacity: 0; }
+        }
+
+        .continue-btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .continue-btn:hover {
+            background: #45a049;
+        }
+
+        .loading-container {
+            display: none;
+            margin-top: 20px;
+            width: 200px;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: #2196F3;
+            transition: width 2s ease-in-out;
+        }
+
+        @keyframes preparing {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .preparing-text {
+            display: none;
+            margin-top: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+            #documentStatusBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+            min-height: 60px;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            padding: 20px;
+            margin: 0;
+            border-radius: 0;
+            text-align: center;
+            border: none;
+            width: 100%;
+        }
+        
+        #documentStatusBanner.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        #documentStatusBanner.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        #documentStatusBanner #statusTitle {
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
+        
+        #documentStatusBanner #statusMessage {
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        #documentStatusBanner .container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        #documentStatusBanner .btn-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        #documentStatusBanner .btn-close:hover {
+            opacity: 1;
+        }
+
+

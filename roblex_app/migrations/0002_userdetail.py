@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(max_length=254)),
                 ('zipcode', models.CharField(max_length=10)),
                 ('working_with_attorney', models.CharField(choices=[('yes', 'Yes'), ('no', 'No')], max_length=3)),
+                
             ],
         ),
     ]

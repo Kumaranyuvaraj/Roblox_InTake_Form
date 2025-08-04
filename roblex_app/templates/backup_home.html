@@ -18,8 +18,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token }}">
     
-    <!-- <style>
-        /* #documentStatusBanner {
+    <style>
+        #documentStatusBanner {
             position: fixed;
             top: 0;
             left: 0;
@@ -86,20 +86,20 @@
         
         #documentStatusBanner .btn-close:hover {
             opacity: 1;
-        } */
-    </style> -->
+        }
+    </style>
 </head>
    
 
     <body>
     <!-- Success/Decline Message Banner -->
-    <!-- <div id="documentStatusBanner" style="display: none;">
+    <div id="documentStatusBanner" style="display: none;">
         <div class="container">
             <h4 id="statusTitle"></h4>
             <p id="statusMessage"></p>
             <button type="button" class="btn-close" aria-label="Close">&times;</button>
         </div>
-    </div> -->
+    </div>
 
           <!-- <nav class="navbar">
         <div class="nav-content">
@@ -439,19 +439,6 @@
   </div>
 </div>
 
-<!-- add this somewhere in your HTML if you don't already have it -->
-<div id="loadingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; font-family:system-ui;">
-  <div style="background:#fff; border-radius:12px; padding:2rem; max-width:420px; width:90%; text-align:center; position:relative; box-shadow:0 30px 60px -10px rgba(0,0,0,0.3);">
-    <div style="margin-bottom:1rem;">
-      <div class="spinner" aria-label="Loading" role="status" style="width:60px; height:60px; margin:0 auto 1rem; border:6px solid #e5e5e5; border-top-color:#667eea; border-radius:50%; animation:spin 1s linear infinite;"></div>
-      <h2 style="margin:0; font-size:1.5rem;">Preparing Retainer</h2>
-      <p id="loadingMessage" style="margin:8px 0 0; font-size:0.95rem; color:#555;">This may take up to 10 seconds. Redirecting in <span id="countdown">10</span>s...</p>
-    </div>
-  </div>
-</div>
-
-
-
 <!-- <script src="https://unpkg.com/libphonenumber-js/bundle/libphonenumber-max.js"></script> -->
 
 
@@ -740,11 +727,7 @@
                                 contentType: false,
                                 success: function () {
                                     showModal("Thank you for your interest. Based on the information provided, your case does not currently meet the eligibility criteria.", "error");
-                                    // Redirect to thank you page after short delay
-                                    setTimeout(() => {
-                                        window.location.href = "/gratitude/";
-                                    }, 1500);
-                                                },
+                                },
                                 error: function (xhr) {
                                     const err = xhr.responseJSON?.error || "Error sending email.";
                                     showModal("Error: " + err, "error");
@@ -972,7 +955,6 @@ let questionsData = [];
 
 
     function submitAnswers(userId, callback) {
-
     const promises = [];
     const csrf = (typeof getCookie === "function") ? getCookie("csrftoken") : null;
 
@@ -1176,14 +1158,14 @@ let questionsData = [];
             if (typeof callback === "function") {
                 callback(null); // prevent any further redirection from callback
             }
-            window.location.href = "/gratitude"; // adjust path if needed
+            window.location.href = "/gratitude/"; // adjust path if needed
             return;
         }
 
         if (ageOptionData.requires_parental_signature) {
             // Show modal with "Continue" button
             showModal("Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer agreement signing.", "success", true);
-            
+
             // Attach event AFTER modal is fully rendered
             setTimeout(() => {
                 const continueBtn = document.getElementById('modal-continue-btn');
@@ -1199,16 +1181,14 @@ let questionsData = [];
                             callback("/retainer-form/");
                         }
                     });
-                } 
-                
-                else {
+                } else {
                     console.error("Continue button not found!");
                 }
             }, 200);
 
         } else {
             // If no parental signature needed, create document submission
-            // showModal("You are eligible for the retainer agreement. Preparing document for signing...");
+            showModal("You are eligible for the retainer agreement. Preparing document for signing...");
             setTimeout(() => {
                 if (ageOptionData.redirect_to_retainer) {
                     createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
@@ -1294,13 +1274,13 @@ window.addEventListener("scroll", function () {
      */
     function createDocumentSubmission(templateType = 'retainer_agreement', emailTemplateType = null) {
         // Show loading state
-        // showModal("Preparing your document for signing...", "info");
+        showModal("Preparing your document for signing...", "info");
         
         // Get user detail ID from form (you may need to store this differently)
         const userDetailId = getCurrentUserDetailId();
         
         if (!userDetailId) {
-            // showModal("Error: User information not found. Please complete the contact details first.", "error");
+            showModal("Error: User information not found. Please complete the contact details first.", "error");
             return;
         }
         
@@ -1360,7 +1340,7 @@ window.addEventListener("scroll", function () {
                 
                 if (response.submission_url) {
                     // Show success message and redirect
-                    // showModal("Document prepared successfully! You will be redirected to sign the retainer agreement.", "success");
+                    showModal("Document prepared successfully! You will be redirected to sign the retainer agreement.", "success");
                     
                     setTimeout(() => {
                         // Redirect to DocuSeal signing URL

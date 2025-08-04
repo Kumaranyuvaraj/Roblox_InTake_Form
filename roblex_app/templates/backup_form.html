@@ -255,88 +255,10 @@ color: red;
     }
 }
 
- #documentStatusBanner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 9999;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            font-family: 'Poppins', sans-serif;
-            min-height: 60px;
-            transition: opacity 0.5s ease-in-out;
-            opacity: 0;
-            padding: 20px;
-            margin: 0;
-            border-radius: 0;
-            text-align: center;
-            border: none;
-            width: 100%;
-        }
-        
-        #documentStatusBanner.success {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            border: 2px solid #c3e6cb;
-            color: #155724;
-        }
-        
-        #documentStatusBanner.warning {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border: 2px solid #ffeaa7;
-            color: #856404;
-        }
-        
-        #documentStatusBanner #statusTitle {
-            font-weight: 600;
-            margin-bottom: 8px;
-            margin-top: 0;
-        }
-        
-        #documentStatusBanner #statusMessage {
-            font-weight: 400;
-            opacity: 0.9;
-            margin-bottom: 8px;
-        }
-        
-        #documentStatusBanner .container {
-            position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        #documentStatusBanner .btn-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            font-weight: bold;
-            color: inherit;
-            opacity: 0.5;
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-            line-height: 1;
-        }
-        
-        #documentStatusBanner .btn-close:hover {
-            opacity: 1;
-        }
 
 </style>
 
 <body class="bg-light">
-
-      <!-- Success/Decline Message Banner -->
-    <div id="documentStatusBanner" style="display: none;">
-        <div class="container">
-            <h4 id="statusTitle"></h4>
-            <p id="statusMessage"></p>
-            
-            <button type="button" class="btn-close" aria-label="Close">&times;</button>
-        </div>
-    </div>
 
 
     <!-- <div class=" mt-4 mb-5 px-3"> -->
@@ -1257,7 +1179,11 @@ $(document).ready(function () {
                     $(".text-danger").remove();
                     $('.robloxValidationStatus').html('');
                 }, 1000);
-                window.location.href = "/gratitude";
+
+                const confirmed = confirm("Do you want to go to the landing page?");
+                if (confirmed) {
+                    window.location.href = "/";
+                }
             },
             error: function (xhr) {
                 console.error(xhr.responseJSON);
@@ -1266,8 +1192,6 @@ $(document).ready(function () {
         });
     });
 });
-
-
 
 
     });
@@ -1334,63 +1258,6 @@ $(document).ready(function () {
     flatpickr("#last_contact", {
         dateFormat: "m-d-Y",
         allowInput: true
-    });
-</script>
-
-<script>
-    // Banner display function
-    function showDocumentStatusMessage(type, title, message) {
-      console.log('showDocumentStatusMessage called with:', { type, title, message });
-
-      const banner = document.getElementById('documentStatusBanner');
-      const titleElement = document.getElementById('statusTitle');
-      const messageElement = document.getElementById('statusMessage');
-
-      if (!banner || !titleElement || !messageElement) {
-        console.error('Required elements not found');
-        return;
-      }
-
-      titleElement.textContent = title;
-      messageElement.textContent = message;
-
-      banner.className = ''; // reset
-      banner.classList.add(type);
-
-      banner.style.display = 'block';
-      setTimeout(() => {
-        banner.style.opacity = '1';
-      }, 50);
-
-      // Auto-hide after 10 seconds
-      setTimeout(() => {
-        banner.style.opacity = '0';
-        setTimeout(() => {
-          banner.style.display = 'none';
-        }, 500);
-      }, 10000);
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // Close button functionality
-      const closeBtn = banner.querySelector('.btn-close');
-      if (closeBtn) {
-        closeBtn.onclick = function () {
-          banner.style.opacity = '0';
-          setTimeout(() => {
-            banner.style.display = 'none';
-          }, 500);
-        };
-      }
-    }
-
-    // Auto-display success message when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      showDocumentStatusMessage(
-        'success',
-        '🎉 Document Successfully Signed!',
-        'Thank you for completing the retainer agreement. We have received your signed document and will be in touch with you shortly regarding the next steps in your case.'
-      );
     });
 </script>
 

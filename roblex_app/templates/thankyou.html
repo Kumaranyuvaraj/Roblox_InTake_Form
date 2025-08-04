@@ -1,11 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thank You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Poppins", system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 60%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2d2d44;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2.5rem 2rem;
+      border-radius: 18px;
+      box-shadow: 0 30px 60px -10px rgba(0,0,0,0.25);
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.8s ease-out;
+    }
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #f0f4ff);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 30px -5px rgba(102,126,234,0.6);
+    }
+    .icon-wrapper svg {
+      width: 40px;
+      height: 40px;
+      stroke: #667eea;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    h1 {
+      margin: 0.25rem 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #2d2d44;
+    }
+    p {
+      margin: 0.75rem 0 1.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #555a7b;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #667eea 0%, #43c6ac 100%);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: transform .2s ease, filter .2s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+    .subtle {
+      font-size: 0.75rem;
+      color: #999bb5;
+      margin-top: 1rem;
+    }
+
+    /* confetti dots */
+    .confetti {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: white;
+      opacity: 0.8;
+      border-radius: 2px;
+      animation: fall 3s linear infinite;
+      mix-blend-mode: screen;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-120px) rotate(0deg);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(420px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card { animation: none; }
+      .confetti-piece { animation: none; }
+    }
+  </style>
 </head>
 <body>
-    <h1>Thank You!!!</h1>
+  <div class="card" role="status" aria-label="Thank you message">
+    <div class="icon-wrapper" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+    <h1>Thank You!</h1>
+    <p>Your submission has been received successfully.</p>
+    <a href="/" class="btn">Go Back Home</a>
+    <div class="subtle">We appreciate your time and effort.</div>
+    <div class="confetti" aria-hidden="true"></div>
+  </div>
+
+  <script>
+    // simple confetti effect
+    const confettiContainer = document.querySelector('.confetti');
+    const colors = ['#ffecb3','#ffd54f','#ff8a65','#81d4fa','#b39ddb','#a5d6a7'];
+    const count = 40;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('div');
+      piece.classList.add('confetti-piece');
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.left = Math.random() * 100 + '%';
+      piece.style.animationDelay = (Math.random() * 2) + 's';
+      piece.style.animationDuration = (2 + Math.random()*2) + 's';
+      piece.style.transform = `scale(${0.7 + Math.random()*0.6})`;
+      confettiContainer.appendChild(piece);
+    }
+  </script>
 </body>
 </html>

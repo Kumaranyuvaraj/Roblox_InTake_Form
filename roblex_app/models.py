@@ -148,8 +148,9 @@ class UserDetail(models.Model):
     email = models.EmailField()
     zipcode = models.CharField(max_length=10)
     working_with_attorney = models.CharField(max_length=3, choices=ATTORNEY_CHOICES)
-    gamer_dob = models.DateField(null=True, blank=True)
+    
     additional_notes = models.CharField(max_length=100, blank=True, null=True)
+    gamer_dob = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
