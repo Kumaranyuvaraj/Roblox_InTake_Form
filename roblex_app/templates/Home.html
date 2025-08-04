@@ -1181,32 +1181,41 @@ let questionsData = [];
         }
 
         if (ageOptionData.requires_parental_signature) {
-            // Show modal with "Continue" button
-            showModal("Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer agreement signing.", "success", true);
-            
-            // Attach event AFTER modal is fully rendered
-            setTimeout(() => {
-                const continueBtn = document.getElementById('modal-continue-btn');
-                if (continueBtn) {
-                    continueBtn.addEventListener('click', () => {
-                        // Close modal
-                        closeCustomModal();
+            // Step 1: Start Document Generation First
+            createDocumentSubmission('retainer_agreement', 'eligible_with_parent')
+                .then(() => {
+                    // Step 2: Once document is ready, show Modal
+                    showModal(
+                        "Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer agreement signing.",
+                        "success",
+                        true
+                    );
 
-                        // Create document submission for signing
-                        if (ageOptionData.redirect_to_retainer) {
-                            createDocumentSubmission('retainer_agreement', 'eligible_with_parent');
-                        } else if (typeof callback === "function") {
-                            callback("/retainer-form/");
+                    // Step 3: Attach Continue button handler after modal is rendered
+                    setTimeout(() => {
+                        const continueBtn = document.getElementById('modal-continue-btn');
+                        if (continueBtn) {
+                            continueBtn.addEventListener('click', () => {
+                                // Close modal
+                                closeCustomModal();
+
+                                // Navigate to next page instantly
+                                if (ageOptionData.redirect_to_retainer) {
+                                    window.location.href = '/retainer-form';
+                                } else if (typeof callback === "function") {
+                                    callback("/retainer-form/");
+                                }
+                            });
+                        } else {
+                            console.error("Continue button not found!");
                         }
-                    });
-                } 
-                
-                else {
-                    console.error("Continue button not found!");
-                }
-            }, 200);
-
-        } else {
+                    }, 200);
+                })
+                .catch((error) => {
+                    console.error("Error in document creation:", error);
+                    // Optional: Show an error modal or alert to user
+                });
+        }else {
             // If no parental signature needed, create document submission
             // showModal("You are eligible for the retainer agreement. Preparing document for signing...");
             setTimeout(() => {
