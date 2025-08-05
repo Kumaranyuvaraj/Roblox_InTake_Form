@@ -245,6 +245,7 @@ class DocumentTemplate(models.Model):
         ('retainer_minor', 'Retainer Agreement - Minor (with parent signature)'),
         ('retainer_adult', 'Retainer Agreement - Adult (18-20)'),
         ('intake_supplemental', 'Supplemental Intake Document'),
+        ('florida_disclosure', 'Florida Disclosure Document (Zipcode 32003-34997)'),
     ]
     
     name = models.CharField(max_length=50, choices=TEMPLATE_TYPES, unique=True)

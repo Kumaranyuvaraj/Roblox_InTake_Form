@@ -2,11 +2,9 @@ from django.urls import path
 
 from roblex_app.views import IntakeFormAPIView, IntakeFormView,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
 QuestionListAPIView, SubmitAnswerAPIView,LandingPage,IndexPage,SendEmailAPIView,EmailTemplateAPIView,\
-CreateDocumentSubmissionAPIView, DocumentWebhookAPIView
+CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView
 
 from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks
-
-# from roblex_app.views import generate_pdf
 
 urlpatterns = [
     path('', LandingPage.as_view(), name='intake-form-page'), 
@@ -30,11 +28,10 @@ urlpatterns = [
    
     # DocuSeal Document Signing API endpoints
     path('api/create-document-submission/', CreateDocumentSubmissionAPIView.as_view(), name='create-document-submission'),
+    path('api/check-document-status/', CheckDocumentStatusAPIView.as_view(), name='check-document-status'),
     path('api/document-webhook/', DocumentWebhookAPIView.as_view(), name='document-webhook'),
 
     path('retainer-form/', retainer_form, name='retainer-form'),
-
-    # path('api/eligibility/', EligibilityAPIView.as_view(), name='eligibility'),
 
     path('gratitude/', thanks, name='gratitude'),
 
