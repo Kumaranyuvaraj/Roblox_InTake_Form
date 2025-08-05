@@ -218,7 +218,6 @@ class SubmitIntakeIfValidAPIView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class UserDetailCreateView(APIView):
     def post(self, request):
         serializer = UserDetailSerializer(data=request.data)

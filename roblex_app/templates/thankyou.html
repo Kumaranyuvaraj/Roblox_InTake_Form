@@ -31,6 +31,20 @@
       overflow: hidden;
       animation: fadeIn 0.8s ease-out;
     }
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #999bb5;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .close-btn:hover {
+      color: #2d2d44;
+    }
     .icon-wrapper {
       width: 80px;
       height: 80px;
@@ -64,30 +78,12 @@
       font-weight: 500;
       color: #555a7b;
     }
-    .btn {
-      display: inline-block;
-      padding: 0.75rem 1.75rem;
-      font-size: 0.95rem;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #667eea 0%, #43c6ac 100%);
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: transform .2s ease, filter .2s ease;
-    }
-    .btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.05);
-    }
     .subtle {
       font-size: 0.75rem;
       color: #999bb5;
       margin-top: 1rem;
     }
 
-    /* confetti dots */
     .confetti {
       pointer-events: none;
       position: absolute;
@@ -126,15 +122,15 @@
 </head>
 <body>
   <div class="card" role="status" aria-label="Thank you message">
+    <button class="close-btn" onclick="window.location.href='/'" aria-label="Close">&times;</button>
     <div class="icon-wrapper" aria-hidden="true">
       <svg viewBox="0 0 24 24">
         <path d="M5 13l4 4L19 7"/>
       </svg>
     </div>
     <h1>Thank You!</h1>
-    <p>Your submission has been received successfully.</p>
-    <a href="/" class="btn">Go Back Home</a>
-    <div class="subtle">We appreciate your time and effort.</div>
+    <p>Your claim has been submitted. Our attorney team will keep in touch with you.</p>
+    <!-- <div class="subtle">We appreciate your time and effort.</div> -->
     <div class="confetti" aria-hidden="true"></div>
   </div>
 

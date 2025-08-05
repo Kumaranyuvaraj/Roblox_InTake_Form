@@ -9,8 +9,8 @@ class IntakeFormSerializer(serializers.ModelSerializer):
     guardian_last_name = serializers.CharField(required=True)
     # question = serializers.CharField(required=True)
     description_predators = serializers.CharField(required=False, allow_blank=True)
-    description_medical_psychological = serializers.CharField(required=True)
-    description_economic_loss = serializers.CharField(required=True)
+    description_medical_psychological = serializers.CharField(required=False,allow_blank=True)
+    description_economic_loss = serializers.CharField(required=False,allow_blank=True)
     cc_names = serializers.CharField(required=True)
     police_details = serializers.CharField(required=True)
     other_complaints = serializers.CharField(required=True)
@@ -48,13 +48,19 @@ class IntakeFormSerializer(serializers.ModelSerializer):
         if first_contact and last_contact:
             if first_contact > last_contact:
                 raise serializers.ValidationError("First contact date cannot be after last contact date.")
+            
+        
 
     # Require at least one gamertag
         if not any([
             data.get("roblox_gamertag"),
             data.get("discord_profile"),
             data.get("xbox_gamertag"),
-            data.get("ps_gamertag")
+            data.get("ps_gamertag"),
+            data.get("description_predators"),
+            data.get("description_medical_psychological"),
+            data.get("description_economic_loss"),
+            data.get("discovery_info")
         ]):
             raise serializers.ValidationError("At least one gamertag or profile must be provided.")
 

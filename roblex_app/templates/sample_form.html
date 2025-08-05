@@ -172,193 +172,157 @@
         .max-w-4xl {
     max-width: 56rem;
 }
-    .mx-auto {
-        margin-left: auto;
-        margin-right: auto;
-    }
-    label{
-        font-size: 14px;
-    }
-    input::placeholder,textarea::placeholder {
-        font-size: 13px;
-        color: #ccc;
-    }
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+label{
+    font-size: 14px;
+}
+input::placeholder,textarea::placeholder {
+    font-size: 13px;
+    color: #ccc;
+}
 
-    #inputContainer .robloxValidationStatus {
+#inputContainer .robloxValidationStatus {
+position: absolute;
+top: 32px;
+
+
+}
+
+.des-mg-tp{
+margin: 33px 3px;
+font-size: 12px;
+color: red;
+}
+
+.err-msg-mt{
+    margin-top: 35px;
+}
+.msg-min-width{
+    min-width: 200px;
+}
+.game-info-img{
     position: absolute;
-    top: 32px;
+}
 
+.rb-err-msg{
+    position: unset;
+    
+}
 
-    }
+.text-danger {
+    font-size: 14px;
+}
+.modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center; align-items: center;
+}
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    text-align: center;
+}
+.close-btn {
+    margin-top: 15px;
+    background-color: #495057;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.tick-icon {
+    display: block;
+    margin: 0 auto;
+    width: 60px;
+    height: auto;
+}
 
-    .des-mg-tp{
-    margin: 33px 3px;
-    font-size: 12px;
-    color: red;
+@media (min-width: 768px) {
+ .rb-err-msg{
+    position: absolute;
+    /* left: -713px; */
+    top: 16px;
     }
+}
 
-    .err-msg-mt{
-        margin-top: 35px;
-    }
-    .msg-min-width{
-        min-width: 200px;
-    }
-    .game-info-img{
-        position: absolute;
-    }
-
-    .rb-err-msg{
-        position: unset;
-        
-    }
-
-    .text-danger {
-        font-size: 14px;
-    }
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        justify-content: center; align-items: center;
-    }
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        max-width: 400px;
-        text-align: center;
-    }
-    .close-btn {
-        margin-top: 15px;
-        background-color: #495057;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .tick-icon {
-        display: block;
-        margin: 0 auto;
-        width: 60px;
-        height: auto;
-    }
-
-    @media (min-width: 768px) {
-    .rb-err-msg{
-        position: absolute;
-        /* left: -713px; */
-        top: 16px;
+ #documentStatusBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+            min-height: 60px;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            padding: 20px;
+            margin: 0;
+            border-radius: 0;
+            text-align: center;
+            border: none;
+            width: 100%;
         }
-    }
-
-    .top0{
-        top: 0 !important;
-    }
-    .error-border {
-        border: 1px solid red !important;
-        box-shadow: 0 0 5px red;
-        transition: box-shadow 0.3s ease, border-color 0.3s ease;
-    }
-
-    #documentStatusBanner {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                z-index: 9999;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                font-family: 'Poppins', sans-serif;
-                min-height: 60px;
-                transition: opacity 0.5s ease-in-out;
-                opacity: 0;
-                padding: 20px;
-                margin: 0;
-                border-radius: 0;
-                text-align: center;
-                border: none;
-                width: 100%;
-            }
-            
-            #documentStatusBanner.success {
-                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-                border: 2px solid #c3e6cb;
-                color: #155724;
-            }
-            
-            #documentStatusBanner.warning {
-                background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-                border: 2px solid #ffeaa7;
-                color: #856404;
-            }
-            
-            #documentStatusBanner #statusTitle {
-                font-weight: 600;
-                margin-bottom: 8px;
-                margin-top: 0;
-            }
-            
-            #documentStatusBanner #statusMessage {
-                font-weight: 400;
-                opacity: 0.9;
-                margin-bottom: 8px;
-            }
-            
-            #documentStatusBanner .container {
-                position: relative;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            
-            #documentStatusBanner .btn-close {
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                background: none;
-                border: none;
-                font-size: 24px;
-                font-weight: bold;
-                color: inherit;
-                opacity: 0.5;
-                cursor: pointer;
-                padding: 0;
-                margin: 0;
-                line-height: 1;
-            }
-            
-            #documentStatusBanner .btn-close:hover {
-                opacity: 1;
-            }
-
-             #spinnerOverlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.4);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-                }
-
-                .spinner {
-                border: 6px solid #f3f3f3;
-                border-top: 6px solid #4a90e2;
-                border-radius: 50%;
-                width: 60px;
-                height: 60px;
-                animation: spin 1s linear infinite;
-                }
-
-                @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-                }
+        
+        #documentStatusBanner.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        #documentStatusBanner.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        #documentStatusBanner #statusTitle {
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
+        
+        #documentStatusBanner #statusMessage {
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        #documentStatusBanner .container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        #documentStatusBanner .btn-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        #documentStatusBanner .btn-close:hover {
+            opacity: 1;
+        }
 
 </style>
 
@@ -654,7 +618,7 @@
                             <label>For parents/guardians-Describe app roximate date you discovered the predator's conduct
                                 and
                                 describe how you discovered the predator's conduct (did the minor child tell you, you found
-                                evidence, etc.). (if applicable)
+                                evidence, etc.).
                             </label>
                             <textarea name="discovery_info" class="form-control" placeholder=" parents/guardians-Describe app roximate date you discovered the predator's conduct"></textarea>
                         </div>
@@ -936,13 +900,6 @@
 
                     <div id="responseMessage" class="mt-3"></div>
                   </div>
-
-                    <!-- Spinner Overlay -->
-                    <div id="spinnerOverlay" style="display: none; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.8); z-index: 9999;">
-                        <div class="spinner"></div>
-                        <div id="spinnerMessage" style="margin-top: 20px; font-size: 18px; color: #333; text-align: center;">
-                        The document is processing and just one step away...
-                    </div>
                
             <!-- <div class="col-2"></div> -->
 <!-- 
@@ -985,7 +942,8 @@ $(document).ready(function () {
         "custody_other_detail"
     ];
     const textareaFields = [
-        "cc_names", "police_details",
+        "description_medical_psychological",
+        "description_economic_loss", "cc_names", "police_details",
         "other_complaints", "in_person_meeting", "additional_info"
     ];
     const radioFields = [
@@ -1024,7 +982,7 @@ $(document).ready(function () {
             error: function (xhr) {
                 const message = xhr.responseJSON?.error || "Gamertag not found.";
                 // $statusDiv.html(`<div class="des-mg-tp">${message}</div>`);
-                $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">${message}</div>`);
+                $statusDiv.html(`<div class="position-absolute text-danger msg-min-width">${message}</div>`);
                 robloxValidationStatus[$input.index()] = false;
             }
         });
@@ -1050,7 +1008,7 @@ $(document).ready(function () {
         }).get().filter(Boolean).join(", ");
     }
 
-        function validateIntakeForm() {
+    function validateIntakeForm() {
         let isValid = true;
         $(".text-danger").remove();
 
@@ -1058,53 +1016,19 @@ $(document).ready(function () {
         dateFields.forEach(field => {
             const input = $(`input[name="${field}"]`);
             const value = input.val();
-            input.removeClass('error-border')
             if (!value) {
                 isValid = false;
-                // input.after('<div class="text-danger">This field is required</div>');
-               input.addClass('error-border');
+                input.after('<div class="text-danger">This field is required</div>');
             } else {
                 const selectedDate = new Date(value + "T00:00:00");
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 if (selectedDate > today) {
                     isValid = false;
-                    // input.after('<div class="text-danger">Future dates are not allowed</div>');
+                    input.after('<div class="text-danger">Future dates are not allowed</div>');
                 }
             }
-
-            // Remove error on input
-            input.on('input', function () {
-                if ($(this).val().trim()) {
-                    $(this).removeClass('error-border');
-                }
-            });
-
         });
-
-
-        // ✅ Validate first_contact vs last_contact dates
-        // const firstContactValue = $('input[name="first_contact"]').val();
-        // const lastContactValue = $('input[name="last_contact"]').val();
-        
-        // if (firstContactValue && lastContactValue) {
-        //     // Parse MM-DD-YYYY format properly
-        //     const parseDate = (dateStr) => {
-        //         if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
-        //             const [month, day, year] = dateStr.split('-');
-        //             return new Date(year, month - 1, day); // month is 0-indexed
-        //         }
-        //         return new Date(dateStr);
-        //     };
-            
-        //     const firstContactDate = parseDate(firstContactValue);
-        //     const lastContactDate = parseDate(lastContactValue);
-            
-        //     if (firstContactDate > lastContactDate) {
-        //         isValid = false;
-        //         $('input[name="first_contact"]').after('<div class="text-danger">First contact date cannot be after last contact date</div>');
-        //     }
-        // }
 
        // Initialize Flatpickr with MM-DD-YYYY format
         flatpickr("#first_contact", {
@@ -1123,7 +1047,7 @@ $(document).ready(function () {
                     const val = this.value.trim();
                     const isValid = /^\d{2}-\d{2}-\d{4}$/.test(val);  // MM-DD-YYYY pattern
                     if (!isValid) {
-                        // alert("Please enter date in MM-DD-YYYY format");
+                        alert("Please enter date in MM-DD-YYYY format");
                         this.value = '';
                     }
                 });
@@ -1144,36 +1068,18 @@ $(document).ready(function () {
         // ✅ Text & Textarea
         textFields.forEach(field => {
             const input = $(`input[name="${field}"]`);
-            input.removeClass('error-border')
             if (input.is(':visible') && !getFieldValues(field).trim()) {
                 isValid = false;
-                // input.after('<div class="text-danger">This field is required</div>');
-                input.addClass('error-border');
+                input.after('<div class="text-danger">This field is required</div>');
             }
-               // Remove error on input
-                input.on('input', function () {
-                    if ($(this).val().trim()) {
-                        $(this).removeClass('error-border');
-                    }
-    });
-
         });
 
         textareaFields.forEach(field => {
             const textarea = $(`textarea[name="${field}"]`);
-            textarea.removeClass('error-border')
             if (!textarea.val().trim()) {
                 isValid = false;
-                // textarea.after('<div class="text-danger">This field is required</div>');
-                textarea.addClass('error-border');
+                textarea.after('<div class="text-danger">This field is required</div>');
             }
-               // Remove error on input
-            textarea.on('input', function () {
-                if ($(this).val().trim()) {
-                    $(this).removeClass('error-border');
-        }
-    });
-
         });
 
         radioFields.forEach(field => {
@@ -1195,8 +1101,6 @@ $(document).ready(function () {
 
         return isValid;
     }
-
-    
 
     function getSelectedRadioValues() {
         const radioData = {};
@@ -1309,9 +1213,6 @@ $(document).ready(function () {
         e.preventDefault();
         if (!validateIntakeForm()) return;
 
-        // ✅ Show Spinner Immediately After Validation
-        document.getElementById('spinnerOverlay').style.display = 'flex';
-
         const formData = {};
         radioFields.forEach(field => {
             const selected = [];
@@ -1356,16 +1257,10 @@ $(document).ready(function () {
                     $(".text-danger").remove();
                     $('.robloxValidationStatus').html('');
                 }, 1000);
-
-                // ✅ Hide spinner before redirect
-                document.getElementById('spinnerOverlay').style.display = 'none';
                 window.location.href = "/gratitude";
             },
             error: function (xhr) {
                 console.error(xhr.responseJSON);
-
-                // ✅ Hide spinner on error
-                document.getElementById('spinnerOverlay').style.display = 'none';
                 $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
             }
         });
@@ -1503,5 +1398,3 @@ $(document).ready(function () {
 
 </body>
 </html>
-
-
