@@ -21,6 +21,11 @@ class Command(BaseCommand):
                 'name': 'intake_supplemental',
                 'docuseal_template_id': 1000003,  # Replace with actual DocuSeal template ID
                 'description': 'Supplemental intake documentation',
+            },
+            {
+                'name': 'florida_disclosure',
+                'docuseal_template_id': 7,  # Template ID provided by user
+                'description': 'Florida Disclosure Document for zipcodes 32003-34997',
             }
         ]
 

@@ -2,39 +2,44 @@ from datetime import date
 import json
 import re
 import traceback
-from django.http import JsonResponse
 import requests
+import base64
+import uuid
+import smtplib
+from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer,EmailLog
-from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer
 from django.conf import settings
-from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer,EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
-from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer,QuestionSerializer, UserAnswerSerializer,EmailLogSerializer, DocumentTemplateSerializer, DocumentSubmissionSerializer, DocumentWebhookEventSerializer
-from django.shortcuts import render,redirect
-
+from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer, EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
+from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer, QuestionSerializer, UserAnswerSerializer, EmailLogSerializer
+from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
-
-import base64
 from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-import uuid
-
-import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-
 from rest_framework.parsers import MultiPartParser, FormParser
-from django.core.files.uploadedfile import InMemoryUploadedFile
 
-# from django.http import Http404, HttpResponse
-# from django.template.loader import render_to_string
-# from weasyprint import HTML
-# from roblex_app.models import IntakeForm
+
+def requires_florida_disclosure(zipcode):
+    """
+    Check if zipcode falls within Florida disclosure range (32003-34997)
+    """
+    if not zipcode:
+        return False
+    
+    # Extract numeric part from zipcode (handle ZIP+4 format)
+    zip_numeric = zipcode.split('-')[0]
+    
+    try:
+        zip_int = int(zip_numeric)
+        return 32003 <= zip_int <= 34997
+    except (ValueError, TypeError):
+        return False
+
 
 class IntakeFormView(APIView):
     """
@@ -71,20 +76,6 @@ class IntakeFormAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class IntakeFormPDFView(APIView):
-#     def get(self, request, pk):
-#         try:
-#             intake = IntakeForm.objects.get(pk=pk)
-#         except IntakeForm.DoesNotExist:
-#             raise Http404("Intake form not found.")
-
-#         html_string = render_to_string('pdf_template.html', {'data': intake})
-#         pdf = HTML(string=html_string).write_pdf()
-
-#         response = HttpResponse(pdf, content_type='application/pdf')
-#         response['Content-Disposition'] = f'attachment; filename="intake_form_{pk}.pdf"'
-#         return response
 
 def push_to_smart_advocate(data):
     SMARTADVOCATE_URL = "https://api.smartadvocate.com/saservice/sawebservice.svc/Receiver/OfficeCalls/a199ce2be8374f129d4bdd34adc6c3ce"
@@ -351,48 +342,6 @@ def email_view(request):
 def retainer_form(request):
     return render(request,'retainer_form.html')
 
-# class EligibilityAPIView(APIView):
-#     def post(self, request):
-#         dob_str = request.data.get("dob")  # expect "YYYY-MM-DD"
-#         if not dob_str:
-#             return Response({"error": "Date of birth is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         try:
-#             dob = date.fromisoformat(dob_str)
-#         except ValueError:
-#             return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         today = date.today()
-#         age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-
-#         # Find the first matching rule (you can order by priority if needed)
-#         rule = None
-#         for r in AgeEligibilityRule.objects.all():
-#             if r.matches(age):
-#                 rule = r
-#                 break
-
-#         if not rule:
-#             return Response({"error": "No matching eligibility rule."}, status=status.HTTP_404_NOT_FOUND)
-
-#         if not rule.is_eligible:
-#             template_type = "rejected"
-#         elif rule.requires_parental_signature:
-#             template_type = "eligible_with_parent"
-#         else:
-#             template_type = "eligible_no_parent"
-
-#         payload = {
-#             "age": age,
-#             "is_eligible": rule.is_eligible,
-#             "requires_parental_signature": rule.requires_parental_signature,
-#             "redirect_to_retainer": rule.redirect_to_retainer,
-#             "template_type": template_type,
-#         }
-#         serializer = EligibilityResultSerializer(payload)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
 def thanks(request):
     return render(request, 'thankyou.html')
 
@@ -401,14 +350,17 @@ def thanks(request):
 # ====================
 
 class CreateDocumentSubmissionAPIView(APIView):
-
+    """
+    Creates document submissions with dynamic Florida disclosure workflow.
+    For Florida zipcodes (32003-34997), creates both disclosure and retainer documents at once.
+    """
     
     def post(self, request):
         try:
             # Extract required parameters
             user_detail_id = request.data.get('user_detail_id')
             template_type = request.data.get('template_type', 'retainer_agreement')
-            email_template_type = request.data.get('email_template_type', 'eligible_no_parent')  # Default for eligible users
+            email_template_type = request.data.get('email_template_type', 'eligible_no_parent')
             
             if not user_detail_id:
                 return Response(
@@ -425,14 +377,161 @@ class CreateDocumentSubmissionAPIView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
-            # Get document template
-            try:
-                doc_template = DocumentTemplate.objects.get(name=template_type)
-            except DocumentTemplate.DoesNotExist:
+            # **NEW**: Florida disclosure workflow - create all required documents at once
+            florida_required = requires_florida_disclosure(user_detail.zipcode)
+            
+            if florida_required and template_type in ['retainer_agreement', 'retainer_minor', 'retainer_adult']:
+                # Create both Florida disclosure and retainer documents
+                print(f"Florida zipcode {user_detail.zipcode} detected - creating both documents")
+                
+                # Determine correct retainer type based on age
+                retainer_template_type = 'retainer_adult'  # Default
+                if user_detail.gamer_dob:
+                    from datetime import date
+                    today = date.today()
+                    dob = user_detail.gamer_dob
+                    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+                    retainer_template_type = 'retainer_minor' if age < 18 else 'retainer_adult'
+                
+                # Create both documents
+                documents_created = self._create_florida_workflow_documents(user_detail, retainer_template_type, email_template_type, request)
+                
+                if documents_created:
+                    # Get the first document (Florida disclosure) for initial signing
+                    florida_disclosure_submission = None
+                    for doc in documents_created:
+                        if doc.document_template.name == 'florida_disclosure':
+                            florida_disclosure_submission = doc
+                            break
+                    
+                    # If we found the Florida disclosure, provide its signing URL
+                    if florida_disclosure_submission:
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{florida_disclosure_submission.docuseal_slug}"
+                        
+                        return Response({
+                            "message": "Both Florida disclosure and retainer documents created successfully",
+                            "submission_url": signing_url,  # Frontend expects this field
+                            "submission_id": florida_disclosure_submission.docuseal_submission_id,
+                            "status": "pending",
+                            "external_id": florida_disclosure_submission.external_id,
+                            "template_type": "florida_disclosure",
+                            "florida_disclosure_required": True,
+                            "documents_created": len(documents_created),
+                            "workflow": "florida_dynamic"
+                        }, status=status.HTTP_201_CREATED)
+                    else:
+                        return Response(
+                            {"error": "Florida disclosure document not found in created documents"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
+                else:
+                    return Response(
+                        {"error": "Failed to create Florida workflow documents"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+            else:
+                # Standard single document creation for non-Florida residents
+                return self._create_single_document(user_detail, template_type, email_template_type, request)
+                
+        except Exception as e:
+            print(f"Error creating document submission: {str(e)}")
+            return Response(
+                {"error": f"Internal server error: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def _create_florida_workflow_documents(self, user_detail, retainer_template_type, email_template_type, request):
+        """
+        Create both Florida disclosure and retainer documents at once
+        """
+        documents_created = []
+        
+        try:
+            # 1. Create Florida disclosure document with specific Florida email template
+            florida_submission = self._create_document_submission(
+                user_detail, 
+                'florida_disclosure', 
+                'florida_disclosure',  # Use specific Florida disclosure email template
+                request
+            )
+            
+            if florida_submission:
+                documents_created.append(florida_submission)
+                print(f"Created Florida disclosure document: {florida_submission.id}")
+            
+            # 2. Create retainer document with regular email template
+            retainer_submission = self._create_document_submission(
+                user_detail, 
+                retainer_template_type, 
+                email_template_type,  # Use the original email template (eligible_no_parent or eligible_with_parent)
+                request
+            )
+            
+            if retainer_submission:
+                documents_created.append(retainer_submission)
+                print(f"Created retainer document: {retainer_submission.id}")
+            
+            return documents_created
+            
+        except Exception as e:
+            print(f"Error creating Florida workflow documents: {str(e)}")
+            return None
+    
+    def _create_single_document(self, user_detail, template_type, email_template_type, request):
+        """
+        Create a single document for non-Florida residents
+        """
+        try:
+            # Determine correct retainer type based on age if needed
+            actual_template_type = template_type
+            if template_type == 'retainer_agreement':
+                if user_detail.gamer_dob:
+                    from datetime import date
+                    today = date.today()
+                    dob = user_detail.gamer_dob
+                    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+                    actual_template_type = 'retainer_minor' if age < 18 else 'retainer_adult'
+                else:
+                    actual_template_type = 'retainer_minor'  # Default to minor if no DOB
+            
+            submission = self._create_document_submission(
+                user_detail, 
+                actual_template_type, 
+                email_template_type, 
+                request
+            )
+            
+            if submission:
+                signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{submission.docuseal_slug}"
+                
+                return Response({
+                    "submission_url": signing_url,
+                    "submission_id": submission.docuseal_submission_id,
+                    "status": "pending",
+                    "external_id": submission.external_id,
+                    "template_type": actual_template_type,
+                    "florida_disclosure_required": False
+                }, status=status.HTTP_201_CREATED)
+            else:
                 return Response(
-                    {"error": f"Document template '{template_type}' not found"},
-                    status=status.HTTP_404_NOT_FOUND
+                    {"error": "Failed to create document submission"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
+                
+        except Exception as e:
+            print(f"Error creating single document: {str(e)}")
+            return Response(
+                {"error": f"Internal server error: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def _create_document_submission(self, user_detail, template_name, email_template_type, request):
+        """
+        Helper method to create a single document submission
+        """
+        try:
+            # Get document template
+            doc_template = DocumentTemplate.objects.get(name=template_name)
             
             # Get email template for custom message
             email_template = None
@@ -459,106 +558,161 @@ class CreateDocumentSubmissionAPIView(APIView):
                     }
                 ],
                 "send_email": True,
-                "completed_redirect_url": f"{request.build_absolute_uri('/')}?signed=success",
+                "completed_redirect_url": f"{request.build_absolute_uri('/')}api/check-document-status/?user_id={user_detail.id}",
                 "declined_redirect_url": f"{request.build_absolute_uri('/')}?signed=declined"
             }
             
             # Add custom message if email template exists
             if email_template:
-                # Replace placeholder in email body with user's first name
                 custom_body = email_template.body.replace('[User First Name]', user_detail.first_name)
-                
                 submitter_data["message"] = {
                     "subject": email_template.subject,
                     "body": custom_body
                 }
-                
-                print(f"Using custom email message: Subject='{email_template.subject}' for user {user_detail.email}")
-            else:
-                print(f"No email template found, using default DocuSeal message for user {user_detail.email}")
             
             # Make API call to DocuSeal
             headers = {
                 "X-Auth-Token": settings.NEXTKEYSIGN_API_TOKEN,
                 "Content-Type": "application/json"
             }
-
-
+            
             response = requests.post(docuseal_url, json=submitter_data, headers=headers)
             
             if response.status_code in [200, 201]:
                 docuseal_response = response.json()
                 
-                # DocuSeal API returns an array of submitters directly
                 if isinstance(docuseal_response, list) and len(docuseal_response) > 0:
                     first_submitter = docuseal_response[0]
-                else:
-                    print(f"DocuSeal API response validation failed: Expected array with submitters")
-                    print(f"Full response: {docuseal_response}")
                     
-                    return Response(
-                        {"error": "Document service returned invalid response format"},
-                        status=status.HTTP_503_SERVICE_UNAVAILABLE
-                    )
-                
-                # Validate required DocuSeal data from submitter object
-                submission_id = first_submitter.get('submission_id')
-                submitter_id = first_submitter.get('id')
-                submitter_slug = first_submitter.get('slug', '')
-                
-                if not submission_id or not submitter_id:
-                    error_msg = f"Invalid DocuSeal response - missing required data: submission_id={submission_id}, submitter_id={submitter_id}"
-                    print(f"DocuSeal API response validation failed: {error_msg}")
-                    print(f"Full response: {docuseal_response}")
+                    submission_id = first_submitter.get('submission_id')
+                    submitter_id = first_submitter.get('id')
+                    submitter_slug = first_submitter.get('slug', '')
                     
-                    return Response(
-                        {"error": f"Document service returned invalid data: {error_msg}"},
-                        status=status.HTTP_503_SERVICE_UNAVAILABLE
-                    )
-                
-                # Generate unique external ID
-                external_id = f"roblox_intake_{user_detail.id}_{timezone.now().strftime('%Y%m%d_%H%M%S')}"
-                
-                # Create document submission record
-                submission = DocumentSubmission.objects.create(
-                    user_detail=user_detail,
-                    document_template=doc_template,
-                    docuseal_submission_id=submission_id,
-                    docuseal_submitter_id=submitter_id,
-                    docuseal_slug=submitter_slug,
-                    status='pending',
-                    external_id=external_id
-                )
-                
-                # Build signing URL
-                signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{submitter_slug}"
-                
-                # Log the creation
-                print(f"Created document submission {submission.id} for user {user_detail.email}")
-                
-                return Response({
-                    "submission_url": signing_url,
-                    "submission_id": submission_id,
-                    "status": "pending",
-                    "external_id": external_id
-                }, status=status.HTTP_201_CREATED)
+                    if submission_id and submitter_id:
+                        # Generate unique external ID
+                        external_id = f"roblox_{template_name}_{user_detail.id}_{timezone.now().strftime('%Y%m%d_%H%M%S')}"
+                        
+                        # Create document submission record
+                        submission = DocumentSubmission.objects.create(
+                            user_detail=user_detail,
+                            document_template=doc_template,
+                            docuseal_submission_id=submission_id,
+                            docuseal_submitter_id=submitter_id,
+                            docuseal_slug=submitter_slug,
+                            status='pending',
+                            external_id=external_id
+                        )
+                        
+                        print(f"Created document submission {submission.id} for template {template_name}")
+                        return submission
             
-            else:
-                # DocuSeal API error
-                error_msg = response.text
-                print(f"DocuSeal API error: {response.status_code} - {error_msg}")
-                
-                return Response(
-                    {"error": f"Document service error: {error_msg}"},
-                    status=status.HTTP_503_SERVICE_UNAVAILABLE
-                )
-                
+            return None
+            
+        except DocumentTemplate.DoesNotExist:
+            print(f"Document template '{template_name}' not found")
+            return None
         except Exception as e:
-            print(f"Error creating document submission: {str(e)}")
-            return Response(
-                {"error": f"Internal server error: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            print(f"Error creating document submission for {template_name}: {str(e)}")
+            return None
+
+
+class CheckDocumentStatusAPIView(APIView):
+    """
+    Endpoint to check document signing status for dynamic Florida workflow.
+    Redirects users based on which documents they've completed.
+    """
+    
+    def get(self, request):
+        try:
+            user_id = request.GET.get('user_id')
+            
+            if not user_id:
+                return redirect('/?error=missing_user_id')
+            
+            try:
+                user_detail = UserDetail.objects.get(id=user_id)
+            except UserDetail.DoesNotExist:
+                return redirect('/?error=user_not_found')
+            
+            # Get all document submissions for this user
+            submissions = DocumentSubmission.objects.filter(user_detail=user_detail).order_by('-created_at')
+            
+            if not submissions.exists():
+                return redirect('/?error=no_documents_found')
+            
+            # Check if this is a Florida workflow (has both disclosure and retainer documents)
+            florida_required = requires_florida_disclosure(user_detail.zipcode)
+            
+            # Count completed documents by type
+            completed_docs = {}
+            pending_docs = {}
+            
+            for submission in submissions:
+                template_name = submission.document_template.name
+                
+                if submission.status == 'completed':
+                    completed_docs[template_name] = submission
+                else:
+                    pending_docs[template_name] = submission
+            
+            if florida_required:
+                # Florida workflow - need both disclosure and retainer completed
+                florida_completed = 'florida_disclosure' in completed_docs
+                retainer_completed = any(template in completed_docs for template in ['retainer_minor', 'retainer_adult'])
+                
+                if florida_completed and retainer_completed:
+                    # Both documents completed - success!
+                    return redirect('/?signed=success&workflow=florida_complete')
+                elif florida_completed and not retainer_completed:
+                    # Disclosure complete, need to sign retainer
+                    retainer_pending = None
+                    for template in ['retainer_minor', 'retainer_adult']:
+                        if template in pending_docs:
+                            retainer_pending = pending_docs[template]
+                            break
+                    
+                    if retainer_pending:
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{retainer_pending.docuseal_slug}"
+                        return redirect(signing_url)
+                    else:
+                        return redirect('/?error=retainer_document_missing')
+                elif not florida_completed and retainer_completed:
+                    # Retainer complete, need to sign disclosure
+                    florida_pending = pending_docs.get('florida_disclosure')
+                    
+                    if florida_pending:
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{florida_pending.docuseal_slug}"
+                        return redirect(signing_url)
+                    else:
+                        return redirect('/?error=disclosure_document_missing')
+                else:
+                    # Neither completed - redirect to first available document
+                    if 'florida_disclosure' in pending_docs:
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{pending_docs['florida_disclosure'].docuseal_slug}"
+                        return redirect(signing_url)
+                    elif pending_docs:
+                        # Redirect to any pending document
+                        first_pending = list(pending_docs.values())[0]
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{first_pending.docuseal_slug}"
+                        return redirect(signing_url)
+                    else:
+                        return redirect('/?error=no_pending_documents')
+            else:
+                # Standard workflow - single document
+                if completed_docs:
+                    # Document completed - success!
+                    return redirect('/?signed=success')
+                elif pending_docs:
+                    # Redirect to pending document
+                    first_pending = list(pending_docs.values())[0]
+                    signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{first_pending.docuseal_slug}"
+                    return redirect(signing_url)
+                else:
+                    return redirect('/?error=no_documents_available')
+                    
+        except Exception as e:
+            print(f"Error checking document status: {str(e)}")
+            return redirect('/?error=status_check_failed')
 
 
 class DocumentWebhookAPIView(APIView):

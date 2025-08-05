@@ -44,6 +44,28 @@ Best regards,
 The Legal Team'''
             },
             {
+                'name': 'florida_disclosure',
+                'subject': 'Florida Disclosure Required - Important Legal Notice',
+                'body': '''Dear [User First Name],
+
+As a Florida resident, we are required by law to provide you with specific disclosure information before proceeding with your case.
+
+👉 Please click the link below to review and digitally sign the Florida disclosure document:
+{{submitter.link}}
+
+Document: {{template.name}}
+From: {{account.name}}
+
+This disclosure contains important information about your rights and our legal obligations under Florida law. Please read it carefully before signing.
+
+After completing this disclosure, you will receive a separate email with your retainer agreement to finalize your case enrollment.
+
+If you have any questions about the disclosure or need assistance, please don't hesitate to contact our office.
+
+Best regards,  
+The Legal Team'''
+            },
+            {
                 'name': 'rejected',
                 'subject': 'Update on Your Roblox Case Inquiry',
                 'body': '''Thank you for reaching out to us regarding your Roblox case inquiry.
