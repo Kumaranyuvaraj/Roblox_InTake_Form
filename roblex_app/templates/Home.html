@@ -1330,16 +1330,23 @@ window.addEventListener("scroll", function () {
 
     // Remove red border on change or input
     document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll("#screen1 select, #screen1 input").forEach(el => {
+    const dobHiddenInput = document.getElementById("gamer_dob");
+    const dobVisibleInput = dobHiddenInput?.nextElementSibling; // null-safe access
+
+    document.querySelectorAll("#screen1 select, #screen1 input").forEach(el => {
         el.addEventListener("input", () => el.classList.remove("error-border"));
         el.addEventListener("change", () => el.classList.remove("error-border"));
-        });
-        dobHiddenInput.addEventListener("change", () => {
-        if (dobHiddenInput.value.trim()) {
-            dobVisibleInput.classList.remove("error-border");
-        }
-        });
     });
+
+    if (dobHiddenInput) {
+        dobHiddenInput.addEventListener("change", () => {
+            if (dobHiddenInput.value.trim()) {
+                dobVisibleInput?.classList.remove("error-border");
+            }
+        });
+    }
+});
+
 
     // ====================
     // DocuSeal Integration Functions
