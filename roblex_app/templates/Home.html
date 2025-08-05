@@ -436,11 +436,11 @@
     </div>
 
     <!-- Spinner Overlay -->
-    <div id="spinnerOverlay" style="display: none; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.8); z-index: 9999;">
+    <!-- <div id="spinnerOverlay" style="display: none; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.8); z-index: 9999;">
         <div class="spinner"></div>
         <div id="spinnerMessage" style="margin-top: 20px; font-size: 18px; color: #333; text-align: center;">
         Your document is being prepared. Just 2 steps to finish your Roblox claim.
-    </div>
+    </div> -->
 </div>
 
 
@@ -479,7 +479,7 @@
 </div>
 
 <!-- add this somewhere in your HTML if you don't already have it -->
-<div id="loadingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; font-family:system-ui;">
+<!-- <div id="loadingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; font-family:system-ui;">
   <div style="background:#fff; border-radius:12px; padding:2rem; max-width:420px; width:90%; text-align:center; position:relative; box-shadow:0 30px 60px -10px rgba(0,0,0,0.3);">
     <div style="margin-bottom:1rem;">
       <div class="spinner" aria-label="Loading" role="status" style="width:60px; height:60px; margin:0 auto 1rem; border:6px solid #e5e5e5; border-top-color:#667eea; border-radius:50%; animation:spin 1s linear infinite;"></div>
@@ -487,7 +487,7 @@
       <p id="loadingMessage" style="margin:8px 0 0; font-size:0.95rem; color:#555;">This may take up to 10 seconds. Redirecting in <span id="countdown">10</span>s...</p>
     </div>
   </div>
-</div>
+</div> -->
 
 
 
@@ -1246,7 +1246,7 @@ let questionsData = [];
                 if (continueBtn) {
                     continueBtn.addEventListener('click', () => {
                         // document.getElementById('spinnerMessage').textContent = "The document is processing and redirecting to the retainer form.";
-                        document.getElementById('spinnerOverlay').style.display = 'flex';
+                        // document.getElementById('spinnerOverlay').style.display = 'flex';
                         // Close modal
                         closeCustomModal();
 
