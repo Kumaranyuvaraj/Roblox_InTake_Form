@@ -265,3 +265,4 @@ node_modules/
 .yarn-integrity
 
 __pycache__
+.github
