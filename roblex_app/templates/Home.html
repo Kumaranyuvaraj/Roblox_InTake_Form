@@ -861,21 +861,9 @@ let questionsData = [];
         const urlParams = new URLSearchParams(window.location.search);
         const signed = urlParams.get('signed');
         
-        console.log('Checking document signing status:', signed);
-        console.log('Full URL:', window.location.href);
-        
         if (signed === 'success') {
-            console.log('Showing success message');
-            // showDocumentStatusMessage(
-            //     'success',
-            //     '🎉 Document Successfully Signed!',
-            //     '
-            // completing the retainer agreement. We have received your signed document and will be in touch with you shortly regarding the next steps in your case.'
-            // );
-
             window.location.href="/intake-form/"
         } else if (signed === 'declined') {
-            console.log('Showing declined message');
             showDocumentStatusMessage(
                 'warning',
                 '📋 Document Signing Declined',
@@ -885,7 +873,6 @@ let questionsData = [];
         
         // Clear the URL parameter to avoid showing the message again on refresh
         if (signed) {
-            console.log('Clearing URL parameter');
             const newUrl = window.location.pathname;
             window.history.replaceState({}, document.title, newUrl);
         }
@@ -894,17 +881,10 @@ let questionsData = [];
     /**
      * Show document status message banner
      */
-    function showDocumentStatusMessage(type, title, message) {
-        console.log('showDocumentStatusMessage called with:', { type, title, message });
-        
+    function showDocumentStatusMessage(type, title, message) {        
         const banner = document.getElementById('documentStatusBanner');
         const titleElement = document.getElementById('statusTitle');
         const messageElement = document.getElementById('statusMessage');
-        
-        console.log('Banner element:', banner);
-        console.log('Title element:', titleElement);
-        console.log('Message element:', messageElement);
-        
         if (!banner || !titleElement || !messageElement) {
             console.error('Required elements not found');
             return;
@@ -925,11 +905,7 @@ let questionsData = [];
         setTimeout(() => {
             banner.style.opacity = '1';
         }, 50);
-        
-        console.log('Banner classes:', banner.className);
-        console.log('Banner style display:', banner.style.display);
-        console.log('Banner should now be visible');
-        
+
         // Auto-hide after 15 seconds
         setTimeout(() => {
             banner.style.opacity = '0';
@@ -1272,18 +1248,18 @@ let questionsData = [];
 
     } else {
         // No parental signature needed
-        // Optional: show modal/message if desired
-
-        setTimeout(() => {
-                // if (ageOptionData.redirect_to_retainer) {
-                createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
-                // } else if (typeof callback === "function") {
-                //     callback("/retainer-form/");
-                // }
-            }, 1500); // small delay so user sees the message
+        // Show loading spinner
+        const spinnerOverlay = document.getElementById("spinnerOverlay");
+        if (spinnerOverlay) {
+            spinnerOverlay.style.display = "flex";
+        }
+        
+        // if (ageOptionData.redirect_to_retainer) {
+        createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
+        // } else if (typeof callback === "function") {
+        //     callback("/retainer-form/");
+        // }
     }
-
-
 
         // // Default: stay on the same page
         // if (typeof callback === "function") callback(null);
@@ -1367,7 +1343,6 @@ window.addEventListener("scroll", function () {
     function createDocumentSubmission(templateType = 'retainer_agreement', emailTemplateType = null) {
         // Show loading state
         // showModal("Preparing your document for signing...", "info");
-        console.log("Creating document submission for:", docType, eligibility);
         // Get user detail ID from form (you may need to store this differently)
         const userDetailId = getCurrentUserDetailId();
         
@@ -1414,7 +1389,7 @@ window.addEventListener("scroll", function () {
             template_type: dbTemplateName,
             email_template_type: finalEmailTemplateType
         };
-        // console.log("Creating document submission for:", docType, eligibility);
+
         // Make API call to create document submission
         $.ajax({
             url: '/api/create-document-submission/',
@@ -1425,7 +1400,6 @@ window.addEventListener("scroll", function () {
                 'X-CSRFToken': csrftoken
             },
             success: function(response) {
-                console.log('Document submission created:', response);
                 
                 // Close current modal
                 closeCustomModal();
