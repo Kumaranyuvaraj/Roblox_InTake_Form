@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,19 +10,127 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/style.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    
+    <!-- <style>
+        #documentStatusBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Poppins', sans-serif;
+            min-height: 60px;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            padding: 20px;
+            margin: 0;
+            border-radius: 0;
+            text-align: center;
+            border: none;
+            width: 100%;
+        }
+        
+        #documentStatusBanner.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        #documentStatusBanner.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        #documentStatusBanner #statusTitle {
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
+        
+        #documentStatusBanner #statusMessage {
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        #documentStatusBanner .container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        #documentStatusBanner .btn-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        #documentStatusBanner .btn-close:hover {
+            opacity: 1;
+        }
+    </style> -->
 
+    <style>
+    #spinnerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    }
 
+    .spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #4a90e2;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    }
 
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    </style>
 </head>
-  
+   
+
     <body>
+    <!-- Success/Decline Message Banner -->
+    <!-- <div id="documentStatusBanner" style="display: none;">
+        <div class="container">
+            <h4 id="statusTitle"></h4>
+            <p id="statusMessage"></p>
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+        </div>
+    </div> -->
+
           <!-- <nav class="navbar">
         <div class="nav-content">
             <a href="#" class="logo px-4">Logo Here</a>
@@ -34,218 +143,376 @@
         </div>
     </nav> -->
 
-    <section class="hero-index">
+    <section class="hero">
       
-        <a href="#" class="logo d-flex justify-content-left">
-            <img src="{% static 'img/theme.svg' %}" alt="Logo" style="width: 260px; height: auto;">
+        <a href="" class="logo  d-flex justify-content-left">
+            <img src="{% static 'img/theme.svg' %}" alt="Logo">
+            <!-- <img src="../static/img/theme.svg" alt="Logo" > -->
         </a>
-        
         <div class="hero-content">
               
 
-            <h1>Kids Hooked on Games? It’s No Accident...</h1>
+            <h1>Roblox & Adult Predators: A Must-Know Warning</h1>
             <div class="separator"></div>
-            <p>gaming companies Use manipulation tactics to keep children glued to their screens</p>
+            <!-- <p>Roblox, the world's largest user-generated gaming platform "designed for children," attracts 78 million daily visitors</p> -->
 
-        <div class="sub-heading outer-design"> Does Your Child Game More Than 2 hrs Per Day?</div>
-            <div class="row mt-4">
-                    <div class=" d-flex justify-content-center">
-                    <button class="home-btn" id="openModal" >Yes</button>
-                    <button class="home-btn" id="openModal2">No</button>
+            <div class="sub-heading"> Has your child had a troubling encounter with an adult on Roblox? If yes, we’re here to help. Just follow 3 simple steps:</div>
+           
+            <div class="step-wrapper">
+                <div class="steps">
+                    <div class="step-icon">
+                        <img src="{% static 'img/icon-prequalify.svg' %}" alt="Prequalify">
+                    </div>
+                    <div>
+                        <small class="pt-2 pb-1">Step 1</small>
+                        <h4>Prequalify</h4>
+                        <p>Briefly explain what happened during the troubling Roblox encounter.</p>
+                    </div>
+                </div>
+                <div class="steps">
+                    <div class="step-icon">
+                        <img src="{% static 'img/icon-retainer.svg' %}" alt="Prequalify">
+                    </div>
+                    <div>
+                        <small class="pt-2 pb-1">Step 2</small>
+                        <h4>Retainer</h4>
+                        <p>We’ll provide a simple agreement so we can move forward.</p>
+                    </div>
+                </div>
+                <div class="steps">
+                    <div class="step-icon">
+                        <img src="{% static 'img/icon-intake.svg' %}" alt="Prequalify">
+                    </div>
+                    <div>
+                        <small class="pt-2 pb-1">Step 3</small>
+                        <h4>Intake</h4>
+                        <p>Complete a quick intake form to understand how we can best help.</p>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row mt-4" id="fixBtnRow">
+                <div class=" d-flex justify-content-center">
+                    <!-- <button class="btn px-5 mx-3" id="openModal" >Yes</button> -->
+                    <button class="home-btn" id="openModal" >Check Prequalification</button>
+                    <!-- <a href="{% url 'index-form-page' %}" class="home-btn">No, all good</a> -->
                 </div>
             </div>
 
         </div>
     </section>
 
- 
-    <div class="section-content primary-color">
-        <div class="row px-4 py-5">
-            <div class="col-12 col-md-6 text-center">
-                <img src="{% static 'img/gamer-3.jpg' %}">
+    <!-- <main class="main-content">
+        <div class="content-grid">
+            <div class="content-card">
+                <div class="card-icon"><img src="{% static 'img/icon-expertise1.svg' %}" alt="Case Evaluation"></div>
+                <div>
+                    <h3>Class Action Expertise</h3>
+                    <p>Specialized representation for group litigation matters, ensuring collective justice and fair compensation.</p>
+                </div>
             </div>
-            <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
-      <h4>  85% OF KIDS & TEENS UNDER 18 ARE ADDICTED TO GAMING </h4>
-   
-      <div><p>That's millions of vulnerable children worldwide whose minds are being exploited by video game companies for profit. <strong>It's time to hold the companies responsible accountable.</strong></p><p></p><p>If your child's gaming habits have spiraled out of control, we can help you take legal action against gaming companies using manipulation tactics to keep children glued to their screens.</p></div>
-   
-    </div>
-</div>
-    </div>
-    <div class="section-safeguard secondary-color">
-        <div class="row px-4 py-5">
-             <marquee class="text-center font-large py-3"><h1 style="color: #64ffda;">Life-Altering Issues Caused By Gaming Addiction</h1></marquee>
-             
-                 <div class="col justify-content-center ">
-                       <main class="">
-        <div class="content-grid row">
-            <div class="content-card-index ">
-                <h3 class="text-center">Mental Health</h3>
-                <img src="{% static 'img/Mental_Health.jpg' %}" alt="Mental Health">
-                <p class="py-4 text-white text-center">ADHD/ADD, anxiety, depression, irritability, psychological distress.</p>
+            <div class="content-card">
+                <div class="card-icon"><img src="{% static 'img/icon-expertise2.svg' %}" alt="Case Evaluation"></div>
+                <div>
+                    <h3>Case Evaluation</h3>
+                    <p>Thorough analysis of legal claims to determine optimal strategies for successful resolution.</p>
+                </div>
             </div>
-            <div class="content-card-index ">
-                <h3 class="text-center">Physical Health</h3>
-                <img src="{% static 'img/physical.jpg' %}"  alt="Physical">
-                <p class="py-4 text-white text-center">Eye strain, repetitive strain injuries, and sedentary lifestyle diseases</p>
-            </div>
-            <div class="content-card-index ">
-                <h3 class="text-center">Daily Life</h3>
-                <img src="{% static 'img/daily_life.jpg' %}" alt="Daily Life">
-                <p class="py-4 text-white text-center">Escapism, poor school performance, sleep deprivation, and social isolation.</p>
-            </div>
-             <div class="content-card-index ">
-                <h3 class="text-center">Withdrawal Symptoms</h3>
-                <img src="{% static 'img/Aggression.jpg' %}" alt="Aggregation">
-                <p class="py-4 text-white text-center">Aggression, gamer's rage, and disengagement from daily activities.</p>
+            <div class="content-card">
+                <div class="card-icon"><img src="{% static 'img/icon-expertise3.svg' %}" alt="Case Evaluation"></div>
+                <div>
+                    <h3>Client Advocacy</h3>
+                    <p>Dedicated protection of client interests through aggressive litigation and negotiation tactics.</p>
+                </div>
             </div>
         </div>
-    </main>
+    </main> -->
+    <div class="section-content primary-color">
+        <div class="row px-4 py-5">
+            <div class="col-12 col-md-4 text-center pb-4 pb-md-0">
+                <!-- <img src="{% static 'img/Roblox-sec1.png' %}" alt="Roblox Image"> -->
+                <img src="{% static 'img/Roblox-sec1.png' %}" alt="Roblox Image">
+            </div>
+            <div class="col-12 col-md-8 d-flex flex-column justify-content-center">
+                <h4>  Is Roblox Putting Children at Risk of Predators? </h4>
+                <p>Many parents trust Roblox to be a safe gaming platform for their children, but mounting lawsuits suggest otherwise. Despite promising child protection, Roblox faces serious allegations of failing to stop predators from targeting kids on its platform.</p>
+                <h4>What You Should Know</h4>
+                <ul>
+                    <li>In 2023, Roblox reported 13,000+ sextortion cases to child safety authorities.</li>
+                    <li>In early 2024, law enforcement requests jumped 33% - predators are still active.</li>
+                    <li>Chat features, avatars, and hidden games are being used to manipulate children.</li>
+                    <li>Kids as young as six have encountered virtual strip clubs and explicit content.</li>
+                    <li>Lawsuits allege Roblox is not doing enough to monitor or block bad actors.</li>
+                    <li>Many parents believe it’s a safe space - but harmful content continues to slip through.</li>
+                </ul>
+                <h4 class="mb-0">This isn’t just a game - it’s a serious risk to children’s safety.</h4>
+      
+            </div>
+</div>
+    </div>
+    <div class="section-safeguard secondary-color1">
+        <div class="row px-4 py-5">
+             
+        <div class="col-12 col-md-8 bg-light-opacity d-flex flex-column justify-content-center">
+            <h4>Doesn’t Roblox Have Safeguards in Place?</h4>
+            <p>Roblox says it uses AI filters and 3,000 human moderators to monitor up to 50,000 private chats per second - all to keep kids safe.</p>
+            <h4>But Critics Say These Protections Are Failing</h4>
+            <ul>
+                <li>Independent researcher Ben Simon (aka Ruben Sim) has exposed major moderation flaws.</li>
+                <li>Harmless messages get flagged, while predatory chats go unchecked.</li>
+                <li>TikTok, with 3x Roblox’s users, employs 40,000 moderators — 10x more than Roblox.</li>
+                <li>Roblox, critics argue, spends more effort marketing safety than ensuring it.</li>
+            </ul>
+            <p class="text-italic mb-0"> “Roblox puts more time into convincing parents their platform is safe than actually protecting children.”</p>
+            <p><span class="bold">- Ben Simon</span>  |  <span class="small"> who urged Roblox to ban a convicted pedophile </span></p>
+            <h4>Roblox’s moderation may not be enough - and your child may not be as safe as you think.</h4>
+            
+                </div>    
+                 <div class=" col-12 col-md-4 text-center ">
+                    <!-- <img src="{% static 'img/Roblox-md-3.jpeg' %}"> -->
+                    <img src="{% static 'img/Roblox-md-3.jpeg' %}" alt="Roblox Safeguards Image">
                  </div>    
 </div>
     </div>
 
-    <div class="section-Lawsuit-index">
-        <div class="row px-4 py-5">
+    <div class="section-Lawsuit py-5">
+        <div class="row px-4">
             <div class="col-12">
-               <div id="" class="text-center">
-                <p>Get The Possible Compensation You Deserve</p>
-                <h1 class=""><strong>Help Create A Safer Gaming Environment For Children</strong></h1>
-                <div class="" data-animation-class=""><div>
-                    <p>Gaming companies' neglect of addiction and related injuries demands justice and accountability.</p>
-                    <p></p>
-                    <p>Our legal team will assess your eligibility for the lawsuit to help secure compensation for your child's professional help.</p>
+                <h4>What Is the Roblox Sexual Abuse Lawsuit About?</h4>
+                <p>Parents across the U.S. are filing lawsuits against Roblox, accusing the company of failing to protect children from sexual exploitation and financial abuse. These legal actions argue that the platform’s safeguards are inadequate, and children are paying the price.</p>
+                <div class="d-block d-md-flex justify-content-between">
+                    <div class=" lawsuit-box">
+                        <h4>Key Allegations</h4>
+                        <ul>
+                            <li>Lawsuit filed in Oct 2022</li>
+                            <li>Class-action claims Roblox exploits kids</li>
+                            <li>Weak controls enable adult content, grooming, and overspending</li>
+                        </ul>
+                    </div>
+                    <div class="lawsuit-box mb-0">
+                        <h4>Why It Matters</h4>
+                        <ul>
+                            <li>Shows systemic failure in safety</li>
+                            <li>Trusted platform exposing children</li>
+                            <li>Parents unaware of real dangers</li>
+                        </ul>
+                    </div>
                 </div>
-                <button class="" id="openModal3">Click To Sign Up</button>
             </div>
-        </div>
-            </div>
+            <!-- <div class="col-12 col-md-6 text-center"> -->
+ <!-- <img src="{% static 'img/Roblox-md-2.jpeg' %}"> -->
+            <!-- </div> -->
         </div>
 
     </div>
 
+    <div class="disclaimer py-4">
+        <div class="row">
+            <div class="col-12">
+                <p>DISCLAIMER</p>
+        
+                  <p>This website is for informational purposes only and is a paid legal advertisement. It does not constitute legal advice, nor does it create an attorney-client relationship. While we strive for accuracy, we cannot guarantee the completeness of the information provided. Always consult a licensed attorney for guidance on your specific legal situation. This website also does not offer medical advice; consult a physician before changing any medical regimen. We are not liable for actions taken based on the information presented here. Our mission is to help you access information that supports your rights.</p>
+                     <p class="mb-0"> © 2025 All rights reserved. NextKey Litigation.</p>
+            </div>
+        </div>
+        
+        
+
+    </div>
     <footer class="footer text-secondary">
-        <p>
-            DISCLAIMER This website is for informational purposes only. This is a paid legal advertisement. It does not constitute legal advice, and no attorney-client relationship is formed. The accuracy and completeness of the information cannot be guaranteed. Users should consult with an attorney for advice on their specific legal issues. This information does not constitute medical advice and it should not be relied upon as such. Always consult a doctor before changing any medical regimen. We are not responsible for any actions taken based on the information provided on this site. We strive to help you find information to fight for your rights.
-        </p>
-        <p class="small">All rights reserved Copyright © 2024 Litigation Notification | <a href="privacyandpolicy.html" class="text-secondary">Privacy Policy</a> | <a href="termsandcondition.html" class="text-secondary">Terms & Conditions</a></p>
+        <div class="d-block d-md-flex justify-content-between align-items-center ">
+
+            <div><a href="privacyandpolicy.html" class="text-secondary ">Privacy Policy </a>| <a href="termsandcondition.html" class="text-secondary">Terms & Conditions</a></div>
+            <div class="d-flex align-items-center gap-1">
+                follow us on:
+                <a href="#" target="_blank" class="text-secondary"><img src="{% static 'img/facebook.png' %}" /> </a> |
+                <a href="#" target="_blank" class="text-secondary"><img src="{% static 'img/insta.png' %}" /> </a>
+            </div>
+        </div>
+        
     </footer>
 
     <!-- modal popup code -->
       <div class="modal-overlay" id="modal">
         <div class="modal-content scroll">
-         <div class="row">
-            <div class="col-11"></div>
-            <button class="col-1 close-modal" onclick="closeModal()">&times;</button>
+            <div class="row justify-content-end">
+                <button class="col-12 close-modal" onclick="closeModal()">&times;</button>
             </div>
             <!-- Screen 1 -->
             <div class="form-screen active px-3" id="screen1">
-                <div class="mt-3">
-                    <label>Within the last 5 weeks, how many hours per day is spent playing Minecraft, Call Of Duty, Fortnite, Roblox or Grand Theft Auto? *</label>
+                <h4 class="model-title">Tell Us What Happened</h4>
+               <div class="input-group">
+                    <label>What best describes the troubling actions?</label>
+                    <select id="question_3" class="question-dropdown" data-question-text="What best describes the troubling actions?"></select>
+                </div>
+
+                <div class="input-group">
+                    <label>Did the child and predator first meet on Roblox?</label>
+                    <select id="question_4" class="question-dropdown" data-question-text="Did the child and predator first meet on Roblox?"></select>
+                </div>
+                <div class="input-group">
+                     <label>Within the last 5 weeks, how many hours per day is spent playing Minecraft, Call Of Duty, Fortnite, Roblox or Grand Theft Auto? *</label>
                     <select id="question_5" class="question-dropdown" data-question-text="Within the last 5 weeks, how many hours per day is spent playing Minecraft, Call Of Duty, Fortnite, Roblox or Grand Theft Auto? *"></select>
 
                 </div>
-               
-
-                   <div class="mt-3">
+                <div class="input-group">
                     <label> What harm has the gamer suffered from? *</label>
                     <select id="question_6" class="question-dropdown" data-question-text="What harm has the gamer suffered from? *"></select>
                 </div>
-                <div class="mt-3">
+                <div class="input-group">
                     <label>What treatment was received as a result of playing video games? *</label>
                     <select id="question_7" class="question-dropdown" data-question-text="What treatment was received as a result of playing video games? *"></select>
 
                 </div>
-                <!-- <div class="mt-3">
-                    <label>Age of gamer? *</label>
-                    <select id="question_8" class="question-dropdown" data-question-text="Age of gamer? *"></select>
-
-                </div> -->
-                <!-- <div class="mt-3">
-                    <label>Date of Birth of gamer? *</label>
-                    <input type="date" id="gamer_dob" class="form-control" required>
-                </div> -->
-
                 <div class="mt-3">
                     <label>Date of Birth of gamer? *</label>
-                    <input type="text" id="gamer_dob" class="form-control" placeholder="MM-DD-YYYY" required>
+                    <input type="text" id="gamer_dob" class="form-control" placeholder="MM-DD-YYYY">
                 </div>
 
-
-                <div class="form-footer">
-                    <button type="button" class="btn-primary" onclick="showScreen(2)">Next</button>
+                 <div class="form-footer">
+                    <!-- <button type="button" class="btn-blue" onclick="showScreen(2)">Next</button> -->
+                    <button type="button" class="btn-blue" onclick="validateScreen1()">Next</button>
                 </div>
             </div>
-
             <!-- Screen 2 -->
-            <div class="form-screen px-3" id="screen2">
+           <div class="form-screen px-3" id="screen2"> 
                 <div class="input-group">
-                <label>First Name:</label>
-                <input type="text" id="first_name" required>
-            </div>
-            <div class="input-group">
-                <label>Last Name:</label>
-                <input type="text" id="last_name" required>
-            </div>
-            <div class="input-group">
-                <label>Cell Phone:</label>
-                <input type="tel" id="cell_phone" required>
-            </div>
-            <div class="input-group">
-                <label>Email:</label>
-                <input type="email" id="email" required>
-            </div>
-            <div class="input-group">
-                <label>Zip Code:</label>
-                <input type="text" id="zipcode" required>
-            </div>
-            <div class="input-group">
-                <label>Are you currently working with an attorney for this case?</label>
-                <select id="working_with_attorney" required>
-                    <option value="">Select</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
-            </div>
-                 <div class="input-group">
-                    <label class="form-label">Additional Notes (optional)</label>
-                    <input type="text" id="additional_notes">
+                    <label>First Name *</label>
+                    <input type="text" id="first_name" placeholder="John" required>
+                </div>
+                <div class="input-group">
+                    <label>Last Name *</label>
+                    <input type="text" id="last_name" placeholder="Smith" required>
+                </div>
+                <div class="input-group">
+                    <label>Cell Phone *</label>
+                    <input type="tel" id="cell_phone" placeholder="123-456-7890" required>
+                </div>
+                <div class="input-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" placeholder="example@domain.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Zip Code *</label>
+                    <input type="text" id="zipcode" placeholder="12345" maxlength="5" required>
+                </div>
+                <div class="input-group">
+                    <label for="working_with_attorney">Are you currently working with an attorney for this case? *</label>
+                    <select id="working_with_attorney" required>
+                        <option value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Additional Notes (optional)</label>
+                    <input type="text" id="additional_notes" placeholder="Any additional details">
                 </div>
                 <div class="input-group d-flex">
-                    <div class="d-flex align-items-end gap-1">
-                        <input type="checkbox" id="consent_checkbox" class="col-1 check-bx">
-                        <label style="font-size: 11px;" class="">
-                            By selecting Submit and completing this form I confirm that I am over 18...
+                    <div class="d-flex align-items-start gap-1">
+                        <input type="checkbox" id="consent_checkbox" class="check-bx">
+                        <label for="consent_checkbox" style="font-size: 12px; padding-top: 2px;" class="">
+                            By selecting Submit and completing this form I confirm that I am over 18 years of age.
                         </label>
                     </div>
                 </div>
-                <div class="form-footer">
-                    <button type="button" class="btn-secondary" onclick="showScreen(1)">Back</button>
-                    <button type="button" class="btn-primary" onclick="submitForm()">Submit</button>
+                <div class="form-footer ">
+                    <button type="button" class="btn-blue-outline" onclick="showScreen(1)">Back</button>
+                    <button type="button" class="btn-blue" onclick="submitForm()">Submit</button>
+                    <!-- <button class="btn-blue" onclick="showCongrats()">Submit</button> -->
                 </div>
             </div>
+
+
+
+    
+
         </div>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+        <!-- <form style="display: none;">
+            {% csrf_token %}
+        </form> -->
     </div>
 
-    <!-- modal popup end -->
+    <!-- Spinner Overlay -->
+    <div id="spinnerOverlay" style="display: none; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.8); z-index: 9999;">
+        <div class="spinner"></div>
+        <div id="spinnerMessage" style="margin-top: 20px; font-size: 18px; color: #333; text-align: center;">
+        Your document is being prepared. Just 2 steps to finish your Roblox claim.
+    </div>
+</div>
 
- <script>
-      // Read CSRF token from the meta tag and add it to every AJAX request
+
+    <!-- modal popup end -->
+    <!-- Congratulations Start -->
+
+     <!-- <div class="congrats-modal" id="congratsModal">
+        <div class="congrats-content">
+            <div class="top-margin">
+
+           
+            <div class="firework"></div>
+            <div class="firework" style="left: 30%; animation-delay: 0.2s"></div>
+            <div class="firework" style="right: 30%; animation-delay: 0.4s"></div>
+            <h2 style="color: #096ae994;">🎉 Congratulations! 🎉</h2>
+            <p style="color: #096ae994;">You've successfully submitted!</p>
+            <button class="continue-btn" onclick="showLoading()">Continue</button>
+            <div class="loading-container center" id="loadingContainer">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="preparing-text" id="preparingText">Preparing your prequalifying Form...</div>
+        </div>
+        </div>
+    </div> -->
+    <!-- Congratulations End -->
+
+
+    
+<div id="customModal" class="modal">
+  <div class="modal-content">
+    <img id="modalIcon" class="icon" src="" alt="icon" />
+    <p id="modalMessage"></p>
+    <!-- <span class="close-btn" onclick="closeCustomModal()">&times;</span> -->
+    <button class="btn-blue" onclick="closeCustomModal()">OK</button>
+  </div>
+</div>
+
+<!-- add this somewhere in your HTML if you don't already have it -->
+<!-- <div id="loadingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; font-family:system-ui;">
+  <div style="background:#fff; border-radius:12px; padding:2rem; max-width:420px; width:90%; text-align:center; position:relative; box-shadow:0 30px 60px -10px rgba(0,0,0,0.3);">
+    <div style="margin-bottom:1rem;">
+      <div class="spinner" aria-label="Loading" role="status" style="width:60px; height:60px; margin:0 auto 1rem; border:6px solid #e5e5e5; border-top-color:#667eea; border-radius:50%; animation:spin 1s linear infinite;"></div>
+      <h2 style="margin:0; font-size:1.5rem;">Preparing Retainer</h2>
+      <p id="loadingMessage" style="margin:8px 0 0; font-size:0.95rem; color:#555;">This may take up to 10 seconds. Redirecting in <span id="countdown">10</span>s...</p>
+    </div>
+  </div>
+</div> -->
+
+
+
+<!-- <script src="https://unpkg.com/libphonenumber-js/bundle/libphonenumber-max.js"></script> -->
+
+
+<script>
+    // Read CSRF token from the meta tag and add it to every AJAX request
     function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
         }
-        return cookieValue;
     }
+    return cookieValue;
+}
 
+    
     const csrftoken = getCookie('csrftoken');
 
     $.ajaxSetup({
@@ -256,19 +523,36 @@
         }
     });
 
+
     function closeModal() {
         document.getElementById('modal').style.display = 'none';
     }
 
     document.getElementById('openModal').addEventListener('click', () => {
-        document.getElementById('modal').style.display = 'block';
+        document.getElementById('modal').style.display = 'flex';
     });
+
+    function validatePhone(number, region) {
+    try {
+        const phone = libphonenumber.parsePhoneNumber(number, region);
+        return phone.isValid();
+    } catch (e) {
+        return false;
+    }
+}
+
 
     // Modal Control
-    document.getElementById('openModal2').addEventListener('click', () => {
-        document.getElementById('modal').style.display = 'block';
-    });
+    // document.getElementById('openModal2').addEventListener('click', () => {
+    //     document.getElementById('modal').style.display = 'block';
+    // });
 
+    const modalBtn2 = document.getElementById('openModal2');
+    if (modalBtn2) {
+        modalBtn2.addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'block';
+        });
+    }
     function showScreen(screenNumber) {
         document.querySelectorAll('.form-screen').forEach(screen => {
             screen.classList.remove('active');
@@ -284,8 +568,31 @@
         altFormat: "m-d-Y",   // what the user sees
         dateFormat: "Y-m-d",  // what .val() returns
         maxDate: "today",
-        allowInput: true
+        allowInput: true,
+        onChange: function(selectedDates, dateStr, instance) {
+            // Remove error border when a valid date is selected
+            const altInput = instance.altInput;
+            if (dateStr) {
+            altInput.classList.remove("error-border");
+            }
+        }
     });
+
+    // const dobInput = document.getElementById('gamer_dob');
+
+    // dobInput.addEventListener('input', function (e) {
+    //     const raw = this.value.replace(/\D/g, ''); // remove non-digits
+    //     if (raw.length === 8) {
+    //         const mm = raw.slice(0, 2);
+    //         const dd = raw.slice(2, 4);
+    //         const yyyy = raw.slice(4);
+    //         const formatted = `${mm}-${dd}-${yyyy}`;
+
+    //         // Set formatted value for user to see
+    //         this._flatpickr.setDate(`${yyyy}-${mm}-${dd}`, true); // true = trigger change event
+    //     }
+    // });
+
 
     function parseDobString(d) {
         if (!d) return null;
@@ -313,25 +620,74 @@
     }
     // ------------------------------
 
+    // function isValidEmail(email) {
+    //     // basic RFC-ish check
+    //     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    // }
+
     function submitForm() {
+
+        let isValid = true;
+
+        // Reset error borders
+        $('#screen2 input, #screen2 select').removeClass('error-border');
+
         const first_name = $("#first_name").val().trim();
         const last_name = $("#last_name").val().trim();
         const cell_phone = $("#cell_phone").val().trim();
         const email = $("#email").val().trim();
         const zipcode = $("#zipcode").val().trim();
         const working_with_attorney = $("#working_with_attorney").val();
+        const gamer_dob = $("#gamer_dob").val();
         const consent = $("#consent_checkbox").is(":checked");
         const additional_notes = $("#additional_notes").val().trim();
 
-        if (!first_name || !last_name || !cell_phone || !email || !zipcode || !working_with_attorney) {
-            alert("Please fill all required fields.");
-            return;
+          // Required field check
+        if (!first_name) {
+            $("#first_name").addClass("error-border");
+            isValid = false;
+        }
+        if (!last_name) {
+            $("#last_name").addClass("error-border");
+            isValid = false;
         }
 
-        if (!consent) {
-            alert("You must agree to the terms before submitting.");
-            return;
+        // ✅ Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            $("#email").addClass("error-border");
+            isValid = false;
         }
+
+        // ✅ US Cell Phone validation (e.g., (123) 456-7890 or 123-456-7890)
+        const phoneRegex = /^(\(\d{3}\)\s*|\d{3}[-.\s]?)\d{3}[-.\s]?\d{4}$/;
+        if (!cell_phone || !phoneRegex.test(cell_phone)) {
+            $("#cell_phone").addClass("error-border");
+            isValid = false;
+        }
+
+        // ✅ US Zip Code validation (5-digit or ZIP+4)
+        const zipRegex = /^\d{5}(-\d{4})?$/;
+        if (!zipcode || !zipRegex.test(zipcode)) {
+            $("#zipcode").addClass("error-border");
+            isValid = false;
+        }
+
+        if (!working_with_attorney) {
+            $("#working_with_attorney").addClass("error-border");
+            isValid = false;
+        }
+
+   
+        if (!consent) {
+            $("#consent_checkbox").addClass("error-border");
+            isValid = false;
+        }
+
+        
+        // Block submission if any errors
+        if (!isValid) return;
+
 
         const redirectUrl = "/intake-form/";
 
@@ -347,10 +703,16 @@
                 email,
                 zipcode,
                 working_with_attorney,
+                gamer_dob,
                 additional_notes
             }),
             success: function (response) {
                 const userId = response.id;
+
+                //  submitAnswers(userId, function () {
+                //     showModal("All submitted!", "success");
+                //     window.location.href = redirectUrl;  // 🔁 Redirect here
+                // });
 
                 // ✅ Step 2: Store first/last name for prepopulation
                 sessionStorage.setItem("guardian_first_name", first_name);
@@ -358,24 +720,24 @@
 
                 // ✅ Step 3: Determine eligibility from DOB
                 const dobValue = $("#gamer_dob").val()?.trim();
-                if (!dobValue) {
-                    alert("Please enter the gamer's Date of Birth.");
-                    return;
-                }
+                // if (!dobValue) {
+                //     alert("Please enter the gamer's Date of Birth.");
+                //     return;
+                // }
 
                 // Parse DOB and calculate age using helper functions
                 const dob = parseDobString(dobValue);
-                if (!dob || isNaN(dob.getTime())) {
-                    alert("Please enter DOB in MM-DD-YYYY format.");
-                    return;
-                }
+                // if (!dob || isNaN(dob.getTime())) {
+                //     alert("Please enter DOB in MM-DD-YYYY format.");
+                //     return;
+                // }
                 const age = calcAge(dob);
 
                 // Find "Age of gamer" question and matching option
                 const ageQuestion = questionsData.find(q =>
                     q.text.toLowerCase().includes("age of gamer")
                 );
-                debugger;
+
                 let matchedOption = null;
                 if (ageQuestion) {
                     ageQuestion.options.forEach(opt => {
@@ -390,10 +752,12 @@
                     });
                 }
 
-                if (!matchedOption) {
-                    alert("No matching age group found for the entered DOB.");
-                    return;
-                }
+                if (!matchedOption) return;
+
+                // if (!matchedOption) {
+                //     showModal("No matching age group found for the entered DOB.", "error");
+                //     return;
+                // }
 
                 // ✅ Step 4: Determine templateType dynamically
                 let templateType = "";
@@ -405,46 +769,58 @@
                     templateType = "eligible_with_parent";
                 }
 
-                // ✅ Step 5: Fetch template from backend API
-                $.ajax({
-                    url: `/api/email-template/${templateType}/`,
-                    type: "GET",
-                    success: function (template) {
-                        // Replace placeholder with user name
-                        const subject = template.subject;
-                        const body = template.body.replace("[User First Name]", first_name);
+                // ✅ Step 5: Handle based on eligibility
+                if (!matchedOption.is_eligible) {
+                    // Send rejection email template
+                    $.ajax({
+                        url: `/api/email-template/${templateType}/`,
+                        type: "GET",
+                        success: function (template) {
+                            // Replace placeholder with user name
+                            const subject = template.subject;
+                            const body = template.body.replace("[User First Name]", first_name);
 
-                        // ✅ Step 6: Send Email via /send-email/
-                        const emailFormData = new FormData();
-                        emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
-                        emailFormData.append("to_email", email);
-                        emailFormData.append("subject", subject);
-                        emailFormData.append("body", body);
+                            // Send rejection email
+                            const emailFormData = new FormData();
+                            emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
+                            emailFormData.append("to_email", email);
+                            emailFormData.append("subject", subject);
+                            emailFormData.append("body", body);
 
-                        $.ajax({
-                            url: "/send-email/",
-                            type: "POST",
-                            data: emailFormData,
-                            processData: false,
-                            contentType: false,
-                            success: function () {
-                                // ✅ Step 7: Submit additional answers & redirect if needed
-                                submitAnswers(userId, function (redirectUrl) {
-                                    if (redirectUrl) {
-                                        window.location.href = redirectUrl;
-                                    }
-                                });
-                            },
-                            error: function (xhr) {
-                                const err = xhr.responseJSON?.error || "Error sending confirmation email.";
-                                alert("Submission succeeded but email failed: " + err);
-                            }
-                        });
-                    },
-                    error: function () {
-                        alert("Could not fetch email template. Please try again.");
-                    }
-                });
+                            $.ajax({
+                                url: "/send-email/",
+                                type: "POST",
+                                data: emailFormData,
+                                processData: false,
+                                contentType: false,
+                                success: function () {
+                                    showModal("Thank you for your interest. Based on the information provided, your case does not currently meet the eligibility criteria.", "error");
+                                    // Redirect to thank you page after short delay
+                                    setTimeout(() => {
+                                        window.location.href = "/gratitude/";
+                                    }, 1500);
+                                                },
+                                error: function (xhr) {
+                                    const err = xhr.responseJSON?.error || "Error sending email.";
+                                    showModal("Error: " + err, "error");
+                                }
+                            });
+                        },
+                        error: function () {
+                            showModal("Could not process request. Please try again.", "error");
+                        }
+                    });
+                } else {
+                    // Eligible - proceed to document signing workflow
+                    // Store user detail ID for document creation
+                    sessionStorage.setItem('user_detail_id', userId);
+                    
+                    // Proceed with answers submission and document creation
+                    submitAnswers(userId, function (redirectUrl) {
+                        // After answers are submitted, trigger document creation
+                        // This will be handled by the submitAnswers callback
+                    });
+                }
             },
             error: function (xhr) {
                 console.error(xhr.responseJSON);
@@ -453,10 +829,110 @@
         });
     }
 
+    function showModal(message, type = "info") {
+    const iconSources = {
+            // success: "{% static 'img/tick.jpg' %}",
+            success:"../static/img/tick.jpg",
+            error: "{% static 'img/error.jpg' %}",
+            info: "{% static 'img/info.jpg' %}"
+        };
+
+        $("#modalMessage").text(message);
+        $("#modalIcon").attr("src", iconSources[type] || iconSources.info);
+
+        $("#customModal").fadeIn();
+        $("#customModal").css("display", "flex");  
+    }
+
+
+
+    function closeCustomModal() {
+    $("#customModal").fadeOut();
+    }
+
+
     // $("#userForm")[0].reset();
-    let questionsData = [];
+let questionsData = [];
+
+    /**
+     * Check URL parameters for document signing status and show appropriate message
+     */
+    function checkDocumentSigningStatus() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const signed = urlParams.get('signed');
+        
+        if (signed === 'success') {
+            window.location.href="/intake-form/"
+        } else if (signed === 'declined') {
+            showDocumentStatusMessage(
+                'warning',
+                '📋 Document Signing Declined',
+                'You have declined to sign the retainer agreement. If you change your mind or have any questions, please feel free to contact us. You can restart the process at any time.'
+            );
+        }
+        
+        // Clear the URL parameter to avoid showing the message again on refresh
+        if (signed) {
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    }
+    
+    /**
+     * Show document status message banner
+     */
+    function showDocumentStatusMessage(type, title, message) {        
+        const banner = document.getElementById('documentStatusBanner');
+        const titleElement = document.getElementById('statusTitle');
+        const messageElement = document.getElementById('statusMessage');
+        if (!banner || !titleElement || !messageElement) {
+            console.error('Required elements not found');
+            return;
+        }
+        
+        // Set content
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        // Remove existing type classes and add new one
+        banner.className = '';
+        banner.classList.add(type);
+        
+        // Show the banner with animation
+        banner.style.display = 'block';
+        
+        // Use setTimeout to trigger opacity transition after element is shown
+        setTimeout(() => {
+            banner.style.opacity = '1';
+        }, 50);
+
+        // Auto-hide after 15 seconds
+        setTimeout(() => {
+            banner.style.opacity = '0';
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 500);
+        }, 15000);
+        
+        // Smooth scroll to top to ensure user sees the message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Handle manual close button
+        const closeBtn = banner.querySelector('.btn-close');
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                banner.style.opacity = '0';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 500);
+            };
+        }
+    }
 
     $(document).ready(function () {
+        // Check for document signing status in URL parameters
+        checkDocumentSigningStatus();
+        
         $.ajax({
             url: "/api/questions/",
             type: "GET",
@@ -485,9 +961,50 @@
                 alert("Failed to load questions.");
             }
         });
+
+        // Remove error-border on input/select change
+        $('#screen2 input, #screen2 select').on('input change', function () {
+            if ($(this).val().trim()) {
+                $(this).removeClass('error-border');
+            }
+        });
+
+        $('#consent_checkbox').on('change', function () {
+            if (this.checked) {
+                $(this).removeClass('error-border');
+            }
+        });
+
+        // Auto-format US phone number: 123-456-7890
+        $('#cell_phone').on('input', function () {
+            let cleaned = $(this).val().replace(/\D/g, ''); // Remove non-digits
+            if (cleaned.length > 10) cleaned = cleaned.slice(0, 10); // Limit to 10 digits
+
+            let formatted = cleaned;
+            if (cleaned.length > 6) {
+                formatted = cleaned.replace(/(\d{3})(\d{3})(\d{1,4})/, '$1-$2-$3');
+            } else if (cleaned.length > 3) {
+                formatted = cleaned.replace(/(\d{3})(\d{1,3})/, '$1-$2');
+            }
+
+            $(this).val(formatted);
+        });
+        // Auto-format US Zip Code: 12345
+        $('#zipcode').on('input', function () {
+            let value = $(this).val().replace(/\D/g, ''); // Remove non-digits
+            if (value.length > 5) value = value.slice(0, 5); // Limit to 5 digits
+            $(this).val(value);
+        });
     });
 
-function submitAnswers(userId, callback) {
+
+
+
+
+
+
+    function submitAnswers(userId, callback) {
+
     const promises = [];
     const csrf = (typeof getCookie === "function") ? getCookie("csrftoken") : null;
 
@@ -666,33 +1183,350 @@ function submitAnswers(userId, callback) {
         }
 
         // Use DB flags on the matched option
+        
+        // Show Modal function integrated with Continue button option
+        function showModal(message, withContinueBtn = false) {
+            const modal = document.getElementById('customModal');
+
+            // Dynamically update modal content with message and button
+            const footer = modal.querySelector('.modal-content');
+            footer.innerHTML = `
+                <p id="modalMessage">${message}</p>
+                ${withContinueBtn
+                    ? `<button id="modal-continue-btn" class="btn-blue">Continue</button>` 
+                    : `<button class="btn-blue" onclick="closeCustomModal()">OK</button>`}
+            `;
+
+            $("#customModal").fadeIn();
+        }
+
+        // Main eligibility check and redirection logic
         const ageOptionData = matchedAgeOption;
+
         if (!ageOptionData.is_eligible) {
-            alert("Thank you for your interest.Based on the information provided, your case does not currently meet the eligibility criteria for a Roblox minor gamer claim.We appreciate your time. If circumstances change, feel free to revisit this form.");
-            if (typeof callback === "function") callback(null);
+            // Redirect to thank-you / gratitude page instead of showing modal
+            if (typeof callback === "function") {
+                callback(null); // prevent any further redirection from callback
+            }
+            window.location.href = "/gratitude"; // adjust path if needed
             return;
         }
-
         if (ageOptionData.requires_parental_signature) {
-            alert("Thank you for answering the prequalification questions.Based on your responses, your case appears to be eligible for a Roblox minor gamer claim.Please click below to continue and complete the retainer form.");
-        } else {
-            alert("You are eligible for the retainer form.");
-        }
+        // Show modal with "Continue" button
+        showModal(
+            "Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer agreement signing.",
+            "success",
+            true
+        );
 
-        if (ageOptionData.redirect_to_retainer) {
-            if (typeof callback === "function") {
-                callback("/retainer-form/");
-                return;
+        // Attach event AFTER modal is rendered
+        setTimeout(() => {
+            const continueBtn = document.getElementById("modal-continue-btn");
+
+            if (continueBtn) {
+                continueBtn.addEventListener("click", () => {
+                    // Show loading spinner
+                    const spinnerOverlay = document.getElementById("spinnerOverlay");
+                    if (spinnerOverlay) {
+                        spinnerOverlay.style.display = "flex";
+                    }
+
+                    // Close the modal
+                    closeCustomModal();
+
+                        // Create document submission for signing
+                        // if (ageOptionData.redirect_to_retainer) {
+                        createDocumentSubmission('retainer_agreement', 'eligible_with_parent');
+                        // } else if (typeof callback === "function") {
+                        //     callback("/retainer-form/");
+                        // }
+                });
+            } else {
+                console.error("Continue button not found!");
             }
-        }
+        }, 200);
 
-        // Default: stay on the same page
-        if (typeof callback === "function") callback(null);
+    } else {
+        // No parental signature needed
+        // Show loading spinner
+        const spinnerOverlay = document.getElementById("spinnerOverlay");
+        if (spinnerOverlay) {
+            spinnerOverlay.style.display = "flex";
+        }
+        
+        // if (ageOptionData.redirect_to_retainer) {
+        createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
+        // } else if (typeof callback === "function") {
+        //     callback("/retainer-form/");
+        // }
+    }
+
+        // // Default: stay on the same page
+        // if (typeof callback === "function") callback(null);
     });
 }
 
+window.addEventListener("scroll", function () {
+        const button = document.getElementById("fixBtnRow");
+        const heroSection = document.querySelector(".hero");
+
+        if (window.scrollY > heroSection.offsetHeight) {
+            button.classList.add("fixed-btn");
+        } else {
+            button.classList.remove("fixed-btn");
+        }
+    });
+
+
+
+    // Validate Screen1
+    function validateScreen1() {
+        let isValid = true;
+
+        // Validate required select fields marked with asterisk in data-question-text
+        const selects = document.querySelectorAll("#screen1 .question-dropdown");
+        selects.forEach(select => {
+        const isRequired = select.dataset.questionText?.includes("*");
+        if (isRequired && !select.value) {
+            select.classList.add("error-border");
+            isValid = false;
+        } else {
+            select.classList.remove("error-border");
+        }
+        });
+
+        // Validate Date of Birth
+        const dobHiddenInput = document.getElementById("gamer_dob");
+        const dobVisibleInput = dobHiddenInput.nextElementSibling; // flatpickr's altInput
+
+        if (!dobHiddenInput.value.trim()) {
+        dobVisibleInput.classList.add("error-border");
+        isValid = false;
+        } else {
+        dobVisibleInput.classList.remove("error-border");
+        }
+
+        if (isValid) {
+        showScreen(2);
+        }
+    }
+
+    // Remove red border on change or input
+    document.addEventListener("DOMContentLoaded", () => {
+    const dobHiddenInput = document.getElementById("gamer_dob");
+    const dobVisibleInput = dobHiddenInput?.nextElementSibling; // null-safe access
+
+    document.querySelectorAll("#screen1 select, #screen1 input").forEach(el => {
+        el.addEventListener("input", () => el.classList.remove("error-border"));
+        el.addEventListener("change", () => el.classList.remove("error-border"));
+    });
+
+    if (dobHiddenInput) {
+        dobHiddenInput.addEventListener("change", () => {
+            if (dobHiddenInput.value.trim()) {
+                dobVisibleInput?.classList.remove("error-border");
+            }
+        });
+    }
+});
+
+
+    // ====================
+    // DocuSeal Integration Functions
+    // ====================
+    
+    /**
+     * Create a document submission and redirect to signing URL
+     * @param {string} templateType - Type of document template ('retainer_agreement', etc.)
+     * @param {string} emailTemplateType - Type of email template to use for custom message ('eligible_no_parent', 'eligible_with_parent')
+     */
+    function createDocumentSubmission(templateType = 'retainer_agreement', emailTemplateType = null) {
+        // Show loading state
+        // showModal("Preparing your document for signing...", "info");
+        // Get user detail ID from form (you may need to store this differently)
+        const userDetailId = getCurrentUserDetailId();
+        
+        if (!userDetailId) {
+            // showModal("Error: User information not found. Please complete the contact details first.", "error");
+            return;
+        }
+        
+        // Map template types to DocumentTemplate names in database
+        let dbTemplateName = '';
+        let finalEmailTemplateType = emailTemplateType; // Use passed parameter if provided
+        
+        if (templateType === 'retainer_agreement') {
+            // Check if parental signature is required based on age
+            const dobValue = $("#gamer_dob").val()?.trim();
+            if (dobValue) {
+                const dob = parseDobString(dobValue);
+                if (dob && !isNaN(dob.getTime())) {
+                    const age = calcAge(dob);
+                    // Under 18 requires parent signature
+                    if (age < 18) {
+                        dbTemplateName = 'retainer_minor';
+                        if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_with_parent';
+                    } else {
+                        dbTemplateName = 'retainer_adult';
+                        if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_no_parent';
+                    }
+                } else {
+                    dbTemplateName = 'retainer_minor'; // Default to minor if DOB is invalid
+                    if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_with_parent';
+                }
+            } else {
+                dbTemplateName = 'retainer_minor'; // Default to minor if no DOB
+                if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_with_parent';
+            }
+        } else {
+            dbTemplateName = templateType;
+            if (!finalEmailTemplateType) finalEmailTemplateType = 'eligible_no_parent'; // Default
+        }
+        
+        // Prepare API request
+        const requestData = {
+            user_detail_id: userDetailId,
+            template_type: dbTemplateName,
+            email_template_type: finalEmailTemplateType
+        };
+
+        // Make API call to create document submission
+        $.ajax({
+            url: '/api/create-document-submission/',
+            type: 'POST',
+            data: JSON.stringify(requestData),
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            success: function(response) {
+                
+                // Close current modal
+                closeCustomModal();
+                
+                if (response.submission_url) {
+                    // Show success message and redirect
+                    // showModal("Document prepared successfully! You will be redirected to sign the retainer agreement.", "success");
+                    
+                    setTimeout(() => {
+                        // Redirect to DocuSeal signing URL
+                        window.location.href = response.submission_url;
+                    }, 2000);
+                } else {
+                    showModal("Error: Could not generate signing URL. Please try again.", "error");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error creating document submission:', error);
+                console.error('Response:', xhr.responseText);
+                
+                let errorMessage = "An error occurred while preparing your document.";
+                
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                }
+                
+                showModal(errorMessage, "error");
+            }
+        });
+    }
+    
+    /**
+     * Get current user detail ID
+     * This function should return the user_detail_id from the session or form
+     * You may need to modify this based on how you store user information
+     */
+    function getCurrentUserDetailId() {
+        // Option 1: From localStorage if you store it there
+        const userDetailId = localStorage.getItem('user_detail_id');
+        if (userDetailId) {
+            return parseInt(userDetailId);
+        }
+        
+        // Option 2: From a hidden form field
+        const hiddenField = document.getElementById('user_detail_id');
+        if (hiddenField && hiddenField.value) {
+            return parseInt(hiddenField.value);
+        }
+        
+        // Option 3: From session storage
+        const sessionId = sessionStorage.getItem('user_detail_id');
+        if (sessionId) {
+            return parseInt(sessionId);
+        }
+        
+        // If no user detail ID found, you may need to create one first
+        console.warn('No user detail ID found. User may need to complete contact details first.');
+        return null;
+    }
+
+
+    // Congartulations Popup Script Start
+
+    function showCongrats() {
+            const modal = document.getElementById('congratsModal');
+            modal.style.display = 'flex';
+            
+            // Create fireworks
+            setTimeout(() => {
+                modal.querySelectorAll('.firework').forEach(firework => {
+                    firework.style.animation = 'none';
+                    void firework.offsetWidth; // Trigger reflow
+                    firework.style.animation = 'firework 1s ease-out';
+                });
+            }, 50);
+        }
+
+        function showLoading() {
+            document.querySelector('.continue-btn').style.display = 'none';
+            const loadingContainer = document.getElementById('loadingContainer');
+            const loadingBar = document.getElementById('loadingBar');
+            const preparingText = document.getElementById('preparingText');
+            
+            loadingContainer.style.display = 'block';
+            preparingText.style.display = 'block';
+            
+            setTimeout(() => {
+                loadingBar.style.width = '100%';
+            }, 100);
+
+            setTimeout(() => {
+                // Simulate completion
+                // alert('Process complete!');
+                location.reload(); // Reset for demo
+            }, 2500);
+        }
+    // Congartulations Popup Script End
 
     </script>
+
+    <!-- Your form and input elements here -->
+
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dobInput = document.querySelector('#gamer_dob');
+
+        dobInput.addEventListener('blur', function () {
+            let raw = this.value.trim().replace(/\D/g, ''); // Remove non-digits
+
+            if (raw.length === 8) {
+                let mm = raw.slice(0, 2);
+                let dd = raw.slice(2, 4);
+                let yyyy = raw.slice(4, 8);
+
+                // Optional: basic range validation
+                let isValidDate = !isNaN(new Date(`${yyyy}-${mm}-${dd}`).getTime());
+                if (isValidDate) {
+                    this.value = `${mm}-${dd}-${yyyy}`;
+                } else {
+                    alert("Invalid date entered. Please use MMDDYYYY format.");
+                    this.value = "";
+                }
+            }
+        });
+    });
+</script> -->
+</body>
 
 
     </body>
@@ -701,6 +1535,7 @@ function submitAnswers(userId, callback) {
 
 <!-- <button id="openModal" class="btn-primary">Yes</button> -->
 
-   
+
+
 
    

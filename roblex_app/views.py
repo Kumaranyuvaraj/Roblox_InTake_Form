@@ -57,7 +57,7 @@ class LandingPage(APIView):
     Serves the landing page form HTML page
     """
     def get(self, request):
-        return render(request, 'Home.html')
+        return render(request, 'index.html')
     
 class IndexPage(APIView):
     """
@@ -159,7 +159,7 @@ class SubmitIntakeIfValidAPIView(APIView):
             client_ip_raw = str(data['client_ip']).strip()
             first_ip = client_ip_raw.split(',')[0].strip()
             data['client_ip'] = first_ip
-            
+
         serializer = IntakeFormSerializer(data=data)
         if serializer.is_valid():
             raw_roblox_name = serializer.validated_data.get("roblox_gamertag", "")
