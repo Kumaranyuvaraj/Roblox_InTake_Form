@@ -1251,11 +1251,11 @@ let questionsData = [];
                         closeCustomModal();
 
                         // Create document submission for signing
-                        if (ageOptionData.redirect_to_retainer) {
-                            createDocumentSubmission('retainer_agreement', 'eligible_with_parent');
-                        } else if (typeof callback === "function") {
-                            callback("/retainer-form/");
-                        }
+                        // if (ageOptionData.redirect_to_retainer) {
+                        createDocumentSubmission('retainer_agreement', 'eligible_with_parent');
+                        // } else if (typeof callback === "function") {
+                        //     callback("/retainer-form/");
+                        // }
                     });
                 } 
                 
@@ -1268,11 +1268,11 @@ let questionsData = [];
             // If no parental signature needed, create document submission
             // showModal("You are eligible for the retainer agreement. Preparing document for signing...");
             setTimeout(() => {
-                if (ageOptionData.redirect_to_retainer) {
-                    createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
-                } else if (typeof callback === "function") {
-                    callback("/retainer-form/");
-                }
+                // if (ageOptionData.redirect_to_retainer) {
+                createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
+                // } else if (typeof callback === "function") {
+                //     callback("/retainer-form/");
+                // }
             }, 1500); // small delay so user sees the message
         }
 
