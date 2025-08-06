@@ -153,8 +153,13 @@ def validate_roblox_username(request):
 
 class SubmitIntakeIfValidAPIView(APIView):
     def post(self, request):
-        data = request.data 
-
+        data = request.data.copy() 
+            
+        if 'client_ip' in data and data['client_ip']:
+            client_ip_raw = str(data['client_ip']).strip()
+            first_ip = client_ip_raw.split(',')[0].strip()
+            data['client_ip'] = first_ip
+            
         serializer = IntakeFormSerializer(data=data)
         if serializer.is_valid():
             raw_roblox_name = serializer.validated_data.get("roblox_gamertag", "")
