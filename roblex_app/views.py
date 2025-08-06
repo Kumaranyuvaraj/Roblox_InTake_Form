@@ -646,7 +646,8 @@ class CheckDocumentStatusAPIView(APIView):
             # Count completed documents by type
             completed_docs = {}
             pending_docs = {}
-            
+            import time
+            time.sleep(3)
             for submission in submissions:
                 template_name = submission.document_template.name
                 
