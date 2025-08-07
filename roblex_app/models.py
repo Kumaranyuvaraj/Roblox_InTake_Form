@@ -32,6 +32,9 @@ class IntakeForm(models.Model):
 
 
 
+    # Link to prequalified user
+    user_detail = models.ForeignKey('UserDetail', on_delete=models.CASCADE, related_name='intake_forms', null=True, blank=True)
+    
     date = models.DateField(null=True, blank=True)
     gamer_first_name = models.CharField(max_length=100,null=True,blank=False)
     gamer_last_name = models.CharField(max_length=100,null=True,blank=False)

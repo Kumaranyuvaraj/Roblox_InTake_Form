@@ -195,7 +195,6 @@
                 <div class=" d-flex justify-content-center">
                     <!-- <button class="btn px-5 mx-3" id="openModal" >Yes</button> -->
                     <button class="home-btn" id="openModal" >Check Prequalification</button>
-                    <!-- <a href="{% url 'index-form-page' %}" class="home-btn">No, all good</a> -->
                 </div>
             </div>
 
@@ -688,9 +687,6 @@
         // Block submission if any errors
         if (!isValid) return;
 
-
-        const redirectUrl = "/intake-form/";
-
         // ✅ Step 1: Submit user details
         $.ajax({
             url: "/api/user-details/",
@@ -708,13 +704,19 @@
             }),
             success: function (response) {
                 const userId = response.id;
+                
+                // Store userId globally for document creation during this session
+                window.currentUserId = userId;
+                
+                // Build redirect URL now that we have userId
+                const redirectUrl = `/intake-form/${userId}/?prequalified=true`;
 
                 //  submitAnswers(userId, function () {
                 //     showModal("All submitted!", "success");
                 //     window.location.href = redirectUrl;  // 🔁 Redirect here
                 // });
 
-                // ✅ Step 2: Store first/last name for prepopulation
+                // ✅ Step 2: Store guardian names for form prefilling (still needed for forms.html)
                 sessionStorage.setItem("guardian_first_name", first_name);
                 sessionStorage.setItem("guardian_last_name", last_name);
 
@@ -812,9 +814,6 @@
                     });
                 } else {
                     // Eligible - proceed to document signing workflow
-                    // Store user detail ID for document creation
-                    sessionStorage.setItem('user_detail_id', userId);
-                    
                     // Proceed with answers submission and document creation
                     submitAnswers(userId, function (redirectUrl) {
                         // After answers are submitted, trigger document creation
@@ -857,27 +856,6 @@ let questionsData = [];
     /**
      * Check URL parameters for document signing status and show appropriate message
      */
-    function checkDocumentSigningStatus() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const signed = urlParams.get('signed');
-        
-        if (signed === 'success') {
-            window.location.href="/intake-form/"
-        } else if (signed === 'declined') {
-            showDocumentStatusMessage(
-                'warning',
-                '📋 Document Signing Declined',
-                'You have declined to sign the retainer agreement. If you change your mind or have any questions, please feel free to contact us. You can restart the process at any time.'
-            );
-        }
-        
-        // Clear the URL parameter to avoid showing the message again on refresh
-        if (signed) {
-            const newUrl = window.location.pathname;
-            window.history.replaceState({}, document.title, newUrl);
-        }
-    }
-    
     /**
      * Show document status message banner
      */
@@ -930,8 +908,7 @@ let questionsData = [];
     }
 
     $(document).ready(function () {
-        // Check for document signing status in URL parameters
-        checkDocumentSigningStatus();
+        // Backend now handles document signing redirects directly
         
         $.ajax({
             url: "/api/questions/",
@@ -1437,25 +1414,27 @@ window.addEventListener("scroll", function () {
      * You may need to modify this based on how you store user information
      */
     function getCurrentUserDetailId() {
-        // Option 1: From localStorage if you store it there
-        const userDetailId = localStorage.getItem('user_detail_id');
-        if (userDetailId) {
-            return parseInt(userDetailId);
+        // During prequalification flow, get from the most recent submission response
+        // This function is called during document creation after user details are submitted
+        
+        // Option 1: From global variable set during form submission
+        if (window.currentUserId) {
+            return parseInt(window.currentUserId);
         }
         
-        // Option 2: From a hidden form field
+        // Option 2: From a hidden form field (if you add one)
         const hiddenField = document.getElementById('user_detail_id');
         if (hiddenField && hiddenField.value) {
             return parseInt(hiddenField.value);
         }
         
-        // Option 3: From session storage
+        // Option 3: From session storage (fallback for compatibility)
         const sessionId = sessionStorage.getItem('user_detail_id');
         if (sessionId) {
             return parseInt(sessionId);
         }
         
-        // If no user detail ID found, you may need to create one first
+        // If no user detail ID found, user needs to complete contact details first
         console.warn('No user detail ID found. User may need to complete contact details first.');
         return null;
     }
