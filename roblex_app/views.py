@@ -111,8 +111,14 @@ class IntakeFormAPIView(APIView):
         serializer = IntakeFormSerializer(data=request.data)
         
         if serializer.is_valid():
-            # Link the intake form to the UserDetail
-            intake_form = serializer.save(user_detail=user_detail)
+            # Get the law firm from middleware (subdomain detection)
+            law_firm = getattr(request, 'law_firm', None)
+            if not law_firm:
+                # Fallback to user_detail's law firm or default
+                law_firm = user_detail.law_firm
+            
+            # Link the intake form to the UserDetail and law firm
+            intake_form = serializer.save(user_detail=user_detail, law_firm=law_firm)
             
             # Push to SmartAdvocate
             response = push_to_smart_advocate(data=request.data)
@@ -328,7 +334,15 @@ class UserDetailCreateView(APIView):
     def post(self, request):
         serializer = UserDetailSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            # Automatically associate with the law firm from subdomain
+            law_firm = getattr(request, 'law_firm', None)
+            if law_firm:
+                serializer.save(law_firm=law_firm)
+            else:
+                # Fallback to default law firm if middleware isn't working
+                from roblex_app.models import LawFirm
+                default_firm = LawFirm.objects.filter(subdomain='default').first()
+                serializer.save(law_firm=default_firm)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -652,8 +666,12 @@ class CreateDocumentSubmissionAPIView(APIView):
         Helper method to create a single document submission
         """
         try:
-            # Get document template
-            doc_template = DocumentTemplate.objects.get(name=template_name)
+            # Get document template using law firm-specific logic
+            doc_template = DocumentTemplate.get_template_for_law_firm(template_name, user_detail.law_firm)
+            
+            if not doc_template:
+                print(f"Document template '{template_name}' not found for law firm '{user_detail.law_firm}' or globally")
+                return None
             
             # Get email template for custom message
             email_template = None
@@ -730,9 +748,6 @@ class CreateDocumentSubmissionAPIView(APIView):
             
             return None
             
-        except DocumentTemplate.DoesNotExist:
-            print(f"Document template '{template_name}' not found")
-            return None
         except Exception as e:
             print(f"Error creating document submission for {template_name}: {str(e)}")
             return None

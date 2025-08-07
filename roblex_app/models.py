@@ -1,6 +1,93 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
+
+
+class LawFirm(models.Model):
+    """
+    Model to represent different law firms using the system
+    Each law firm gets their own subdomain and isolated data
+    """
+    name = models.CharField(max_length=200, help_text="Full name of the law firm")
+    subdomain = models.CharField(
+        max_length=100, 
+        unique=True, 
+        help_text="Subdomain identifier (e.g., 'hilliard' for hilliard.roblox.nextkeylitigation.com)"
+    )
+    contact_email = models.EmailField(help_text="Primary contact email for the law firm")
+    phone_number = models.CharField(max_length=20, blank=True, help_text="Contact phone number")
+    address = models.TextField(blank=True, help_text="Law firm address")
+    is_active = models.BooleanField(default=True, help_text="Whether this law firm is active")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Law Firm"
+        verbose_name_plural = "Law Firms"
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.subdomain})"
+
+    @property
+    def full_domain(self):
+        """Return the full subdomain URL"""
+        return f"{self.subdomain}.roblox.nextkeylitigation.com"
+
+    def get_leads_count(self):
+        """Return count of leads for this law firm"""
+        return self.leads.count()
+
+    def get_active_leads_count(self):
+        """Return count of leads that have submitted intake forms"""
+        return self.leads.filter(intake_forms__isnull=False).distinct().count()
+
+
+class LawFirmUser(models.Model):
+    """
+    Model to associate Django users with law firms and define their roles
+    Enables multi-tenant access control
+    """
+    ROLE_CHOICES = [
+        ('super_admin', 'Super Administrator'),
+        ('law_firm_admin', 'Law Firm Administrator'),
+        ('law_firm_staff', 'Law Firm Staff'),
+        ('law_firm_viewer', 'Read Only Access'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='law_firm_profile')
+    law_firm = models.ForeignKey(
+        LawFirm, 
+        on_delete=models.CASCADE, 
+        related_name='users',
+        null=True,
+        blank=True,
+        help_text="Leave blank for super administrators"
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='law_firm_staff')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Law Firm User"
+        verbose_name_plural = "Law Firm Users"
+
+    def __str__(self):
+        law_firm_name = self.law_firm.name if self.law_firm else "Super Admin"
+        return f"{self.user.get_full_name() or self.user.username} - {law_firm_name}"
+
+    def can_manage_users(self):
+        """Check if user can manage other users in their law firm"""
+        return self.role in ['super_admin', 'law_firm_admin']
+
+    def can_edit_data(self):
+        """Check if user can edit data"""
+        return self.role in ['super_admin', 'law_firm_admin', 'law_firm_staff']
+
+    def is_super_admin(self):
+        """Check if user is a super administrator"""
+        return self.role == 'super_admin'
 
 
 class IntakeForm(models.Model):
@@ -34,6 +121,16 @@ class IntakeForm(models.Model):
 
     # Link to prequalified user
     user_detail = models.ForeignKey('UserDetail', on_delete=models.CASCADE, related_name='intake_forms', null=True, blank=True)
+    
+    # Law firm association (auto-populated from user_detail.law_firm for easier querying)
+    law_firm = models.ForeignKey(
+        LawFirm, 
+        on_delete=models.CASCADE, 
+        related_name='intake_forms',
+        null=True,
+        blank=True,
+        help_text="Auto-populated from user_detail.law_firm"
+    )
     
     date = models.DateField(null=True, blank=True)
     gamer_first_name = models.CharField(max_length=100,null=True,blank=False)
@@ -145,6 +242,16 @@ class UserDetail(models.Model):
         ('no', 'No'),
     )
 
+    # Law firm association - automatically set based on subdomain
+    law_firm = models.ForeignKey(
+        LawFirm, 
+        on_delete=models.CASCADE, 
+        related_name='leads',
+        null=True,
+        blank=True,
+        help_text="Law firm this lead belongs to (auto-assigned based on subdomain)"
+    )
+    
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     cell_phone = models.CharField(max_length=20)
@@ -157,8 +264,26 @@ class UserDetail(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Lead"
+        verbose_name_plural = "Leads"
+        ordering = ['-created_at']
+
     def __str__(self):
+        law_firm_name = self.law_firm.name if self.law_firm else "Unassigned"
+        return f"{self.first_name} {self.last_name} ({law_firm_name})"
+    
+    @property
+    def full_name(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def get_age(self):
+        """Calculate age from gamer_dob"""
+        if self.gamer_dob:
+            from datetime import date
+            today = date.today()
+            return today.year - self.gamer_dob.year - ((today.month, today.day) < (self.gamer_dob.month, self.gamer_dob.day))
+        return None
     
 # class AgeEligibilityRule(models.Model):
 #     min_age = models.PositiveSmallIntegerField(null=True, blank=True)  # inclusive
@@ -251,14 +376,55 @@ class DocumentTemplate(models.Model):
         ('florida_disclosure', 'Florida Disclosure Document (Zipcode 32003-34997)'),
     ]
     
-    name = models.CharField(max_length=50, choices=TEMPLATE_TYPES, unique=True)
+    name = models.CharField(max_length=50, choices=TEMPLATE_TYPES)
+    # Law firm association - null means global template, specific value means law firm override
+    law_firm = models.ForeignKey(
+        LawFirm, 
+        on_delete=models.CASCADE, 
+        related_name='document_templates',
+        null=True,
+        blank=True,
+        help_text="Leave blank for global templates, set for law firm-specific overrides"
+    )
     docuseal_template_id = models.IntegerField()  # Template ID from DocuSeal
     description = models.TextField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        # Ensure each law firm can have only one template per type
+        unique_together = [['name', 'law_firm']]
+
     def __str__(self):
-        return self.get_name_display()
+        law_firm_name = f" ({self.law_firm.name})" if self.law_firm else " (Global)"
+        return f"{self.get_name_display()}{law_firm_name}"
+    
+    @classmethod
+    def get_template_for_law_firm(cls, template_type, law_firm=None):
+        """
+        Get the appropriate template for a law firm with fallback to global
+        Args:
+            template_type: One of the TEMPLATE_TYPES choices
+            law_firm: LawFirm instance or None
+        Returns:
+            DocumentTemplate instance or None
+        """
+        # First try to get law firm-specific template
+        if law_firm:
+            template = cls.objects.filter(
+                name=template_type, 
+                law_firm=law_firm, 
+                is_active=True
+            ).first()
+            if template:
+                return template
+        
+        # Fallback to global template
+        return cls.objects.filter(
+            name=template_type, 
+            law_firm__isnull=True, 
+            is_active=True
+        ).first()
 
 
 class DocumentSubmission(models.Model):
@@ -301,6 +467,11 @@ class DocumentSubmission(models.Model):
 
     def __str__(self):
         return f"{self.user_detail} - {self.document_template.name} ({self.status})"
+    
+    @property
+    def law_firm(self):
+        """Get law firm from user_detail"""
+        return self.user_detail.law_firm if self.user_detail else None
 
 
 class DocumentWebhookEvent(models.Model):

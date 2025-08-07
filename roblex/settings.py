@@ -61,6 +61,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'roblex_app.middleware.SubdomainMiddleware',  # Add subdomain detection
+    'roblex_app.middleware.LawFirmContextMiddleware',  # Add law firm context
 ]
 
 ROOT_URLCONF = 'roblex.urls'
