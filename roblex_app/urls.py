@@ -4,8 +4,7 @@ from roblex_app.views import IntakeFormAPIView, IntakeFormView,SubmitIntakeIfVal
 QuestionListAPIView, SubmitAnswerAPIView,LandingPage,IndexPage,SendEmailAPIView,EmailTemplateAPIView,\
 CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView
 
-from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks
-
+from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,read_docx_file
 urlpatterns = [
     path('', LandingPage.as_view(), name='intake-form-page'), 
     path('index/', IndexPage.as_view(), name='index-form-page'),
@@ -34,5 +33,8 @@ urlpatterns = [
     path('retainer-form/', retainer_form, name='retainer-form'),
 
     path('gratitude/', thanks, name='gratitude'),
+
+
+    path('read-doc/<str:filename>/', read_docx_file, name='read_docx'),
 
 ]

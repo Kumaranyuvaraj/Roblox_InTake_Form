@@ -85,31 +85,35 @@
     }
 
     .confetti {
-      pointer-events: none;
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-    }
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+    z-index: 9999;
+  }
     .confetti-piece {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: white;
-      opacity: 0.8;
-      border-radius: 2px;
-      animation: fall 3s linear infinite;
-      mix-blend-mode: screen;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    opacity: 0.9;
+    border-radius: 50%;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+   @keyframes fall {
+    0% {
+      transform: translateY(-100px) rotate(0deg);
+      opacity: 1;
     }
-    @keyframes fall {
-      0% {
-        transform: translateY(-120px) rotate(0deg);
-        opacity: 0.9;
-      }
-      100% {
-        transform: translateY(420px) rotate(360deg);
-        opacity: 0;
-      }
+    100% {
+      transform: translateY(100vh) rotate(360deg);
+      opacity: 0;
     }
+  }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
@@ -128,27 +132,38 @@
         <path d="M5 13l4 4L19 7"/>
       </svg>
     </div>
+
+    <div class="confetti"></div>
     <h1>Thank You!</h1>
-    <p>Your claim has been submitted. Our attorney team will keep in touch with you.</p>
+    <p id="thankyou-message">Loading...</p>
     <!-- <div class="subtle">We appreciate your time and effort.</div> -->
-    <div class="confetti" aria-hidden="true"></div>
+    <!-- <div class="confetti" aria-hidden="true"></div> -->
   </div>
 
   <script>
-    // simple confetti effect
-    const confettiContainer = document.querySelector('.confetti');
-    const colors = ['#ffecb3','#ffd54f','#ff8a65','#81d4fa','#b39ddb','#a5d6a7'];
-    const count = 40;
-    for (let i = 0; i < count; i++) {
-      const piece = document.createElement('div');
-      piece.classList.add('confetti-piece');
-      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-      piece.style.left = Math.random() * 100 + '%';
-      piece.style.animationDelay = (Math.random() * 2) + 's';
-      piece.style.animationDuration = (2 + Math.random()*2) + 's';
-      piece.style.transform = `scale(${0.7 + Math.random()*0.6})`;
-      confettiContainer.appendChild(piece);
-    }
+   // ✅ Eligibility message logic
+  const params = new URLSearchParams(window.location.search);
+  const isEligible = params.get("eligible") !== "false"; // default is eligible
+  const message = isEligible
+      ? "Your claim has been submitted. Our attorney team will keep in touch with you."
+      : "Sorry, you're not eligible to complete the retainer form.";
+  document.getElementById("thankyou-message").innerText = message;
+
+  // ✅ Simple confetti animation
+  const confettiContainer = document.querySelector('.confetti');
+  const colors = ['#ffecb3', '#ffd54f', '#ff8a65', '#81d4fa', '#b39ddb', '#a5d6a7'];
+  const count = 40;
+
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.classList.add('confetti-piece');
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.animationDelay = (Math.random() * 2) + 's';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.transform = `scale(${0.7 + Math.random() * 0.6})`;
+    confettiContainer.appendChild(piece);
+  }
   </script>
 </body>
 </html>

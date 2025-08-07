@@ -247,6 +247,10 @@
         height: auto;
     }
 
+    .robloxValidationStatus{
+        position: relative;
+    }
+
     @media (min-width: 768px) {
     .rb-err-msg{
         position: absolute;
@@ -998,16 +1002,56 @@ $(document).ready(function () {
 
    
 
-    let robloxValidationStatus = {};
+    // let robloxValidationStatus = {};
 
-    // ✅ Roblox username validation
+    // // ✅ Roblox username validation
+    // $(document).on("blur", ".roblox-gamertag", function () {
+    //     const $input = $(this);
+    //     const username = $input.val().trim();
+    //     const $statusDiv = $input.siblings(".robloxValidationStatus");
+    //     if (!username) return;
+    //     $statusDiv.html("Validating...");
+    //     robloxValidationStatus[$input.index()] = false;
+
+    //     $.ajax({
+    //         url: "/api/validate-roblox/",
+    //         type: "POST",
+    //         contentType: "application/json",
+    //         data: JSON.stringify({ username }),
+    //         success: function (response) {
+    //         const message = response?.success || "Gamertag found.";
+        
+
+    //         $statusDiv.html(`<div class="text-success">${message}</div>`);
+    //         robloxValidationStatus[$input.index()] = true;
+    //         },
+    //         error: function (xhr) {
+    //             const message = xhr.responseJSON?.error || "Gamertag not found.";
+    //             // $statusDiv.html(`<div class="des-mg-tp">${message}</div>`);
+    //             $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">${message}</div>`);
+    //             robloxValidationStatus[$input.index()] = false;
+    //         }
+    //     });
+    // });
+
+
+     let robloxValidationStatus = {};
+
+    // ✅ Roblox username validation on blur
     $(document).on("blur", ".roblox-gamertag", function () {
         const $input = $(this);
         const username = $input.val().trim();
         const $statusDiv = $input.siblings(".robloxValidationStatus");
-        if (!username) return;
+
+        const index = $(".roblox-gamertag").index($input);
+        robloxValidationStatus[index] = false;
+
+        if (!username) {
+            $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">Field is required.</div>`);
+            return;
+        }
+
         $statusDiv.html("Validating...");
-        robloxValidationStatus[$input.index()] = false;
 
         $.ajax({
             url: "/api/validate-roblox/",
@@ -1015,20 +1059,40 @@ $(document).ready(function () {
             contentType: "application/json",
             data: JSON.stringify({ username }),
             success: function (response) {
-            const message = response?.success || "Gamertag found.";
-        
-
-            $statusDiv.html(`<div class="text-success">${message}</div>`);
-            robloxValidationStatus[$input.index()] = true;
+                const message = response?.success || "Gamertag found.";
+                $statusDiv.html(`<div class="text-success">${message}</div>`);
+                robloxValidationStatus[index] = true;
             },
             error: function (xhr) {
                 const message = xhr.responseJSON?.error || "Gamertag not found.";
-                // $statusDiv.html(`<div class="des-mg-tp">${message}</div>`);
                 $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">${message}</div>`);
-                robloxValidationStatus[$input.index()] = false;
+                robloxValidationStatus[index] = false;
             }
         });
     });
+
+    // ✅ Prevent submission if any gamertag is invalid
+    $("#intakeForm").on("submit", function (e) {
+        let isValid = true;
+
+        $(".roblox-gamertag").each(function (i) {
+            const value = $(this).val().trim();
+
+            // If value exists but hasn't been validated or is invalid
+            if (value && !robloxValidationStatus[i]) {
+                const $statusDiv = $(this).siblings(".robloxValidationStatus");
+                $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">gamertag not found.</div>`);
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            // alert("Please correct the invalid Roblox usernames before submitting.");
+            return false;
+        }
+    });
+
 
     $('input[name="custody_type"]').on('change', function () {
         $('#otherCustodyTextDiv').toggle($('#custody6').is(':checked'));
@@ -1263,6 +1327,12 @@ $(document).ready(function () {
 
     document.body.appendChild(clonedForm);
 
+    // ✅ Hide error messages from cloned form
+    const clonedErrorBox = clonedForm.querySelector("#responseMessage");
+    if (clonedErrorBox) {
+        clonedErrorBox.style.display = "none";
+    }
+
     html2canvas(clonedForm, {
         scale: 2,
         scrollY: 0,
@@ -1305,69 +1375,73 @@ $(document).ready(function () {
 
 
 
-    $("#intakeForm").on("submit", function (e) {
-        e.preventDefault();
-        if (!validateIntakeForm()) return;
+$("#intakeForm").on("submit", function (e) {
+    e.preventDefault();
 
-        // ✅ Show Spinner Immediately After Validation
-        document.getElementById('spinnerOverlay').style.display = 'flex';
+    // ✅ Check for invalid Roblox gamertags before proceeding
+    const hasInvalidGamertag = Object.values(robloxValidationStatus).some(status => status === false);
+    if (hasInvalidGamertag) {
+        $("#responseMessage").html('<div class="alert alert-danger">One or more Roblox gamertags are invalid. Please fix them before submitting.</div>');
+        return; // Stop submission
+    }
 
-        const formData = {};
-        radioFields.forEach(field => {
-            const selected = [];
-            $(`input[name="${field}"]:checked`).each(function () {
-                selected.push($(this).val());
-            });
-            formData[field] = selected;
+    if (!validateIntakeForm()) return;
+
+    document.getElementById('spinnerOverlay').style.display = 'flex';
+
+    const formData = {};
+    radioFields.forEach(field => {
+        const selected = [];
+        $(`input[name="${field}"]:checked`).each(function () {
+            selected.push($(this).val());
         });
+        formData[field] = selected;
+    });
 
-        $(this).serializeArray().forEach(({ name, value }) => {
-            if (!radioFields.includes(name)) {
-                if (name === "roblox_gamertag") {
-                    const allGamertags = [];
-                    $("input[name='roblox_gamertag']").each(function () {
-                        const cleaned = $(this).val().trim().replace(/[@_]/g, '');
-                        if (cleaned) allGamertags.push(cleaned);
-                    });
-                    formData[name] = allGamertags.join(", ");
-                } else {
-                    formData[name] = value;
-                }
+    $(this).serializeArray().forEach(({ name, value }) => {
+        if (!radioFields.includes(name)) {
+            if (name === "roblox_gamertag") {
+                const allGamertags = [];
+                $("input[name='roblox_gamertag']").each(function () {
+                    const cleaned = $(this).val().trim().replace(/[@_]/g, '');
+                    if (cleaned) allGamertags.push(cleaned);
+                });
+                formData[name] = allGamertags.join(", ");
+            } else {
+                formData[name] = value;
             }
-        });
+        }
+    });
 
-
-        fetchIPAndTimestamp(() => {
+    fetchIPAndTimestamp(() => {
         takeScreenshotPDF((pdfData) => {
-        $.ajax({
-            url: "/api/submit-validated-intake/",
-            type: "POST",
-            data: JSON.stringify({
-                ...formData,
-                client_ip: clientIP,
-                submitted_at: localTimestamp,
-                pdf_data: pdfData
-            }),
-            contentType: "application/json",
-            success: function () {
-                setTimeout(() => {
-                    document.getElementById("intakeForm").reset();
-                    $('#otherCustodyTextDiv').hide();
-                    $(".text-danger").remove();
-                    $('.robloxValidationStatus').html('');
-                }, 1000);
+            $.ajax({
+                url: "/api/submit-validated-intake/",
+                type: "POST",
+                data: JSON.stringify({
+                    ...formData,
+                    client_ip: clientIP,
+                    submitted_at: localTimestamp,
+                    pdf_data: pdfData
+                }),
+                contentType: "application/json",
+                success: function () {
+                    setTimeout(() => {
+                        document.getElementById("intakeForm").reset();
+                        $('#otherCustodyTextDiv').hide();
+                        $(".text-danger").remove();
+                        $('.robloxValidationStatus').html('');
+                    }, 1000);
 
-                // ✅ Hide spinner before redirect
-                document.getElementById('spinnerOverlay').style.display = 'none';
-                window.location.href = "/gratitude";
-            },
-            error: function (xhr) {
-                console.error(xhr.responseJSON);
-
-                // ✅ Hide spinner on error
-                document.getElementById('spinnerOverlay').style.display = 'none';
-                $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
-            }
+                    document.getElementById('spinnerOverlay').style.display = 'none';
+                    window.location.href = "/gratitude";
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseJSON);
+                    document.getElementById('spinnerOverlay').style.display = 'none';
+                    $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
+                }
+            });
         });
     });
 });
@@ -1375,7 +1449,9 @@ $(document).ready(function () {
 
 
 
-    });
+
+
+    
 
     $("#exportBtn").on("click", function () {
         if (!validateIntakeForm()) return;

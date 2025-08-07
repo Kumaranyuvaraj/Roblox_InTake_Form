@@ -1,12 +1,14 @@
 from datetime import date
 import json
+import os
 import re
 import traceback
+from docx import Document
 import requests
 import base64
 import uuid
 import smtplib
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -921,3 +923,16 @@ class DocumentWebhookAPIView(APIView):
         if x_forwarded_for:
             return x_forwarded_for.split(',')[0]
         return request.META.get('REMOTE_ADDR')
+    
+
+
+def read_docx_file(request, filename):
+    file_path = os.path.join(settings.BASE_DIR, 'roblex_app', 'static', 'docs', filename)
+
+    if not os.path.exists(file_path):
+        raise Http404("Document not found")
+
+    doc = Document(file_path)
+    content = "\n".join([para.text for para in doc.paragraphs])
+
+    return render(request, 'doc_reader.html', {'content': content, 'filename': filename})
