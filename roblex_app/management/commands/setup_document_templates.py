@@ -31,11 +31,6 @@ class Command(BaseCommand):
                 'description': 'Global: Retainer agreement for adults (18-20 years old)',
             },
             {
-                'name': 'intake_supplemental',
-                'docuseal_template_id': 1000003,  # Replace with actual DocuSeal template ID
-                'description': 'Global: Supplemental intake documentation',
-            },
-            {
                 'name': 'florida_disclosure',
                 'docuseal_template_id': 7,  # Template ID provided by user
                 'description': 'Global: Florida Disclosure Document for zipcodes 32003-34997',
@@ -86,6 +81,11 @@ class Command(BaseCommand):
                     'docuseal_template_id': 200 + law_firm.id,  # Example: unique ID per law firm
                     'description': f'{law_firm.name}: Retainer agreement for adults with custom branding',
                 },
+                {
+                    'name': 'florida_disclosure',
+                    'docuseal_template_id': 300 + law_firm.id,  # Example: unique ID per law firm
+                    'description': f'{law_firm.name}: Florida Disclosure Document for zipcodes 32003-34997',
+                }
                 # Note: Not all law firms may need custom versions of all templates
             ]
 
