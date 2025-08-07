@@ -7,7 +7,7 @@ from roblex_app.models import (
 
 from django.utils.html import format_html
 from django.urls import reverse
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.admin import AdminSite
@@ -269,6 +269,30 @@ class IntakeFormAdmin(LawFirmFilteredModelAdmin):
     def get_law_firm_field_name(self):
         """IntakeForm uses 'law_firm' field directly"""
         return 'law_firm'
+    
+    def get_queryset(self, request):
+        """Custom filtering for IntakeForm - handle both direct law_firm and user_detail.law_firm"""
+        qs = super(admin.ModelAdmin, self).get_queryset(request)  # Skip LawFirmFilteredModelAdmin's get_queryset
+        
+        if request.user.is_superuser:
+            return qs  # Superusers see everything
+        
+        user_law_firm = self.get_user_law_firm(request)
+        if user_law_firm:
+            # Filter by either direct law_firm field OR user_detail.law_firm
+            return qs.filter(
+                Q(law_firm=user_law_firm) | 
+                Q(user_detail__law_firm=user_law_firm)
+            )
+        
+        # If no law firm found, return empty queryset
+        return qs.none()
+    
+    def save_model(self, request, obj, form, change):
+        """Ensure law_firm is set from user_detail if missing"""
+        if obj.user_detail and obj.user_detail.law_firm and not obj.law_firm:
+            obj.law_firm = obj.user_detail.law_firm
+        super().save_model(request, obj, form, change)
 
     def pdf_link(self, obj):
         if obj.pdf_file:
@@ -285,10 +309,10 @@ class IntakeFormAdmin(LawFirmFilteredModelAdmin):
 
     def law_firm_name(self, obj):
         if obj.law_firm:
-            return format_html('<span style="background-color: #e9ecef; padding: 2px 6px; border-radius: 3px;">{}</span>', obj.law_firm.name)
+            return format_html('<span style="background-color: #007bff; color: white; padding: 2px 6px; border-radius: 3px;" title="Direct law_firm field">{}</span>', obj.law_firm.name)
         elif obj.user_detail and obj.user_detail.law_firm:
-            return format_html('<span style="background-color: #f8d7da; padding: 2px 6px; border-radius: 3px;">{} (from user)</span>', obj.user_detail.law_firm.name)
-        return "No Law Firm"
+            return format_html('<span style="background-color: #dc3545; color: white; padding: 2px 6px; border-radius: 3px;" title="From user_detail.law_firm">{} (from user)</span>', obj.user_detail.law_firm.name)
+        return format_html('<span style="background-color: #6c757d; color: white; padding: 2px 6px; border-radius: 3px;">No Law Firm</span>')
     law_firm_name.short_description = "Law Firm"
 
     def document_submissions_count(self, obj):
