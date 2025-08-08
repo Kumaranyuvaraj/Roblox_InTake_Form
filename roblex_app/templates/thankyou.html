@@ -145,8 +145,8 @@
   const params = new URLSearchParams(window.location.search);
   const isEligible = params.get("eligible") !== "false"; // default is eligible
   const message = isEligible
-      ? "Your claim has been submitted. Our attorney team will keep in touch with you."
-      : "Sorry, you're not eligible to complete the retainer form.";
+      ? "Your claim has been submitted. Our attorney team will keep in touch with you..."
+      : "Sorry, you're not eligible for the claim...";
   document.getElementById("thankyou-message").innerText = message;
 
   // ✅ Simple confetti animation
