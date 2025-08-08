@@ -9,11 +9,12 @@ import base64
 import uuid
 import smtplib
 from django.http import Http404, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
-from roblex_app.models import EmailTemplate, UserDetail, Question, Option, UserAnswer, EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
+from roblex_app.models import IntakeForm, EmailTemplate, UserDetail, Question, Option, UserAnswer, EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
 from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer, QuestionSerializer, UserAnswerSerializer, EmailLogSerializer
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
@@ -43,39 +44,87 @@ def requires_florida_disclosure(zipcode):
         return False
 
 
-class IntakeFormView(APIView):
+def intake_form_view(request, user_detail_id):
     """
-    Handles GET to show the form, and POST to process or redirect
+    Handles GET to show the form with access control based on UserDetail ID
     """
-    def get(self, request):
-        return render(request, 'forms.html')
+    # Verify that the user_detail_id exists - returns 404 if not found
+    user_detail = get_object_or_404(UserDetail, id=user_detail_id)
+    
+    # Check if user has already submitted an intake form
+    existing_intake = IntakeForm.objects.filter(user_detail=user_detail).first()
+    if existing_intake:
+        # User has already submitted an intake form, redirect to thank you page
+        return redirect('/gratitude?already_submitted=true')
+    
+    # Only handle GET requests for form display
+    if request.method != 'GET':
+        # For POST requests, redirect back to form (keeping the same pattern)
+        return redirect('intake-form-page', user_detail_id=user_detail_id)
+    
+    # Check for status parameters from document signing
+    signed = request.GET.get('signed')
+    workflow = request.GET.get('workflow')
+    prequalified = request.GET.get('prequalified')
+    
+    # Pass user_detail context to template for prefilling form data
+    context = {
+        'user_detail': user_detail,
+        'user_detail_id': user_detail_id,
+        'signed_status': signed,
+        'workflow_type': workflow,
+        'prequalified': prequalified
+    }
+    
+    return render(request, 'forms.html', context)
 
-    def post(self, request):
-        # After submission, redirect back to form
-        return redirect('')  # assuming you have this URL name
-
-class LandingPage(APIView):
+def landing_page(request):
     """
     Serves the landing page form HTML page
     """
-    def get(self, request):
-        return render(request, 'index.html')
+    return render(request, 'index.html')
     
-class IndexPage(APIView):
+def index_page(request):
     """
     Serves the index page form HTML page
     """
-    def get(self, request):
-        return render(request, 'index.html')
+    return render(request, 'index.html')
 
 class IntakeFormAPIView(APIView):
     def post(self, request):
-        serializer = IntakeFormSerializer(data=request.data)
-        response =push_to_smart_advocate(data=request.data)
+        # Get user_detail_id from request data or URL
+        user_detail_id = request.data.get('user_detail_id')
+        
+        if not user_detail_id:
+            return Response(
+                {'error': 'user_detail_id is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verify UserDetail exists
+        try:
+            user_detail = UserDetail.objects.get(id=user_detail_id)
+        except UserDetail.DoesNotExist:
+            return Response(
+                {'error': 'Invalid user_detail_id'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 
+        serializer = IntakeFormSerializer(data=request.data)
         
         if serializer.is_valid():
-            serializer.save()
+            # Get the law firm from middleware (subdomain detection)
+            law_firm = getattr(request, 'law_firm', None)
+            if not law_firm:
+                # Fallback to user_detail's law firm or default
+                law_firm = user_detail.law_firm
+            
+            # Link the intake form to the UserDetail and law firm
+            intake_form = serializer.save(user_detail=user_detail, law_firm=law_firm)
+            
+            # Push to SmartAdvocate
+            response = push_to_smart_advocate(data=request.data)
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -110,6 +159,43 @@ def push_to_smart_advocate(data):
     except requests.RequestException as e:
         return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
     
+
+class CheckIntakeStatusAPIView(APIView):
+    """
+    Check if a user has already submitted an intake form
+    """
+    def post(self, request):
+        try:
+            user_detail_id = request.data.get('user_detail_id')
+            
+            if not user_detail_id:
+                return Response(
+                    {"error": "user_detail_id is required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                user_detail = UserDetail.objects.get(id=user_detail_id)
+            except UserDetail.DoesNotExist:
+                return Response(
+                    {"error": "User not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Check if intake form exists
+            existing_intake = IntakeForm.objects.filter(user_detail=user_detail).first()
+            
+            return Response({
+                "already_submitted": existing_intake is not None,
+                "intake_id": existing_intake.id if existing_intake else None
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Internal server error: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 @api_view(['POST'])
 def validate_roblox_username(request):
@@ -156,6 +242,35 @@ def validate_roblox_username(request):
 class SubmitIntakeIfValidAPIView(APIView):
     def post(self, request):
         data = request.data.copy() 
+        
+        # Get user_detail_id from request data
+        user_detail_id = data.get('user_detail_id')
+        if not user_detail_id:
+            return Response(
+                {'error': 'user_detail_id is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verify UserDetail exists
+        try:
+            user_detail = UserDetail.objects.get(id=user_detail_id)
+        except UserDetail.DoesNotExist:
+            return Response(
+                {'error': 'Invalid user_detail_id'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has already submitted an intake form
+        existing_intake = IntakeForm.objects.filter(user_detail=user_detail).first()
+        if existing_intake:
+            return Response(
+                {
+                    'error': 'You have already submitted an intake form',
+                    'already_submitted': True,
+                    'intake_id': existing_intake.id
+                }, 
+                status=status.HTTP_409_CONFLICT
+            )
             
         if 'client_ip' in data and data['client_ip']:
             client_ip_raw = str(data['client_ip']).strip()
@@ -187,7 +302,8 @@ class SubmitIntakeIfValidAPIView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            intake_instance = serializer.save()
+            # Link the intake form to the UserDetail
+            intake_instance = serializer.save(user_detail=user_detail)
 
             # Handle additional fields
             client_ip = data.get("client_ip")
@@ -220,7 +336,15 @@ class UserDetailCreateView(APIView):
     def post(self, request):
         serializer = UserDetailSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            # Automatically associate with the law firm from subdomain
+            law_firm = getattr(request, 'law_firm', None)
+            if law_firm:
+                serializer.save(law_firm=law_firm)
+            else:
+                # Fallback to default law firm if middleware isn't working
+                from roblex_app.models import LawFirm
+                default_firm = LawFirm.objects.filter(subdomain='default').first()
+                serializer.save(law_firm=default_firm)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -350,7 +474,14 @@ def retainer_form(request):
     return render(request,'retainer_form.html')
 
 def thanks(request):
-    return render(request, 'thankyou.html')
+    # Check if user is being redirected because they already submitted
+    already_submitted = request.GET.get('already_submitted', 'false').lower() == 'true'
+    
+    context = {
+        'already_submitted': already_submitted
+    }
+    
+    return render(request, 'thankyou.html', context)
 
 # ====================
 # DocuSeal API Views
@@ -537,8 +668,12 @@ class CreateDocumentSubmissionAPIView(APIView):
         Helper method to create a single document submission
         """
         try:
-            # Get document template
-            doc_template = DocumentTemplate.objects.get(name=template_name)
+            # Get document template using law firm-specific logic
+            doc_template = DocumentTemplate.get_template_for_law_firm(template_name, user_detail.law_firm)
+            
+            if not doc_template:
+                print(f"Document template '{template_name}' not found for law firm '{user_detail.law_firm}' or globally")
+                return None
             
             # Get email template for custom message
             email_template = None
@@ -615,9 +750,6 @@ class CreateDocumentSubmissionAPIView(APIView):
             
             return None
             
-        except DocumentTemplate.DoesNotExist:
-            print(f"Document template '{template_name}' not found")
-            return None
         except Exception as e:
             print(f"Error creating document submission for {template_name}: {str(e)}")
             return None
@@ -670,7 +802,7 @@ class CheckDocumentStatusAPIView(APIView):
                 
                 if florida_completed and retainer_completed:
                     # Both documents completed - success!
-                    return redirect('/?signed=success&workflow=florida_complete')
+                    return redirect(f'/intake-form/{user_detail.id}/?signed=success&workflow=florida_complete')
                 elif florida_completed and not retainer_completed:
                     # Disclosure complete, need to sign retainer
                     retainer_pending = None
@@ -709,7 +841,7 @@ class CheckDocumentStatusAPIView(APIView):
                 # Standard workflow - single document
                 if completed_docs:
                     # Document completed - success!
-                    return redirect('/?signed=success')
+                    return redirect(f'/intake-form/{user_detail.id}/?signed=success')
                 elif pending_docs:
                     # Redirect to pending document
                     first_pending = list(pending_docs.values())[0]

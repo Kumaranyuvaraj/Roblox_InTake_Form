@@ -981,6 +981,32 @@ $(document).ready(function () {
         }
     });
 
+    // Check if user has already submitted intake form
+    function checkIntakeFormStatus() {
+        const userDetailId = getUserDetailId();
+        if (!userDetailId) return;
+
+        $.ajax({
+            url: "/api/check-intake-status/",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ user_detail_id: userDetailId }),
+            success: function(response) {
+                if (response.already_submitted) {
+                    alert('You have already submitted an intake form. Redirecting to thank you page.');
+                    window.location.href = '/gratitude?already_submitted=true';
+                }
+            },
+            error: function(xhr) {
+                console.log('Error checking intake status:', xhr.responseJSON);
+                // Continue loading form if check fails
+            }
+        });
+    }
+
+    // Check intake status when page loads
+    checkIntakeFormStatus();
+
     const dateFields = ["first_contact", "last_contact"];
     const textFields = [
         "gamer_first_name", "gamer_last_name",
@@ -1275,6 +1301,28 @@ $(document).ready(function () {
     let clientIP = '';
     let localTimestamp = '';
 
+    // Get user_detail_id from URL path or sessionStorage
+    function getUserDetailId() {
+        // First try to get from URL path (/intake-form/123/)
+        const pathParts = window.location.pathname.split('/');
+        const urlUserId = pathParts[pathParts.length - 2]; // Get the ID before the trailing slash
+        
+        if (urlUserId && !isNaN(urlUserId)) {
+            return parseInt(urlUserId);
+        }
+        
+        // Fallback to sessionStorage
+        const sessionUserId = sessionStorage.getItem('user_detail_id');
+        if (sessionUserId) {
+            return parseInt(sessionUserId);
+        }
+        
+        // If no user_detail_id found, redirect to homepage
+        alert('Access denied. Please complete the prequalification process first.');
+        window.location.href = '/';
+        return null;
+    }
+
     function fetchIPAndTimestamp(callback) {
         fetch('/get-ip')
             .then(res => res.json())
@@ -1422,7 +1470,8 @@ $("#intakeForm").on("submit", function (e) {
                     ...formData,
                     client_ip: clientIP,
                     submitted_at: localTimestamp,
-                    pdf_data: pdfData
+                    pdf_data: pdfData,
+                    user_detail_id: getUserDetailId()  // Add user_detail_id
                 }),
                 contentType: "application/json",
                 success: function () {
@@ -1439,7 +1488,14 @@ $("#intakeForm").on("submit", function (e) {
                 error: function (xhr) {
                     console.error(xhr.responseJSON);
                     document.getElementById('spinnerOverlay').style.display = 'none';
-                    $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
+                
+                // Check if user already submitted (HTTP 409 Conflict)
+                    if (xhr.status === 409 && xhr.responseJSON && xhr.responseJSON.already_submitted) {
+                        alert('You have already submitted an intake form. Redirecting to thank you page.');
+                        window.location.href = "/gratitude?already_submitted=true";
+                    } else {
+                        $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Check console.</div>');
+                    }
                 }
             });
         });

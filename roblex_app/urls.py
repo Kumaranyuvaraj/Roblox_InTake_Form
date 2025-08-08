@@ -1,17 +1,18 @@
 from django.urls import path
 
-from roblex_app.views import IntakeFormAPIView, IntakeFormView,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
-QuestionListAPIView, SubmitAnswerAPIView,LandingPage,IndexPage,SendEmailAPIView,EmailTemplateAPIView,\
-CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView
+from roblex_app.views import IntakeFormAPIView, intake_form_view,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
+QuestionListAPIView, SubmitAnswerAPIView,landing_page,index_page,SendEmailAPIView,EmailTemplateAPIView,\
+CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView, CheckIntakeStatusAPIView
 
 from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,read_docx_file
 urlpatterns = [
-    path('', LandingPage.as_view(), name='intake-form-page'), 
-    path('index/', IndexPage.as_view(), name='index-form-page'),
-    path('intake-form/', IntakeFormView.as_view(), name='intake-form-page'), 
+    path('', landing_page, name='landing-page'),
+    path('index/', index_page, name='index-page'),
+    path('intake-form/<int:user_detail_id>/', intake_form_view, name='intake-form-page'), 
     path('api/intake-form/', IntakeFormAPIView.as_view(), name='intake-form'),
     path('api/validate-roblox/', validate_roblox_username, name='validate_roblox'),
     path("api/submit-validated-intake/", SubmitIntakeIfValidAPIView.as_view(), name="submit_validated_intake"),
+    path('api/check-intake-status/', CheckIntakeStatusAPIView.as_view(), name='check-intake-status'),
 
     
     path('api/user-details/', UserDetailCreateView.as_view(), name='user-details-create'),
