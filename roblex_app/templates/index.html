@@ -308,9 +308,9 @@
     <div class="disclaimer py-4">
         <div class="row">
             <div class="col-12">
-                <p>DISCLAIMER</p>
         
-                  <p>This website is for informational purposes only and is a paid legal advertisement. It does not constitute legal advice, nor does it create an attorney-client relationship. While we strive for accuracy, we cannot guarantee the completeness of the information provided. Always consult a licensed attorney for guidance on your specific legal situation. This website also does not offer medical advice; consult a physician before changing any medical regimen. We are not liable for actions taken based on the information presented here. Our mission is to help you access information that supports your rights.</p>
+               <p><strong>DISCLAIMER:</strong> The hiring of a lawyer is an important decision that should not be based solely on advertisements. The material contained on <a href="https://nextkeylitigation.com" target="_blank">nextkeylitigation.com</a> is for general informational purposes only and does not constitute legal advice. Our list of participating law firms is licensed to practice law only in the following states: Mississippi, Arkansas, Illinois, Florida, and Georgia. <strong>NOT ACCEPTING CLAIMS FROM RESIDENTS IN THE FOLLOWING STATES UNTIL FURTHER NOTICE: [FL]</strong></p>
+
                      <p class="mb-0"> © 2025 All rights reserved. NextKey Litigation.</p>
             </div>
         </div>
@@ -322,12 +322,14 @@
         <div class="d-block d-md-flex justify-content-between align-items-center px-3 py-2">
 
             <div>
-                <a href="{% url 'read_docx' 'ABOUT_US.docx' %}" target="_blank" class="text-secondary">About Us</a> |
-                <a href="{% url 'read_docx' 'CONSENT_BOX.docx' %}" target="_blank" class="text-secondary">Consent Box</a> |
-                <a href="{% url 'read_docx' 'DISCLAIMER.docx' %}" target="_blank" class="text-secondary">Disclaimer</a> |
-                <a href="{% url 'read_docx' 'PARTICIPATING_FIRMS.docx' %}" target="_blank" class="text-secondary">Participating Firms</a> |
-                <a href="{% url 'read_docx' 'PRIVACY_POLICY.docx' %}" target="_blank" class="text-secondary">Privacy Policy</a> |
-                <a href="{% url 'read_docx' 'TERMS_OF_SERVICE.docx' %}" target="_blank" class="text-secondary">Terms of Service</a> |
+                <a href="{% url 'about_us' %}" class="text-secondary">About Us</a> |
+                <a href="{% url 'disclaimer' %}" class="text-secondary">Disclaimer</a> |
+                <a href="{% url 'participating_firms' %}" class="text-secondary">Participating Firms</a> |
+                <a href="{% url 'privacy_policy' %}" class="text-secondary">Privacy Policy</a> |
+                <a href="{% url 'terms_of_service' %}" class="text-secondary">Terms of Service</a> |
+
+
+                
             </div>
             <div class="d-flex align-items-center gap-2">
                 <span>Follow us on:</span>

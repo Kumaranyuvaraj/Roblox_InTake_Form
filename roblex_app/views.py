@@ -78,6 +78,7 @@ def intake_form_view(request, user_detail_id):
     
     return render(request, 'forms.html', context)
 
+
 def landing_page(request):
     """
     Serves the landing page form HTML page
@@ -1058,13 +1059,34 @@ class DocumentWebhookAPIView(APIView):
     
 
 
-def read_docx_file(request, filename):
-    file_path = os.path.join(settings.BASE_DIR, 'roblex_app', 'static', 'docs', filename)
+# def read_docx_file(request, filename):
+#     file_path = os.path.join(settings.BASE_DIR, 'roblex_app', 'static', 'docs', filename)
 
-    if not os.path.exists(file_path):
-        raise Http404("Document not found")
+#     if not os.path.exists(file_path):
+#         raise Http404("Document not found")
 
-    doc = Document(file_path)
-    content = "\n".join([para.text for para in doc.paragraphs])
+#     doc = Document(file_path)
+#     content = "\n".join([para.text for para in doc.paragraphs])
 
-    return render(request, 'doc_reader.html', {'content': content, 'filename': filename})
+#     return render(request, 'doc_reader.html', {'content': content, 'filename': filename})
+
+
+def about_us_view(request):
+    return render(request, 'about_us.html')
+
+
+# def consent_box_view(request):
+#     return render(request, 'consent_box.html')
+
+
+def disclaimer_view(request):
+    return render(request, 'disclaimer.html')
+
+def participating_firms_view(request):
+    return render(request, 'participating_firms.html')
+
+def privacy_policy_view(request):
+    return render(request, 'privacy_policy.html')
+
+def terms_of_service_view(request):
+    return render(request, 'terms.html')

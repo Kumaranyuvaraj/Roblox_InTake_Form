@@ -4,7 +4,8 @@ from roblex_app.views import IntakeFormAPIView, intake_form_view,SubmitIntakeIfV
 QuestionListAPIView, SubmitAnswerAPIView,landing_page,index_page,SendEmailAPIView,EmailTemplateAPIView,\
 CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView, CheckIntakeStatusAPIView
 
-from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,read_docx_file
+from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,about_us_view,disclaimer_view,\
+participating_firms_view,privacy_policy_view,terms_of_service_view
 urlpatterns = [
     path('', landing_page, name='landing-page'),
     path('index/', index_page, name='index-page'),
@@ -36,6 +37,13 @@ urlpatterns = [
     path('gratitude/', thanks, name='gratitude'),
 
 
-    path('read-doc/<str:filename>/', read_docx_file, name='read_docx'),
+    # path('read-doc/<str:filename>/', read_docx_file, name='read_docx'),
+     path('about-us/', about_us_view, name='about_us'),
+    #  path('consent-box/', consent_box_view, name='consent_box'),
+    path('disclaimer/', disclaimer_view, name='disclaimer'),
+    path('participating-firms/', participating_firms_view, name='participating_firms'),
+    path('privacy-policy/', privacy_policy_view, name='privacy_policy'),
+    path('terms-of-service/', terms_of_service_view, name='terms_of_service'),
+
 
 ]

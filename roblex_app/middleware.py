@@ -33,7 +33,8 @@ class SubdomainMiddleware:
             try:
                 request.law_firm = LawFirm.objects.get(subdomain='default', is_active=True)
             except LawFirm.DoesNotExist:
-                raise Http404("Default law firm not configured")
+                # raise Http404("Default law firm not configured"
+                pass
 
         response = self.get_response(request)
         return response

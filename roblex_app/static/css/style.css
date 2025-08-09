@@ -299,7 +299,6 @@ div img {
     display: none;
 }
 
-@media (max-width: 768px) {}
 
 /* button style */
 
@@ -491,7 +490,7 @@ div img {
     padding: 5px 20px 20px 20px;
     border-radius: 8px;
     position: relative;
-    max-height: 80vh;
+    max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 0px 20px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -853,9 +852,15 @@ button {
             opacity: 1;
         }
 
-
-
-
+/* Legal */
+.logo-legal img {
+    max-width: 200px;
+    height: auto;
+}
+.border-bottom-blue {
+    border-bottom: 2px solid #243b57;
+    padding-bottom: 30px;
+}
 
 
 

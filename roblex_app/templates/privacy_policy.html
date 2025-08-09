@@ -1,0 +1,415 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>PRIVACY POLICY</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .policy-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .policy-header .arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .policy-header[aria-expanded="true"] .arrow {
+            transform: rotate(90deg);
+        }
+
+        .accordion {
+            --bs-accordion-bg: transparent;
+        }
+
+        .accordion-button {
+            color: #ffffff;
+        }
+
+        .accordion-button:not(.collapsed) {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0);
+            box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 var(--bs-accordion-border-color);
+        }
+
+        .accordion-item {
+            /* color: var(--bs-accordion-color); */
+            /* background-color: var(--bs-accordion-bg); */
+            color: #ffffff;
+            border: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .accordion-item:last-of-type>.accordion-header .accordion-button.collapsed {
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .accordion-button::after {
+            /* flex-shrink: 0;
+            width: var(--bs-accordion-btn-icon-width);
+            height: var(--bs-accordion-btn-icon-width);
+            margin-left: auto;
+            content: ""; */
+            /* background-image: var(--bs-accordion-btn-icon); */
+            background-image: url("../static/img/arrow_down.png");
+            /* background-repeat: no-repeat;
+            background-size: var(--bs-accordion-btn-icon-width);
+            transition: var(--bs-accordion-btn-icon-transition); */
+            opacity: 0.4;
+        }
+        .accordion-button:not(.collapsed)::after {
+            background-image: url("../static/img/arrow_down.png");
+            opacity: 0.4;
+        }
+        .accordion-button:not(.collapsed) {
+           
+            box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 #0c3b81;
+        }
+        .accordion-body {
+            /* padding: var(--bs-accordion-body-padding-y) var(--bs-accordion-body-padding-x); */
+            padding-left: 30px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .accordion-button:focus{
+           --bs-accordion-btn-focus-box-shadow: 0;
+        }
+        
+        #toggleAll{
+            color: #ffffff;
+            text-decoration: none;
+           opacity: 0.7;
+        }
+        #toggleAll:hover{opacity: 1;}
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 border-bottom-blue">
+                <a href="" class="logo-legal">
+                    <!-- <img src="{% static 'img/theme.svg' %}" alt="Roblox Sex Abuse Claims"> -->
+                    <img src="{% static 'img/theme.svg' %}" alt="Roblox Sex Abuse Claims">
+                </a>
+            </div>
+            <div class="col-12 pt-4">
+                <p>NEXTKEY LITIGATION PRIVACY POLICY</p>
+                <p>NEXTKEY LITIGATION PRIVACY POLICY EFFECTIVE DATE: AUGUST 6, 2025</p>
+            </div>
+            <div class="col-md-12 text-end">
+                <div class="my-3">
+                    <a href="#" id="toggleAll" class="text-decoration-none">Expand All</a>
+                </div>
+            </div>
+            <div class="col-md-12 pb-3">
+                <div class="accordion" id="policyAccordion">
+
+                    <!-- Policy 1 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy1" aria-expanded="false">
+                                1. INTRODUCTION
+                            </button>
+                        </h2>
+                        <div id="policy1" class="accordion-collapse collapse show">
+                            <div class="accordion-body">
+                                <p>1.1. Thank you for visiting the website of NextKey Stats, LLC (“NextKey Litigation&quot; or
+“Company&quot;). We operate as Limited Liability Company in all states. We are not lawyers
+or a law firm but rather a marketing company that assist specific lawyers, law firms and
+others to obtain potential case leads. All references to &quot;websites&quot; or &quot;site&quot; include
+Company websites that post a link to this Privacy Policy, including this website, other
+Company owned and/or operated websites that post on this Privacy Policy but not sites
+of third parties even if referenced in our Site.</p>
+<p>1.2. PURPOSE OF POLICY
+This Privacy Policy governs your use of our websites. This Privacy Policy describes
+what information NextKey Litigation may collect about you on our websites, why we
+collect it, how we use it, and under what circumstances we may share it with third
+parties. This Privacy Policy also describes the choices you can make about how we
+collect and use your information. This Privacy Policy does not apply to our data
+collection activities offline, and does not govern the data practices of third parties that
+may interact with our websites.</p>
+<p>1.3 CONSENT TO OUR PRIVACY POLICY BY YOUR USE OF THE WEBSITE
+By using our websites, you consent to our Privacy Policy and Terms of Use and our
+collection, use and sharing of your information and data, and other activities, as
+described below. Further, by your use of Company&#39;s Site all consumers and / or
+potential legal claimants specifically: A.) agree to be bound by all applicable provisions
+herein, and B.) authorize and direct NextKey Litigation to disclose to applicable law
+firms, including their agents and assignees, any personal information and / or data that
+they have provide to NextKey Litigation.
+<p>In addition, please review our Terms of Service, which governs your use of the
+websites.</p>
+<p>If you do not consent to our collecting and sharing your Personal Information (defined
+below) as described in this Privacy Policy and in the Terms of Service, do not use the
+websites.</p>
+<p>1.4. NOTICE CONCERNING CHILDREN
+PLEASE NOTE: We are a general audience site, and do not direct any of our content
+specifically at children under 13 years of age. We understand and are committed to
+respecting the sensitive nature of children&#39;s privacy online. If we learn or have reason to
+suspect that a Site user is under age 13, we will promptly delete any personal
+information related to that user. However, where children are potential claimants and
+have a parent and / or guardian or potential guardian, we will use that information with
+certain safeguards as solely chosen by us.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Policy 2 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy2" aria-expanded="false">
+                                2. INFORMATION COLLECTION PRACTICES
+                            </button>
+                        </h2>
+                        <div id="policy2" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <p>2.1. WHAT INFORMATION DOES THE COMPANY COLLECT?</p>
+
+<p>(a) INFORMATION YOU PROVIDE. In operating the Site, Company may collect registration data, general identity information and other contact information, as well as information in the following categories: accident or incident information related to a potential legal claim provided by a Site user.</p>
+
+<p>(b) AUTOMATIC COLLECTION. When you visit the Site, our servers automatically recognize (1) visitors' domain names; (2) IP addresses (the number assigned to computers on the Internet); (3) device information; and (4) location data. This "traffic data" may be used for improving the services we offer, as explained in more detail below.</p>
+
+<p>(c) TRACKING TECHNOLOGIES. We use "cookies" and other tracking technologies that allow us to store a small piece of data on your computer about your visit to the Site. Cookies help us learn which areas of the Site are useful and which areas need improvement. You can choose whether to accept cookies by changing the settings on your browser. However, if you choose to disable this function, your experience at the Site may be diminished and some features may not work as they were intended.</p>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Policy  -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy3" aria-expanded="false">
+                                3. USE AND SHARING OF INFORMATION
+                            </button>
+                        </h2>
+                        <div id="policy3" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                
+
+<p>3.1. WHAT DOES COMPANY DO WITH COLLECTED INFORMATION?</p>
+
+<p>(a) OPERATING OUR SITE AND PERFORMING SERVICES. We use your personal information to verify your identity, to check your qualifications, or to follow up with transactions initiated on the Site. We may also use your contact information to inform you of any changes to the Site, or to send you additional information about Company or our services.</p>
+
+<p>(b) TRAFFIC DATA. We use traffic data to analyze our Site traffic, but we do not examine this information for individually identifying information. In addition, we may use IP addresses to help diagnose problems with our server, to administer the Site, or to display the content according to your preferences. Traffic and transaction information may also be shared with business partners and advertisers on an aggregate basis.</p>
+
+<p>(c) USE OF COOKIES. We may use cookies and other tracking technologies to deliver content specific to your interests or for other purposes.</p>
+
+<p>(d) DISCLOSURE OF PERSONAL INFORMATION. We may disclose personal information that you provide via the Site to the following third parties:</p>
+<ul>
+    <li>Our subsidiaries and affiliates;</li>
+    <li>Attorneys, Law Firms and similar entities that are interested in your type of legal claim or other issue so that they might consider contacting you about such claims. No such entity is obligated to pursue any claim for you unless and until they reach an agreement with you about that process.</li>
+    <li>Contractors, vendors, and service providers we use to support our business and the Site. These support partners have all agreed to uphold the same standards of security and confidentiality that we provide to you under this Policy, and they have agreed to only use your information to carry out their specific business obligations to our Company.</li>
+    <li>Any disclosure noted herein and done pursuant to the provision of this Privacy Policy, shall be deemed to have been done with your permission, consent and agreement.</li>
+</ul>
+
+
+<p>We may also disclose personal information that you provide via the Site in the event of a merger, acquisition, or any form of sale of some or all of our assets, in which case personal information we collect via the Site will be among the assets transferred to the buyer. Further, we may disclose your personal information to third parties to</p>
+<ul>
+    <li>Comply with any court order or other legal obligation;</li>
+    <li>Enforce or apply our terms of use and other agreements; and</li>
+    <li>Protect the rights, property, or safety of our business, our clients, customers, employees, or others. This includes exchanging information with other companies and organizations for the purposes of fraud protection, information security, and other related matters.</li>
+</ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Policy  -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy4" aria-expanded="false">
+                                4. FOR RESIDENTS OF CALIFORNIA and other states that employ all or some of Privacy laws noted below.
+                            </button>
+                        </h2>
+                        <div id="policy4" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <p>4.1 SHINE THE LIGHT</p>
+<p>Under California's "Shine the Light" law, California residents who provide certain personal information in obtaining products or services for personal, family, or household use are entitled to request and obtain from us, once each calendar year, information about the customer information we shared, if any, with other businesses for their own direct marketing uses.</p>
+<p>If applicable, this information would include the categories of customer information and the names and addresses of those businesses with which we shared customer information for the immediately preceding calendar year (i.e. requests made in 2021 will only apply to data received in 2022).</p>
+<p>However, as noted above we do not now collect information for general marketing purposes but only preliminary information for: lawyers, law firms and/or others that have an interest in the consumer's issue or legal claim. We will only collect basic identity information and certain information about a legal claim or other issue that Consumers may have given to us.</p>
+<p>To obtain this information, please send an e-mail message to info@emmpartners.com with "Request for California Privacy Information" in the subject line and in the body of your message. We will provide in response the requested information to you at your e-mail address, if available. Response time is as noted below.</p>
+<p>Please be aware that not all information sharing is covered by the "Shine the Light" requirements and only required information will be included in our response.</p>
+
+<p>4.2 ERASER BUTTON</p>
+<p>Under California's "Eraser Button" law, California residents under age 18 who have registered to use the Site may request removal of content they have posted. However, Company does not have a Website wherein a person of any age can post any information. Therefore, Company does not have a method to "Erase" uncollected non existing data.</p>
+
+<p>4.3 The California Consumer Privacy Act ("CCPA") was amended by Proposition 24 called the California Privacy Right Act ("CPRA") which provide additional rights to residents of California regarding information collection and use practices.</p>
+<p>However, Company does not sell or collect information of third parties nor does it have Websites available for posting data. Company only obtains consumer identification data and thumb nail sketches of data solely related to possible claims or legal issues with the sole purpose that such information shall be shared with such possible entities that may assist the consumer. Consumers explicitly direct that Company share such all such information and contact data generally referenced in this Policy with said entities. If appropriate such entities will contact Consumer and collect further and additional data that in most cases will not be shared with NextKey Litigation.</p>
+<p>Under these circumstances cited herein, Consumers understand that some Privacy Rights that apply to standard Website Commercial Transactions do not apply to this type of data collection as the collection herein is limited in scope and conditional subject to the review and future requests for more information by our data users such as lawyers and other entities.</p>
+
+<p>4.3.1 CATEGORIES OF PERSONAL INFORMATION COLLECTED</p>
+<p>We identify below the categories of personal information that we have collected about our users in the last 12 months, using the categories provided in the CCPA.</p>
+<ul>
+  <li>Identifiers</li>
+  <li>Basic information about a potential legal claim or other matter for which a claim may be of interest to a service provider. Such potential service provider will receive some or all of the information collected by NextKey Litigation as solely decided by Company.</li>
+  <li>Any other data collected by us as noted herein that may help us maintain our Site or may be of interest to a potential service provider. Such data to be shared with any or all service provider at any time as solely decided by Company.</li>
+</ul>
+<p>For more detail on the information we collect, please refer to our Information Collection Practices above. We collect and use these categories of personal information for the business purposes described in the Information Collection Practices section.</p>
+
+<p>4.3.2 CATEGORIES OF PERSONAL INFORMATION SOLD</p>
+<p>Company does not sell personal information of consumers as a stand-alone item as generally defined under the CCPA. However, such information noted herein is provided to: lawyers, law firms or similar entities as part of the Company's process of providing data to service providers that may potentially provide services to a Consumer.</p>
+<p>We identify below the categories of personal information that we have sold (as defined under the CCPA) in the last 12 months, using the categories provided in the CCPA.</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Policy  -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy5" aria-expanded="false">
+                                5. OTHER RIGHTS OF CALIFORNIA RESIDENTS
+                            </button>
+                        </h2>
+                        <div id="policy5" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                               <p>A. Right to Know</p>
+<p>You have the right to know certain details about our data practices in the past 12 months. In particular, you may request the following from us:</p>
+<ul>
+    <li>The categories of personal information we have collected about you;</li>
+    <li>The categories of sources from which the personal information was collected;</li>
+    <li>The categories of personal information about you we disclosed for a business purpose or sold;</li>
+    <li>The categories of third parties to whom the personal information was disclosed for a business purpose or sold;</li>
+    <li>The business or commercial purpose for collecting or selling the personal information; and</li>
+    <li>The pieces of personal information we have collected about you.</li>
+</ul>
+<p>To exercise the Right to Know, Right to Delete, Right to Opt-Out, or Right to Non-Discrimination, please submit a request via email to info@emmpartners.com. In the request, please specify which right you are seeking to exercise and the scope of the request. We Hawkins will respond as noted below.</p>
+
+<p>B. Right to Delete</p>
+<p>You have the right to request that we delete the personal information we have collected from you in the last 12 months. We will respond as noted below.</p>
+
+<p>C. Right to Opt-Out</p>
+<p>You have the right to tell us not to sell your information at any time. We will respond as noted below.</p>
+
+<p>D. Right to Non-discrimination</p>
+<p>You have the right not to receive discriminatory treatment by us for exercising any of your rights. We will respond as noted below.</p>
+
+<p>E. Authorized Agent</p>
+<p>You can designate an authorized agent to submit requests on your behalf. However, we will require written proof of the agent&#39;s permission to do so and verify your identity directly. Note, if any of your data is transferred to an attorney, law firm, and/or others that have an interest in the consumer&#39;s issue or legal claim as noted above, it will be deemed that you have authorized us to transfer any or all such data in our sole discretion.</p>
+
+<p>F. Notice of Financial Incentives</p>
+<p>Other than the transfer of certain information to lawyers, law firms, and advisors that are interested in your potential legal claims or providing other assistance to you, we will not participate in any financial incentives programs, benefits, or other offerings, including payments to consumers as compensation for the disclosure, deletion, or sale of personal information about them.</p>
+
+<p>G. Our Response Time</p>
+<p>Unless otherwise required, we will confirm receipt of your request within 20 business days of our receipt. We may require further specific information from you to help us verify your identity and process your request. You will ordinarily be given ten (10) business days to respond unless you request more time. Our response time will be extended to allow you time to respond. If you fail to respond and/or we are unable to verify your identity, we may deny your request to delete or take other action. If we deny your request, we will explain the reason why in our response. Once you have responded to our identity request or other request, we normally expect to respond thirty (30) days thereafter unless you alter or modify your original request.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Policy  -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy6" aria-expanded="false">
+                                6. SECURITY
+                            </button>
+                        </h2>
+                        <div id="policy6" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                The Site has security measures in place to prevent the loss, misuse, and alteration of
+the information that we obtain from you, but we make no assurances about our ability to
+prevent any such loss, misuse, to you or to any third party arising out of any such loss,
+misuse, or alteration.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Policy  -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy7" aria-expanded="false">
+                                7. PUBLIC WEBSITE AREAS AND ACCESS TO OTHER WEBSITES
+                            </button>
+                        </h2>
+                        <div id="policy7" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                               <p>7.1. OTHER WEBSITES</p>
+<p>Our Site may contain links to other non-related websites. If you choose to visit other
+websites, we are not responsible for the privacy practices or content of those other
+websites. It is your responsibility to review the privacy policies at those websites to
+confirm that you understand and agree with their policies.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Policy  -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed policy-header" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#policy8" aria-expanded="false">
+                                8. CONTACT INFORMATION AND POLICY UPDATES
+                            </button>
+                        </h2>
+                        <div id="policy8" class="accordion-collapse collapse show">
+                            <div class="accordion-body">
+                                <p>8.1. CONTACTING US</p>
+<p>If you have any questions about this Policy, our practices related to this Site, or if you
+would like to have us remove your information from our database, please feel contact us
+at the following info@nextkeylitigation.com.</p>
+<p>8.2. UPDATES AND CHANGES</p>
+<p>We reserve the right, at any time, to add to, change, update, or modify this Policy,
+simply by posting such change, update, or modification on the Site and without any
+other notice to you. Any such change, update, or modification will be effective
+immediately upon posting on the Site. It is your responsibility to review this Policy from
+time to time to ensure that you continue to agree with all of its terms.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <footer class="footer text-secondary">
+        <div class="d-block d-md-flex justify-content-between align-items-center px-3 py-2">
+
+            <div>
+                <a href="{% url 'about_us' %}" class="text-secondary">About Us</a> |
+                <a href="{% url 'disclaimer' %}" class="text-secondary">Disclaimer</a> |
+                <a href="{% url 'participating_firms' %}" class="text-secondary">Participating Firms</a> |
+                <a href="{% url 'privacy_policy' %}" class="text-secondary">Privacy Policy</a> |
+                <a href="{% url 'terms_of_service' %}" class="text-secondary">Terms of Service</a> |
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span>Follow us on:</span>
+                <a href="https://facebook.com" target="_blank" class="text-secondary">
+                    <img src="{% static 'img/facebook.png' %}" alt="Facebook" width="20" />
+                </a>
+                <a href="https://instagram.com" target="_blank" class="text-secondary">
+                    <img src="{% static 'img/insta.png' %}" alt="Instagram" width="20" />
+                </a>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const toggleAllLink = document.getElementById('toggleAll');
+        const allCollapses = document.querySelectorAll('.accordion-collapse');
+        let allExpanded = false;
+
+        toggleAllLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            allExpanded = !allExpanded;
+            toggleAllLink.textContent = allExpanded ? 'Collapse All' : 'Expand All';
+
+            allCollapses.forEach(collapseEl => {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
+                allExpanded ? bsCollapse.show() : bsCollapse.hide();
+            });
+        });
+    </script>
+
+</body>
+
+</html>
