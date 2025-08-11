@@ -5,13 +5,14 @@ QuestionListAPIView, SubmitAnswerAPIView,landing_page,index_page,SendEmailAPIVie
 CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView, CheckIntakeStatusAPIView
 
 from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,about_us_view,disclaimer_view,\
-participating_firms_view,privacy_policy_view,terms_of_service_view
+participating_firms_view,privacy_policy_view,terms_of_service_view,validate_xbox_gamertag
 urlpatterns = [
     path('', landing_page, name='landing-page'),
     path('index/', index_page, name='index-page'),
     path('intake-form/<int:user_detail_id>/', intake_form_view, name='intake-form-page'), 
     path('api/intake-form/', IntakeFormAPIView.as_view(), name='intake-form'),
     path('api/validate-roblox/', validate_roblox_username, name='validate_roblox'),
+    path("api/validate-xbox-gamertag/<str:gamertag>/",validate_xbox_gamertag, name="validate_xbox_gamertag"),
     path("api/submit-validated-intake/", SubmitIntakeIfValidAPIView.as_view(), name="submit_validated_intake"),
     path('api/check-intake-status/', CheckIntakeStatusAPIView.as_view(), name='check-intake-status'),
 

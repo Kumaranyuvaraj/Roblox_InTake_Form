@@ -3,6 +3,15 @@
 <html lang="en">
 
 <head>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WCBZJQFX');</script>
+    <!-- End Google Tag Manager -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Intake Form</title>
@@ -368,6 +377,11 @@
 
 <body class="bg-light">
 
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCBZJQFX"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
       <!-- Success/Decline Message Banner -->
     <div id="documentStatusBanner" style="display: none;">
         <div class="container">
@@ -557,15 +571,10 @@
                             <label>Xbox Gamertag (if applicable)
                                 <button type="button" class="btn btn-ico" data-toggle="tooltip" data-placement="bottom"
                                     title="It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.">
-                                    <!-- <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16" height="16"
-                                        viewBox="0 0 24 24">
-                                        <path
-                                            d="M 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 C 24 5.371094 18.628906 0 12 0 Z M 12 2 C 17.523438 2 22 6.476563 22 12 C 22 17.523438 17.523438 22 12 22 C 6.476563 22 2 17.523438 2 12 C 2 6.476563 6.476563 2 12 2 Z M 12 5.8125 C 11.816406 5.8125 11.664063 5.808594 11.5 5.84375 C 11.335938 5.878906 11.183594 5.96875 11.0625 6.0625 C 10.941406 6.15625 10.851563 6.285156 10.78125 6.4375 C 10.710938 6.589844 10.6875 6.769531 10.6875 7 C 10.6875 7.226563 10.710938 7.40625 10.78125 7.5625 C 10.851563 7.71875 10.941406 7.84375 11.0625 7.9375 C 11.183594 8.03125 11.335938 8.085938 11.5 8.125 C 11.664063 8.164063 11.816406 8.1875 12 8.1875 C 12.179688 8.1875 12.371094 8.164063 12.53125 8.125 C 12.691406 8.085938 12.816406 8.03125 12.9375 7.9375 C 13.058594 7.84375 13.148438 7.71875 13.21875 7.5625 C 13.289063 7.410156 13.34375 7.226563 13.34375 7 C 13.34375 6.769531 13.289063 6.589844 13.21875 6.4375 C 13.148438 6.285156 13.058594 6.15625 12.9375 6.0625 C 12.816406 5.96875 12.691406 5.878906 12.53125 5.84375 C 12.371094 5.808594 12.179688 5.8125 12 5.8125 Z M 10.78125 9.15625 L 10.78125 18.125 L 13.21875 18.125 L 13.21875 9.15625 Z">
-                                        </path>
-                                    </svg> -->
                                 </button>
                             </label>
                             <input type="text" name="xbox_gamertag" class="form-control" placeholder="Enter Xbox Gamertag">
+                            <div class="xboxValidationStatus"></div>
 
                         </div>
                         </div>
@@ -1061,7 +1070,7 @@ $(document).ready(function () {
     // });
 
 
-     let robloxValidationStatus = {};
+    let robloxValidationStatus = {};
 
     // ✅ Roblox username validation on blur
     $(document).on("blur", ".roblox-gamertag", function () {
@@ -1097,24 +1106,67 @@ $(document).ready(function () {
         });
     });
 
+
+    // const xboxValidationStatus = {};
+
+    // $("input[name='xbox_gamertag']").on("input", function () {
+    //     const gamertag = $(this).val().trim();
+    //     const statusElement = $(this).siblings(".xboxValidationStatus");
+
+    //     if (!gamertag) {
+    //         statusElement.html('');
+    //         xboxValidationStatus[gamertag] = null;
+    //         return;
+    //     }
+
+    //     // statusElement.html('<span class="text-info">Validating...</span>');
+
+    //     // Example AJAX call to validate Xbox gamertag
+    //     $.ajax({
+    //         url: `/api/validate-xbox-gamertag/${encodeURIComponent(gamertag)}`,
+    //         type: "GET",
+    //         success: function (data) {
+    //             if (data.valid) {
+    //                 statusElement.html('<span class="text-success">Gamertag found.</span>');
+    //                 xboxValidationStatus[gamertag] = true;
+    //             } else {
+    //                 statusElement.html('<span class="text-danger">Gamertag not found.</span>');
+    //                 xboxValidationStatus[gamertag] = false;
+    //             }
+    //         },
+    //         error: function () {
+    //             // statusElement.html('<span class="text-danger">Error validating gamertag.</span>');
+    //             xboxValidationStatus[gamertag] = false;
+    //         }
+    //     });
+    // });
+
+
+
     // ✅ Prevent submission if any gamertag is invalid
     $("#intakeForm").on("submit", function (e) {
         let isValid = true;
 
+        // $(".xbox-gamertag").each(function (i) {
+        //     const value = $(this).val().trim();
+        //     if (value && !xboxValidationStatus[i]) {
+        //         const $statusDiv = $(this).siblings(".xboxValidationStatus");
+        //         $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">Gamertag not found.</div>`);
+        //         isValid = false;
+        //     }
+        // });
+
         $(".roblox-gamertag").each(function (i) {
             const value = $(this).val().trim();
-
-            // If value exists but hasn't been validated or is invalid
             if (value && !robloxValidationStatus[i]) {
                 const $statusDiv = $(this).siblings(".robloxValidationStatus");
-                $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">gamertag not found.</div>`);
+                $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">Gamertag not found.</div>`);
                 isValid = false;
             }
         });
 
         if (!isValid) {
             e.preventDefault();
-            // alert("Please correct the invalid Roblox usernames before submitting.");
             return false;
         }
     });
@@ -1225,11 +1277,11 @@ $(document).ready(function () {
 
 
 
-        $(".roblox-gamertag").each(function (index) {
-            if (robloxValidationStatus[index] === false) {
-                isValid = false;
-            }
-        });
+        // $(".roblox-gamertag").each(function (index) {
+        //     if (robloxValidationStatus[index] === false) {
+        //         isValid = false;
+        //     }
+        // });
 
         // ✅ Text & Textarea
         textFields.forEach(field => {
@@ -1427,11 +1479,15 @@ $("#intakeForm").on("submit", function (e) {
     e.preventDefault();
 
     // ✅ Check for invalid Roblox gamertags before proceeding
-    const hasInvalidGamertag = Object.values(robloxValidationStatus).some(status => status === false);
+    const hasInvalidGamertag = 
+    Object.values(robloxValidationStatus).some(status => status === false)
+    // Object.values(xboxValidationStatus).some(status => status === false);
+
     if (hasInvalidGamertag) {
-        $("#responseMessage").html('<div class="alert alert-danger">One or more Roblox gamertags are invalid. Please fix them before submitting.</div>');
-        return; // Stop submission
+        $("#responseMessage").html('<div class="alert alert-danger">One or more gamertags are invalid. Please fix them before submitting.</div>');
+        return; 
     }
+
 
     if (!validateIntakeForm()) return;
 
@@ -1450,7 +1506,7 @@ $("#intakeForm").on("submit", function (e) {
         if (!radioFields.includes(name)) {
             if (name === "roblox_gamertag") {
                 const allGamertags = [];
-                $("input[name='roblox_gamertag']").each(function () {
+                $(`input[name='${name}']`).each(function () {
                     const cleaned = $(this).val().trim().replace(/[@_]/g, '');
                     if (cleaned) allGamertags.push(cleaned);
                 });
@@ -1471,7 +1527,7 @@ $("#intakeForm").on("submit", function (e) {
                     client_ip: clientIP,
                     submitted_at: localTimestamp,
                     pdf_data: pdfData,
-                    user_detail_id: getUserDetailId()  // Add user_detail_id
+                    user_detail_id: getUserDetailId()
                 }),
                 contentType: "application/json",
                 success: function () {
@@ -1489,7 +1545,6 @@ $("#intakeForm").on("submit", function (e) {
                     console.error(xhr.responseJSON);
                     document.getElementById('spinnerOverlay').style.display = 'none';
                 
-                // Check if user already submitted (HTTP 409 Conflict)
                     if (xhr.status === 409 && xhr.responseJSON && xhr.responseJSON.already_submitted) {
                         alert('You have already submitted an intake form. Redirecting to thank you page.');
                         window.location.href = "/gratitude?already_submitted=true";
@@ -1500,6 +1555,7 @@ $("#intakeForm").on("submit", function (e) {
             });
         });
     });
+
 });
 
 
