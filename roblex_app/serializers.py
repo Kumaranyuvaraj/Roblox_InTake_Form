@@ -119,7 +119,7 @@ class EmailTemplateSerializer(serializers.ModelSerializer):
 class DocumentTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentTemplate
-        fields = ['id', 'name', 'docuseal_template_id', 'description', 'is_active']
+        fields = ['id', 'name', 'nextkeysign_template_id', 'description', 'is_active']
 
 
 class DocumentSubmissionSerializer(serializers.ModelSerializer):
@@ -128,8 +128,8 @@ class DocumentSubmissionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = DocumentSubmission
-        fields = ['id', 'user_detail', 'document_template', 'docuseal_submission_id', 
-                 'docuseal_submitter_id', 'docuseal_slug', 'status', 'sent_at', 'opened_at', 
+        fields = ['id', 'user_detail', 'document_template', 'nextkeysign_submission_id', 
+                 'nextkeysign_submitter_id', 'nextkeysign_slug', 'status', 'sent_at', 'opened_at', 
                  'completed_at', 'declined_at', 'signed_document_url', 'audit_log_url', 
                  'decline_reason', 'external_id', 'created_at', 'updated_at']
 

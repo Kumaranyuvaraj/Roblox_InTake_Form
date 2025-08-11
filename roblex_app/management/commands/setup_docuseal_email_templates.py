@@ -3,7 +3,7 @@ from roblex_app.models import EmailTemplate
 
 
 class Command(BaseCommand):
-    help = 'Create or update email templates for DocuSeal document signing workflow'
+    help = 'Create or update email templates for NextKeySign document signing workflow'
 
     def handle(self, *args, **options):
         templates = [
@@ -100,5 +100,5 @@ The Legal Team'''
                 )
 
         self.stdout.write(
-            self.style.SUCCESS('Successfully set up all DocuSeal email templates!')
+            self.style.SUCCESS('Successfully set up all NextKeySign email templates!')
         )

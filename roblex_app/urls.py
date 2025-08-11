@@ -27,7 +27,7 @@ urlpatterns = [
 
     path('api/email-template/<str:template_type>/',EmailTemplateAPIView.as_view(),name='email-template'),
    
-    # DocuSeal Document Signing API endpoints
+    # NextKeySign Document Signing API endpoints
     path('api/create-document-submission/', CreateDocumentSubmissionAPIView.as_view(), name='create-document-submission'),
     path('api/check-document-status/', CheckDocumentStatusAPIView.as_view(), name='check-document-status'),
     path('api/document-webhook/', DocumentWebhookAPIView.as_view(), name='document-webhook'),

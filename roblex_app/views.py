@@ -485,7 +485,7 @@ def thanks(request):
     return render(request, 'thankyou.html', context)
 
 # ====================
-# DocuSeal API Views
+# NextKeySign API Views
 # ====================
 
 class CreateDocumentSubmissionAPIView(APIView):
@@ -545,12 +545,12 @@ class CreateDocumentSubmissionAPIView(APIView):
                     
                     # If we found the Florida disclosure, provide its signing URL
                     if florida_disclosure_submission:
-                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{florida_disclosure_submission.docuseal_slug}"
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{florida_disclosure_submission.nextkeysign_slug}"
                         
                         return Response({
                             "message": "Both Florida disclosure and retainer documents created successfully",
                             "submission_url": signing_url,  # Frontend expects this field
-                            "submission_id": florida_disclosure_submission.docuseal_submission_id,
+                            "submission_id": florida_disclosure_submission.nextkeysign_submission_id,
                             "status": "pending",
                             "external_id": florida_disclosure_submission.external_id,
                             "template_type": "florida_disclosure",
@@ -641,11 +641,11 @@ class CreateDocumentSubmissionAPIView(APIView):
             )
             
             if submission:
-                signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{submission.docuseal_slug}"
+                signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{submission.nextkeysign_slug}"
                 
                 return Response({
                     "submission_url": signing_url,
-                    "submission_id": submission.docuseal_submission_id,
+                    "submission_id": submission.nextkeysign_submission_id,
                     "status": "pending",
                     "external_id": submission.external_id,
                     "template_type": actual_template_type,
@@ -681,14 +681,14 @@ class CreateDocumentSubmissionAPIView(APIView):
             try:
                 email_template = EmailTemplate.objects.get(name=email_template_type)
             except EmailTemplate.DoesNotExist:
-                print(f"Warning: Email template '{email_template_type}' not found, will use default DocuSeal message")
+                print(f"Warning: Email template '{email_template_type}' not found, will use default NextKeySign message")
             
-            # Prepare DocuSeal API request
-            docuseal_url = f"{settings.NEXTKEYSIGN_BASE_URL}/api/submissions"
+            # Prepare NextKeySign API request
+            nextkeysign_url = f"{settings.NEXTKEYSIGN_BASE_URL}/api/submissions"
             
             # Build submitter data
             submitter_data = {
-                "template_id": doc_template.docuseal_template_id,
+                "template_id": doc_template.nextkeysign_template_id,
                 "submitters": [
                     {
                         "name": f"{user_detail.first_name} {user_detail.last_name}",
@@ -713,19 +713,19 @@ class CreateDocumentSubmissionAPIView(APIView):
                     "body": custom_body
                 }
             
-            # Make API call to DocuSeal
+            # Make API call to NextKeySign
             headers = {
                 "X-Auth-Token": settings.NEXTKEYSIGN_API_TOKEN,
                 "Content-Type": "application/json"
             }
             
-            response = requests.post(docuseal_url, json=submitter_data, headers=headers)
+            response = requests.post(nextkeysign_url, json=submitter_data, headers=headers)
             
             if response.status_code in [200, 201]:
-                docuseal_response = response.json()
+                nextkeysign_response = response.json()
                 
-                if isinstance(docuseal_response, list) and len(docuseal_response) > 0:
-                    first_submitter = docuseal_response[0]
+                if isinstance(nextkeysign_response, list) and len(nextkeysign_response) > 0:
+                    first_submitter = nextkeysign_response[0]
                     
                     submission_id = first_submitter.get('submission_id')
                     submitter_id = first_submitter.get('id')
@@ -739,9 +739,9 @@ class CreateDocumentSubmissionAPIView(APIView):
                         submission = DocumentSubmission.objects.create(
                             user_detail=user_detail,
                             document_template=doc_template,
-                            docuseal_submission_id=submission_id,
-                            docuseal_submitter_id=submitter_id,
-                            docuseal_slug=submitter_slug,
+                            nextkeysign_submission_id=submission_id,
+                            nextkeysign_submitter_id=submitter_id,
+                            nextkeysign_slug=submitter_slug,
                             status='pending',
                             external_id=external_id
                         )
@@ -813,7 +813,7 @@ class CheckDocumentStatusAPIView(APIView):
                             break
                     
                     if retainer_pending:
-                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{retainer_pending.docuseal_slug}"
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{retainer_pending.nextkeysign_slug}"
                         return redirect(signing_url)
                     else:
                         return redirect('/?error=retainer_document_missing')
@@ -822,19 +822,19 @@ class CheckDocumentStatusAPIView(APIView):
                     florida_pending = pending_docs.get('florida_disclosure')
                     
                     if florida_pending:
-                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{florida_pending.docuseal_slug}"
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{florida_pending.nextkeysign_slug}"
                         return redirect(signing_url)
                     else:
                         return redirect('/?error=disclosure_document_missing')
                 else:
                     # Neither completed - redirect to first available document
                     if 'florida_disclosure' in pending_docs:
-                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{pending_docs['florida_disclosure'].docuseal_slug}"
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{pending_docs['florida_disclosure'].nextkeysign_slug}"
                         return redirect(signing_url)
                     elif pending_docs:
                         # Redirect to any pending document
                         first_pending = list(pending_docs.values())[0]
-                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{first_pending.docuseal_slug}"
+                        signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{first_pending.nextkeysign_slug}"
                         return redirect(signing_url)
                     else:
                         return redirect('/?error=no_pending_documents')
@@ -846,7 +846,7 @@ class CheckDocumentStatusAPIView(APIView):
                 elif pending_docs:
                     # Redirect to pending document
                     first_pending = list(pending_docs.values())[0]
-                    signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{first_pending.docuseal_slug}"
+                    signing_url = f"{settings.NEXTKEYSIGN_BASE_URL}/s/{first_pending.nextkeysign_slug}"
                     return redirect(signing_url)
                 else:
                     return redirect('/?error=no_documents_available')
@@ -893,7 +893,7 @@ class DocumentWebhookAPIView(APIView):
             
             # Find corresponding submission
             try:
-                submission = DocumentSubmission.objects.get(docuseal_submission_id=submission_id)
+                submission = DocumentSubmission.objects.get(nextkeysign_submission_id=submission_id)
             except DocumentSubmission.DoesNotExist:
                 return Response({"status": "ok"}, status=status.HTTP_200_OK)
             

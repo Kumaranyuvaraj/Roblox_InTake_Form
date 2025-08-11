@@ -22,17 +22,17 @@ class Command(BaseCommand):
         global_templates = [
             {
                 'name': 'retainer_minor',
-                'docuseal_template_id': 3,  # Replace with actual DocuSeal template ID
+                'nextkeysign_template_id': 3,  # Replace with actual NextKeySign template ID
                 'description': 'Global: Retainer agreement for minors (under 18) requiring parental signature',
             },
             {
                 'name': 'retainer_adult',
-                'docuseal_template_id': 3,  # Replace with actual DocuSeal template ID
+                'nextkeysign_template_id': 3,  # Replace with actual NextKeySign template ID
                 'description': 'Global: Retainer agreement for adults (18-20 years old)',
             },
             {
                 'name': 'florida_disclosure',
-                'docuseal_template_id': 7,  # Template ID provided by user
+                'nextkeysign_template_id': 7,  # Template ID provided by user
                 'description': 'Global: Florida Disclosure Document for zipcodes 32003-34997',
             }
         ]
@@ -44,7 +44,7 @@ class Command(BaseCommand):
                 name=template_data['name'],
                 law_firm=None,  # Global template
                 defaults={
-                    'docuseal_template_id': template_data['docuseal_template_id'],
+                    'nextkeysign_template_id': template_data['nextkeysign_template_id'],
                     'description': template_data['description'],
                     'is_active': True
                 }
@@ -73,17 +73,17 @@ class Command(BaseCommand):
             law_firm_templates = [
                 {
                     'name': 'retainer_minor',
-                    'docuseal_template_id': 100 + law_firm.id,  # Example: unique ID per law firm
+                    'nextkeysign_template_id': 100 + law_firm.id,  # Example: unique ID per law firm
                     'description': f'{law_firm.name}: Retainer agreement for minors with custom branding',
                 },
                 {
                     'name': 'retainer_adult',
-                    'docuseal_template_id': 200 + law_firm.id,  # Example: unique ID per law firm
+                    'nextkeysign_template_id': 200 + law_firm.id,  # Example: unique ID per law firm
                     'description': f'{law_firm.name}: Retainer agreement for adults with custom branding',
                 },
                 {
                     'name': 'florida_disclosure',
-                    'docuseal_template_id': 300 + law_firm.id,  # Example: unique ID per law firm
+                    'nextkeysign_template_id': 300 + law_firm.id,  # Example: unique ID per law firm
                     'description': f'{law_firm.name}: Florida Disclosure Document for zipcodes 32003-34997',
                 }
                 # Note: Not all law firms may need custom versions of all templates
@@ -94,7 +94,7 @@ class Command(BaseCommand):
                     name=template_data['name'],
                     law_firm=law_firm,
                     defaults={
-                        'docuseal_template_id': template_data['docuseal_template_id'],
+                        'nextkeysign_template_id': template_data['nextkeysign_template_id'],
                         'description': template_data['description'],
                         'is_active': True
                     }
@@ -102,7 +102,7 @@ class Command(BaseCommand):
                 
                 action = 'Created' if created else 'Updated'
                 self.stdout.write(
-                    self.style.SUCCESS(f'  {action}: {template.name} (ID: {template.docuseal_template_id})')
+                    self.style.SUCCESS(f'  {action}: {template.name} (ID: {template.nextkeysign_template_id})')
                 )
 
         self.stdout.write('\n' + self.style.SUCCESS('All document templates setup complete!'))
@@ -115,5 +115,5 @@ class Command(BaseCommand):
         self.stdout.write(f'  Law firm-specific templates: {firm_count}')
         
         self.stdout.write('\n' + self.style.WARNING(
-            'Note: Update docuseal_template_id values with your actual DocuSeal template IDs.'
+            'Note: Update nextkeysign_template_id values with your actual NextKeySign template IDs.'
         ))

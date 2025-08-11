@@ -33,3 +33,10 @@ requests==2.31.0
 python-decouple==3.8
 debugpy==1.8.1
 python-docx==1.2.0
+
+# New dependencies for retainer app
+pandas==1.5.3
+openpyxl==3.1.2
+celery==5.3.4
+redis==5.0.1
+numpy==1.24.3
