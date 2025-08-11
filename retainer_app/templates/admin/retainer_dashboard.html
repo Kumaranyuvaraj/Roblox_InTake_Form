@@ -4,16 +4,263 @@
 {% block title %}Dashboard - {{ block.super }}{% endblock %}
 
 {% block extrahead %}
+<meta http-equiv="refresh" content="30">
+<script>
+    // Enhanced auto-reload functionality with countdown and user interaction detection
+    let reloadTimer;
+    let countdownTimer;
+    let countdownValue = 30;
+    let indicator;
+    let userActive = false;
+    
+    function createRefreshIndicator() {
+        indicator = document.createElement('div');
+        indicator.className = 'refresh-indicator';
+        indicator.innerHTML = `
+            <span class="icon">🔄</span> 
+            Next refresh in 
+            <span class="countdown">${countdownValue}s</span>
+        `;
+        document.body.appendChild(indicator);
+        
+        // Show indicator after 5 seconds
+        setTimeout(() => {
+            if (indicator && !userActive) {
+                indicator.classList.add('show');
+            }
+        }, 5000);
+    }
+    
+    function updateCountdown() {
+        if (indicator && countdownValue > 0) {
+            const countdownSpan = indicator.querySelector('.countdown');
+            if (countdownSpan) {
+                countdownSpan.textContent = `${countdownValue}s`;
+            }
+            countdownValue--;
+        }
+    }
+    
+    function startCountdown() {
+        countdownValue = 30;
+        countdownTimer = setInterval(updateCountdown, 1000);
+    }
+    
+    function showRefreshingState() {
+        if (indicator) {
+            indicator.innerHTML = '<span class="icon">🔄</span> Refreshing data...';
+            indicator.classList.add('refreshing');
+        }
+    }
+    
+    function startAutoReload() {
+        // Clear any existing timers
+        clearTimeout(reloadTimer);
+        clearInterval(countdownTimer);
+        
+        // Remove existing indicator
+        if (indicator) {
+            indicator.remove();
+        }
+        
+        // Reset values
+        countdownValue = 30;
+        userActive = false;
+        
+        // Create new indicator
+        createRefreshIndicator();
+        
+        // Start countdown
+        startCountdown();
+        
+        // Set reload timer
+        reloadTimer = setTimeout(() => {
+            showRefreshingState();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }, 30000); // 30 seconds
+    }
+    
+    function resetAutoReload() {
+        userActive = true;
+        
+        // Hide indicator
+        if (indicator) {
+            indicator.classList.remove('show');
+        }
+        
+        // Clear timers
+        clearTimeout(reloadTimer);
+        clearInterval(countdownTimer);
+        
+        // Reset after 10 seconds of inactivity
+        setTimeout(() => {
+            if (userActive) {
+                userActive = false;
+                startAutoReload();
+            }
+        }, 10000);
+    }
+    
+    // Listen for Django admin theme changes
+    function detectThemeChanges() {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && 
+                    (mutation.attributeName === 'data-theme' || mutation.attributeName === 'class')) {
+                    // Theme changed, update CSS variables if needed
+                    updateThemeVariables();
+                }
+            });
+        });
+        
+        // Observe changes to body and html elements
+        observer.observe(document.body, { 
+            attributes: true, 
+            attributeFilter: ['class', 'data-theme'] 
+        });
+        observer.observe(document.documentElement, { 
+            attributes: true, 
+            attributeFilter: ['class', 'data-theme'] 
+        });
+    }
+    
+    function updateThemeVariables() {
+        // Force update of CSS variables based on current theme
+        const isDark = document.body.classList.contains('theme-dark') || 
+                      document.documentElement.getAttribute('data-theme') === 'dark' ||
+                      document.body.classList.contains('dark-mode') ||
+                      window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const root = document.documentElement;
+        if (isDark) {
+            root.style.setProperty('--bg-color', '#1a1a1a');
+            root.style.setProperty('--card-bg', '#2d2d2d');
+            root.style.setProperty('--text-primary', '#ffffff');
+            root.style.setProperty('--text-secondary', '#cccccc');
+            root.style.setProperty('--text-muted', '#999999');
+            root.style.setProperty('--border-color', '#444444');
+            root.style.setProperty('--shadow', 'rgba(0, 0, 0, 0.3)');
+        } else {
+            root.style.setProperty('--bg-color', '#f8f9fa');
+            root.style.setProperty('--card-bg', '#ffffff');
+            root.style.setProperty('--text-primary', '#333333');
+            root.style.setProperty('--text-secondary', '#666666');
+            root.style.setProperty('--text-muted', '#999999');
+            root.style.setProperty('--border-color', '#eeeeee');
+            root.style.setProperty('--shadow', 'rgba(0, 0, 0, 0.1)');
+        }
+    }
+    
+    // Start auto-reload when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize theme detection
+        detectThemeChanges();
+        updateThemeVariables();
+        
+        // Start auto-reload
+        startAutoReload();
+    });
+    
+    // Detect user activity
+    ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(event => {
+        document.addEventListener(event, resetAutoReload, { passive: true });
+    });
+    
+    // Pause auto-reload when tab is not visible
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearTimeout(reloadTimer);
+            clearInterval(countdownTimer);
+        } else if (!userActive) {
+            startAutoReload();
+        }
+    });
+</script>
 <style>
+    /* CSS Variables for theme support */
+    :root {
+        --bg-color: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-primary: #333333;
+        --text-secondary: #666666;
+        --text-muted: #999999;
+        --border-color: #eeeeee;
+        --shadow: rgba(0, 0, 0, 0.1);
+        --primary-color: #007bff;
+        --success-color: #28a745;
+        --info-color: #17a2b8;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --purple-color: #6f42c1;
+    }
+    
+    /* Dark mode support - better detection for Django admin */
+    .theme-dark,
+    [data-theme="dark"],
+    body[data-theme="dark"],
+    html[data-theme="dark"],
+    .dark-mode,
+    body.theme-dark,
+    html.theme-dark {
+        --bg-color: #1a1a1a !important;
+        --card-bg: #2d2d2d !important;
+        --text-primary: #ffffff !important;
+        --text-secondary: #cccccc !important;
+        --text-muted: #999999 !important;
+        --border-color: #444444 !important;
+        --shadow: rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* Auto dark mode based on system preference */
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]):not(.theme-light) {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #999999;
+            --border-color: #444444;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+    }
+    
+    /* Override for light mode when explicitly set */
+    .theme-light,
+    [data-theme="light"],
+    body[data-theme="light"],
+    html[data-theme="light"],
+    .light-mode,
+    body.theme-light,
+    html.theme-light {
+        --bg-color: #f8f9fa !important;
+        --card-bg: #ffffff !important;
+        --text-primary: #333333 !important;
+        --text-secondary: #666666 !important;
+        --text-muted: #999999 !important;
+        --border-color: #eeeeee !important;
+        --shadow: rgba(0, 0, 0, 0.1) !important;
+    }
+    
     .dashboard-container {
         padding: 20px;
         max-width: 1200px;
         margin: 0 auto;
+        background-color: var(--bg-color);
+        min-height: 100vh;
+        transition: background-color 0.3s ease;
+        color: var(--text-primary);
+    }
+    
+    /* Ensure proper inheritance for all child elements */
+    .dashboard-container * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
     
     .dashboard-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        color: var(--text-primary);
         padding: 30px;
         border-radius: 10px;
         margin-bottom: 30px;
@@ -21,6 +268,7 @@
     }
     
     .dashboard-header h1 {
+        color: var(--text-primary) !important;
         margin: 0;
         font-size: 2.5rem;
         font-weight: 300;
@@ -40,22 +288,22 @@
     }
     
     .stat-card {
-        background: white;
+        background: var(--card-bg);
         border-radius: 10px;
         padding: 25px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px var(--shadow);
         border-left: 4px solid;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
     }
     
     .stat-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 6px 12px var(--shadow);
     }
     
     .stat-card h3 {
         margin: 0 0 10px 0;
-        color: #333;
+        color: var(--text-primary);
         font-size: 1.1rem;
         font-weight: 600;
     }
@@ -79,10 +327,10 @@
     
     .section-title {
         font-size: 1.8rem;
-        color: #fff;
+        color: var(--text-primary);
         margin-bottom: 20px;
         padding-bottom: 10px;
-        border-bottom: 2px solid #eee;
+        border-bottom: 2px solid var(--border-color);
     }
     
     .cards-grid {
@@ -93,12 +341,12 @@
     }
     
     .status-card {
-        background: white;
+        background: var(--card-bg);
         border-radius: 8px;
         padding: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px var(--shadow);
         text-align: center;
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, background-color 0.3s ease;
         border-top: 3px solid;
     }
     
@@ -119,7 +367,7 @@
     
     .status-card .title {
         font-size: 0.9rem;
-        color: #666;
+        color: var(--text-secondary);
         font-weight: 500;
     }
     
@@ -131,21 +379,22 @@
     }
     
     .activity-card {
-        background: white;
+        background: var(--card-bg);
         border-radius: 10px;
         padding: 25px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px var(--shadow);
+        transition: background-color 0.3s ease;
     }
     
     .activity-card h3 {
         margin: 0 0 20px 0;
-        color: #333;
+        color: var(--text-primary);
         font-size: 1.3rem;
     }
     
     .activity-item {
         padding: 12px 0;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -161,12 +410,12 @@
     
     .activity-name {
         font-weight: 600;
-        color: #333;
+        color: var(--text-primary);
     }
     
     .activity-email {
         font-size: 0.9rem;
-        color: #666;
+        color: var(--text-secondary);
     }
     
     .activity-status {
@@ -179,14 +428,14 @@
     
     .activity-date {
         font-size: 0.8rem;
-        color: #999;
+        color: var(--text-muted);
         margin-left: 10px;
     }
     
     .empty-state {
         text-align: center;
         padding: 40px;
-        color: #666;
+        color: var(--text-secondary);
     }
     
     .law-firm-badge {
@@ -212,6 +461,43 @@
         .dashboard-header h1 {
             font-size: 2rem;
         }
+    }
+    
+    /* Auto-reload indicator */
+    .refresh-indicator {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--primary-color);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        z-index: 1000;
+        box-shadow: 0 2px 10px var(--shadow);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+    
+    .refresh-indicator.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .refresh-indicator .countdown {
+        font-weight: bold;
+        margin-left: 5px;
+    }
+    
+    /* Loading animation */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .refresh-indicator.refreshing .icon {
+        animation: spin 1s linear infinite;
     }
 </style>
 {% endblock %}
