@@ -380,7 +380,7 @@ class EmailLog(models.Model):
 
 
 class DocumentTemplate(models.Model):
-    """Maps legal document types to DocuSeal template IDs"""
+    """Maps legal document types to NextKeySign template IDs"""
     TEMPLATE_TYPES = [
         ('retainer_minor', 'Retainer Agreement - Minor (with parent signature)'),
         ('retainer_adult', 'Retainer Agreement - Adult (18-20)'),
@@ -398,7 +398,7 @@ class DocumentTemplate(models.Model):
         blank=True,
         help_text="Leave blank for global templates, set for law firm-specific overrides"
     )
-    docuseal_template_id = models.IntegerField()  # Template ID from DocuSeal
+    nextkeysign_template_id = models.IntegerField()  # Template ID from NextKeySign
     description = models.TextField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -455,10 +455,10 @@ class DocumentSubmission(models.Model):
     intake_form = models.ForeignKey(IntakeForm, on_delete=models.CASCADE, null=True, blank=True)
     document_template = models.ForeignKey(DocumentTemplate, on_delete=models.CASCADE)
     
-    # DocuSeal integration fields
-    docuseal_submission_id = models.IntegerField(unique=True)
-    docuseal_submitter_id = models.IntegerField()
-    docuseal_slug = models.CharField(max_length=100)  # Unique signing URL slug
+    # NextKeySign integration fields
+    nextkeysign_submission_id = models.IntegerField(unique=True)
+    nextkeysign_submitter_id = models.IntegerField()
+    nextkeysign_slug = models.CharField(max_length=100)  # Unique signing URL slug
     
     # Status tracking
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -487,7 +487,7 @@ class DocumentSubmission(models.Model):
 
 
 class DocumentWebhookEvent(models.Model):
-    """Logs all webhook events from DocuSeal"""
+    """Logs all webhook events from NextKeySign"""
     EVENT_TYPES = [
         ('form.viewed', 'Form Viewed'),
         ('form.started', 'Form Started'),

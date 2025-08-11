@@ -592,8 +592,8 @@ class DocumentSubmissionInline(admin.TabularInline):
     status_colored.short_description = "Status"
 
     def signing_link(self, obj):
-        if obj.docuseal_slug and obj.status not in ['completed', 'declined', 'expired']:
-            return format_html('<a href="https://sign.nextkeystack.com/s/{}" target="_blank">🔗 Sign</a>', obj.docuseal_slug)
+        if obj.nextkeysign_slug and obj.status not in ['completed', 'declined', 'expired']:
+            return format_html('<a href="https://sign.nextkeystack.com/s/{}" target="_blank">🔗 Sign</a>', obj.nextkeysign_slug)
         elif obj.signed_document_url:
             return format_html('<a href="{}" target="_blank">📋 Signed Doc</a>', obj.signed_document_url)
         return "-"
@@ -932,7 +932,7 @@ admin.site.enable_nav_sidebar = True
 
 
 # ====================
-# DocuSeal Document Signing Admin
+# NextKeySign Document Signing Admin
 # ====================
 
 @admin.register(DocumentTemplate)
@@ -960,20 +960,20 @@ class DocumentTemplateAdmin(SuperuserOnlyModelAdmin):
     list_display = [
         'template_type_display',
         'law_firm_scope',
-        'docuseal_template_id', 
+        'nextkeysign_template_id', 
         'template_usage_count',
         'is_active',
         'created_at'
     ]
     list_filter = ['name', 'law_firm', 'is_active', 'created_at']
-    search_fields = ['name', 'description', 'docuseal_template_id', 'law_firm__name']
+    search_fields = ['name', 'description', 'nextkeysign_template_id', 'law_firm__name']
     readonly_fields = ['created_at']
     date_hierarchy = 'created_at'
     list_per_page = 20
     
     fieldsets = (
         ('Template Information', {
-            'fields': ('name', 'law_firm', 'docuseal_template_id', 'description')
+            'fields': ('name', 'law_firm', 'nextkeysign_template_id', 'description')
         }),
         ('Configuration', {
             'fields': ('is_active',)
@@ -1044,8 +1044,8 @@ class DocumentSubmissionAdmin(LawFirmFilteredModelAdmin):
     template_scope.short_description = "Template Scope"
     
     def signing_link(self, obj):
-        if obj.docuseal_slug and obj.status not in ['completed', 'declined', 'expired']:
-            return format_html('<a href="{}/s/{}" target="_blank">🔗 Sign</a>', settings.NEXTKEYSIGN_BASE_URL or 'https://sign.nextkeystack.com', obj.docuseal_slug)
+        if obj.nextkeysign_slug and obj.status not in ['completed', 'declined', 'expired']:
+            return format_html('<a href="{}/s/{}" target="_blank">🔗 Sign</a>', settings.NEXTKEYSIGN_BASE_URL or 'https://sign.nextkeystack.com', obj.nextkeysign_slug)
         return "No URL"
     signing_link.short_description = "Signing Link"
     
@@ -1099,11 +1099,11 @@ class DocumentSubmissionAdmin(LawFirmFilteredModelAdmin):
         'user_detail__last_name', 
         'user_detail__email',
         'user_detail__law_firm__name',
-        'docuseal_submission_id',
+        'nextkeysign_submission_id',
         'external_id'
     ]
     date_hierarchy = 'created_at'
-    readonly_fields = ['docuseal_submission_id', 'docuseal_submitter_id', 'docuseal_slug', 'external_id', 'created_at', 'updated_at']
+    readonly_fields = ['nextkeysign_submission_id', 'nextkeysign_submitter_id', 'nextkeysign_slug', 'external_id', 'created_at', 'updated_at']
     list_per_page = 25
     
     fieldsets = (
@@ -1116,8 +1116,8 @@ class DocumentSubmissionAdmin(LawFirmFilteredModelAdmin):
         ('Timestamps', {
             'fields': ('created_at', 'updated_at', 'completed_at', 'sent_at', 'opened_at', 'declined_at')
         }),
-        ('DocuSeal Data', {
-            'fields': ('docuseal_submission_id', 'docuseal_submitter_id', 'docuseal_slug', 'external_id'),
+        ('NextKeySign Data', {
+            'fields': ('nextkeysign_submission_id', 'nextkeysign_submitter_id', 'nextkeysign_slug', 'external_id'),
             'classes': ('collapse',)
         })
     )
@@ -1146,7 +1146,7 @@ class DocumentWebhookEventAdmin(SuperuserOnlyModelAdmin):
         'created_at'
     ]
     list_filter = ['event_type', 'processed', 'created_at']
-    search_fields = ['document_submission__docuseal_submission_id', 'event_type']
+    search_fields = ['document_submission__nextkeysign_submission_id', 'event_type']
     readonly_fields = ['created_at', 'webhook_data']
     date_hierarchy = 'created_at'
     list_per_page = 50

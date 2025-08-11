@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'roblex_app.apps.RoblexAppConfig',
+    'retainer_app.apps.RetainerAppConfig',
     'rest_framework'
 ]
 
@@ -70,7 +71,9 @@ ROOT_URLCONF = 'roblex.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'retainer_app' / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -175,8 +178,37 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
-# DocuSeal Configuration
+# NextKeySign Configuration
 NEXTKEYSIGN_BASE_URL = config("NEXTKEYSIGN_BASE_URL")
 NEXTKEYSIGN_API_TOKEN = config("NEXTKEYSIGN_API_TOKEN")
+
+# Celery Configuration
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://redis:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://redis:6379/0")
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+# Celery Task Routes - separate queues for retainer app
+CELERY_TASK_ROUTES = {
+    'retainer_app.tasks.*': {'queue': 'retainer_processing'},
+    'retainer_app.tasks.create_nextkeysign_submission': {'queue': 'retainer_submissions'},
+    'retainer_app.tasks.retry_failed_submission': {'queue': 'retainer_submissions'},
+}
+
+# File Upload Settings for Large Excel Files (200MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 262144000  # 250MB in bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 262144000  # 250MB in bytes
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000     # Increase for large Excel files with many rows
+
+# File Upload Handlers - use temporary files for large uploads
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+]
+
+# Temporary file upload directory
+FILE_UPLOAD_TEMP_DIR = '/tmp/'
 
 
