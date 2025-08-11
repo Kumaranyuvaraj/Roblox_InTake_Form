@@ -49,9 +49,22 @@ services:
     volumes:
       - redis_data:/data
 
-  celery:
+  # Celery worker for processing large Excel files
+  celery_processing:
     build: .
-    command: celery -A roblex worker --loglevel=info --queues=retainer_processing,retainer_submissions
+    command: celery -A roblex worker --loglevel=info --queues=retainer_processing --concurrency=2 --max-tasks-per-child=50
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  # Celery worker for NextKeySign submissions and emails
+  celery_submissions:
+    build: .
+    command: celery -A roblex worker --loglevel=info --queues=retainer_submissions --concurrency=4 --max-tasks-per-child=100
     env_file:
       - .env
     depends_on:

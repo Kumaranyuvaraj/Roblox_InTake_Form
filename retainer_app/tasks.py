@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 def process_excel_upload(self, upload_id):
     """
     Main task to process an Excel upload and create RetainerRecipient records
+    Optimized for large files (50k records per file)
     """
     try:
         upload = ExcelUpload.objects.get(id=upload_id)
@@ -28,11 +29,13 @@ def process_excel_upload(self, upload_id):
         
         logger.info(f"Starting processing of Excel upload {upload_id}")
         
-        # Read Excel file
-        df = pd.read_excel(upload.file.path)
+        # Read Excel file with optimizations for large files
+        df = pd.read_excel(upload.file.path, dtype=str)  # Read all as strings to avoid type issues
         total_rows = len(df)
         upload.total_rows = total_rows
         upload.save()
+        
+        logger.info(f"Loaded {total_rows} rows from Excel file")
         
         # Expected columns
         required_columns = ['ID', 'Name', 'Email']
@@ -47,6 +50,10 @@ def process_excel_upload(self, upload_id):
         failed_count = 0
         skipped_count = 0
         
+        # Process in batches for better performance with large files
+        batch_size = 100  # Process 100 records at a time
+        recipients_batch = []
+        
         for index, row in df.iterrows():
             try:
                 # Validate required fields
@@ -55,8 +62,8 @@ def process_excel_upload(self, upload_id):
                     logger.warning(f"Skipping row {index + 1}: Missing required data")
                     continue
                 
-                # Create RetainerRecipient
-                recipient = RetainerRecipient.objects.create(
+                # Prepare recipient data for batch creation
+                recipient_data = RetainerRecipient(
                     excel_upload=upload,
                     external_id=str(row['ID']),
                     name=str(row['Name']),
@@ -64,25 +71,40 @@ def process_excel_upload(self, upload_id):
                     phone=str(row.get('Phone', '')) if not pd.isna(row.get('Phone', '')) else '',
                     state=str(row.get('State', '')) if not pd.isna(row.get('State', '')) else '',
                     zip_code=str(row.get('Zip Code', '')) if not pd.isna(row.get('Zip Code', '')) else '',
-                    age=int(row.get('Age', 0)) if not pd.isna(row.get('Age', 0)) and row.get('Age', 0) != '' else None,
+                    age=int(row.get('Age', 0)) if not pd.isna(row.get('Age', 0)) and str(row.get('Age', '')).isdigit() else None,
                     first_name_injured=str(row.get('First Name Injured', '')) if not pd.isna(row.get('First Name Injured', '')) else '',
                     last_name_injured=str(row.get('Last Name Injured', '')) if not pd.isna(row.get('Last Name Injured', '')) else '',
                 )
                 
-                # Queue NextKeySign submission task
-                create_nextkeysign_submission.delay(recipient.id)
+                recipients_batch.append(recipient_data)
                 successful_count += 1
                 
-                # Update progress
-                upload.processed_rows = successful_count + failed_count + skipped_count
-                upload.save()
+                # Batch create when we reach batch_size
+                if len(recipients_batch) >= batch_size:
+                    created_recipients = RetainerRecipient.objects.bulk_create(recipients_batch)
+                    # Queue NextKeySign submissions for the batch
+                    for recipient in created_recipients:
+                        create_nextkeysign_submission.delay(recipient.id)
+                    recipients_batch = []
+                    
+                    # Update progress
+                    upload.processed_rows = successful_count + failed_count + skipped_count
+                    upload.save()
+                    logger.info(f"Processed {successful_count + failed_count + skipped_count}/{total_rows} rows")
                 
             except Exception as e:
                 failed_count += 1
                 logger.error(f"Error processing row {index + 1}: {str(e)}")
                 continue
         
+        # Create remaining recipients in the last batch
+        if recipients_batch:
+            created_recipients = RetainerRecipient.objects.bulk_create(recipients_batch)
+            for recipient in created_recipients:
+                create_nextkeysign_submission.delay(recipient.id)
+        
         # Update final statistics
+        upload.processed_rows = successful_count + failed_count + skipped_count  # Fix: Update final processed count
         upload.successful_submissions = successful_count
         upload.failed_submissions = failed_count
         upload.skipped_rows = skipped_count
@@ -119,6 +141,7 @@ def process_excel_upload(self, upload_id):
 def create_nextkeysign_submission(self, recipient_id):
     """
     Create a NextKeySign submission for a specific recipient and send custom email
+    Optimized for high-volume processing
     """
     try:
         recipient = RetainerRecipient.objects.get(id=recipient_id)
@@ -126,6 +149,10 @@ def create_nextkeysign_submission(self, recipient_id):
         law_firm = upload.law_firm
         
         logger.info(f"Creating NextKeySign submission for recipient {recipient_id}")
+        
+        # Add small delay to avoid overwhelming API (minimal impact)
+        import time
+        time.sleep(0.1)  # 100ms delay
         
         # Generate external ID
         timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
