@@ -242,6 +242,11 @@ class UserDetail(models.Model):
         ('no', 'No'),
     )
 
+    AGREEMENT_CHOICES = (
+    ('agree', 'I Agree'),
+    ('not_agree', 'I Do Not Agree'),
+    )
+
     # Law firm association - automatically set based on subdomain
     law_firm = models.ForeignKey(
         LawFirm, 
@@ -258,9 +263,16 @@ class UserDetail(models.Model):
     email = models.EmailField()
     zipcode = models.CharField(max_length=10)
     working_with_attorney = models.CharField(max_length=3, choices=ATTORNEY_CHOICES)
-    
     additional_notes = models.CharField(max_length=100, blank=True, null=True)
     gamer_dob = models.DateField(null=True, blank=True)
+
+    agreement_status = models.CharField(
+    max_length=20, 
+    choices=AGREEMENT_CHOICES,
+    null=True,
+    blank=True
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -85,11 +85,11 @@ def landing_page(request):
     """
     return render(request, 'index.html')
     
-def index_page(request):
-    """
-    Serves the index page form HTML page
-    """
-    return render(request, 'index.html')
+# def index_page(request):
+#     """
+#     Serves the index page form HTML page
+#     """
+#     return render(request, 'index.html')
 
 class IntakeFormAPIView(APIView):
     def post(self, request):
@@ -324,7 +324,7 @@ class SubmitIntakeIfValidAPIView(APIView):
 
         serializer = IntakeFormSerializer(data=data)
         if serializer.is_valid():
-            
+
             # ---- Roblox Validation ----
             raw_roblox_name = serializer.validated_data.get("roblox_gamertag", "")
             usernames = [re.sub(r'^[^A-Za-z]+', '', name.strip()) for name in raw_roblox_name.split(",") if name.strip()]
@@ -1144,10 +1144,8 @@ class DocumentWebhookAPIView(APIView):
 def about_us_view(request):
     return render(request, 'about_us.html')
 
-
-# def consent_box_view(request):
-#     return render(request, 'consent_box.html')
-
+def consent_box_view(request):
+    return render(request, 'consent_box.html')
 
 def disclaimer_view(request):
     return render(request, 'disclaimer.html')

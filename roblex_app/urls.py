@@ -1,14 +1,14 @@
 from django.urls import path
 
 from roblex_app.views import IntakeFormAPIView, intake_form_view,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
-QuestionListAPIView, SubmitAnswerAPIView,landing_page,index_page,SendEmailAPIView,EmailTemplateAPIView,\
+QuestionListAPIView, SubmitAnswerAPIView,landing_page,SendEmailAPIView,EmailTemplateAPIView,\
 CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView, CheckIntakeStatusAPIView
 
-from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,about_us_view,disclaimer_view,\
+from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,about_us_view,consent_box_view,disclaimer_view,\
 participating_firms_view,privacy_policy_view,terms_of_service_view,validate_xbox_gamertag
 urlpatterns = [
     path('', landing_page, name='landing-page'),
-    path('index/', index_page, name='index-page'),
+    # path('index/', index_page, name='index-page'),
     path('intake-form/<int:user_detail_id>/', intake_form_view, name='intake-form-page'), 
     path('api/intake-form/', IntakeFormAPIView.as_view(), name='intake-form'),
     path('api/validate-roblox/', validate_roblox_username, name='validate_roblox'),
@@ -39,8 +39,8 @@ urlpatterns = [
 
 
     # path('read-doc/<str:filename>/', read_docx_file, name='read_docx'),
-     path('about-us/', about_us_view, name='about_us'),
-    #  path('consent-box/', consent_box_view, name='consent_box'),
+    path('about-us/', about_us_view, name='about_us'),
+    path('consent-box/', consent_box_view, name='consent_box'),
     path('disclaimer/', disclaimer_view, name='disclaimer'),
     path('participating-firms/', participating_firms_view, name='participating_firms'),
     path('privacy-policy/', privacy_policy_view, name='privacy_policy'),

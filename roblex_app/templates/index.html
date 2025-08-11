@@ -325,7 +325,7 @@
         <div class="row">
             <div class="col-12">
         
-               <p><strong>DISCLAIMER:</strong> The hiring of a lawyer is an important decision that should not be based solely on advertisements. The material contained on <a href="https://nextkeylitigation.com" target="_blank">nextkeylitigation.com</a> is for general informational purposes only and does not constitute legal advice. Our list of participating law firms is licensed to practice law only in the following states: Mississippi, Arkansas, Illinois, Florida, and Georgia. <strong>NOT ACCEPTING CLAIMS FROM RESIDENTS IN THE FOLLOWING STATES UNTIL FURTHER NOTICE: [FL]</strong></p>
+               <p><strong>DISCLAIMER:</strong> The hiring of a lawyer is an important decision that should not be based solely on advertisements. The material contained on <a href="https://nextkeylitigation.com" target="_blank">nextkeylitigation.com</a> is for general informational purposes only and does not constitute legal advice. Our list of participating law firms is licensed to practice law only in the following states: Mississippi, Arkansas, Illinois, Florida, and Georgia.</p>
 
                      <p class="mb-0"> © 2025 All rights reserved. NextKey Litigation.</p>
             </div>
@@ -339,6 +339,7 @@
 
             <div>
                 <a href="{% url 'about_us' %}" class="text-secondary">About Us</a> |
+                <a href="{% url 'consent_box' %}" class="text-secondary">Consent Box</a> |
                 <a href="{% url 'disclaimer' %}" class="text-secondary">Disclaimer</a> |
                 <a href="{% url 'participating_firms' %}" class="text-secondary">Participating Firms</a> |
                 <a href="{% url 'privacy_policy' %}" class="text-secondary">Privacy Policy</a> |
@@ -426,7 +427,7 @@
                     <input type="text" id="zipcode" placeholder="12345" maxlength="5" required>
                 </div>
                 <div class="input-group">
-                    <label for="working_with_attorney">Are you currently working with an attorney for this case? *</label>
+                    <label for="working_with_attorney">Are you currently working with an attorney for gaming sex abuse claim? *</label>
                     <select id="working_with_attorney" required>
                         <option value="">Select</option>
                         <option value="yes">Yes</option>
@@ -438,13 +439,24 @@
                     <input type="text" id="additional_notes" placeholder="Any additional details">
                 </div>
                 <div class="input-group d-flex">
-                    <div class="d-flex align-items-start gap-1">
-                        <input type="checkbox" id="consent_checkbox" class="check-bx">
-                        <label for="consent_checkbox" style="font-size: 12px; padding-top: 2px;" class="">
-                            By selecting Submit and completing this form I confirm that I am over 18 years of age.
-                        </label>
-                    </div>
+                    <label>
+                        <input type="checkbox" id="agreecheck" name="agreement_status" value="agree" disabled> I Agree
+                    </label>
+                    <label>
+                        <input type="checkbox" id="notAgreecheck" name="agreement_status" value="not_agree" disabled> I Do Not Agree
+                    </label>
+
+                    
+
                 </div>
+
+                <br>
+                <a href="#" id="openConsentBox">Consent Box</a>
+                <small id="consent-hint" style="color:gray;">
+                    Please read the consent box before making a choice.
+                </small>
+
+
                 <div class="form-footer ">
                     <button type="button" class="btn-blue-outline" onclick="showScreen(1)">Back</button>
                     <button type="button" class="btn-blue" onclick="submitForm()">Submit</button>
@@ -654,6 +666,22 @@
     //     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     // }
 
+    document.getElementById("openConsentBox").addEventListener("click", function (e) {
+    e.preventDefault();
+    window.consentWindow = window.open(
+        "/consent-box",
+        "ConsentWindow",
+        "width=800,height=600"
+    );
+});
+
+    window.addEventListener("message", function (event) {
+        if (event.data && event.data.allowAgreement) {
+            document.getElementById("agreecheck").disabled = false;
+            document.getElementById("notAgreecheck").disabled = false;
+        }
+    });
+
     function submitForm() {
 
         let isValid = true;
@@ -668,7 +696,17 @@
         const zipcode = $("#zipcode").val().trim();
         const working_with_attorney = $("#working_with_attorney").val();
         const gamer_dob = $("#gamer_dob").val();
-        const consent = $("#consent_checkbox").is(":checked");
+        // const consent = $("#consent_checkbox").is(":checked");
+
+        // Get all checked agreement checkboxes
+        const checkedAgreements = $("input[name='agreement_status']:checked");
+        if (checkedAgreements.length !== 1) {
+            $("input[name='agreement_status']").addClass("error-border");
+            isValid = false;
+        } else {
+            agreement_status = checkedAgreements.val(); // will be "agree" or "not_agree"
+        }
+
         const additional_notes = $("#additional_notes").val().trim();
 
           // Required field check
@@ -708,10 +746,10 @@
         }
 
    
-        if (!consent) {
-            $("#consent_checkbox").addClass("error-border");
-            isValid = false;
-        }
+        // if (!consent) {
+        //     $("#agreement_status").addClass("error-border");
+        //     isValid = false;
+        // }
 
         
         // Block submission if any errors
@@ -730,7 +768,8 @@
                 zipcode,
                 working_with_attorney,
                 gamer_dob,
-                additional_notes
+                additional_notes,
+                agreement_status
             }),
             success: function (response) {
                 const userId = response.id;
@@ -939,6 +978,8 @@ let questionsData = [];
 
     $(document).ready(function () {
         // Backend now handles document signing redirects directly
+
+    
         
         $.ajax({
             url: "/api/questions/",
@@ -976,11 +1017,11 @@ let questionsData = [];
             }
         });
 
-        $('#consent_checkbox').on('change', function () {
-            if (this.checked) {
-                $(this).removeClass('error-border');
-            }
-        });
+        // $('#consent_checkbox').on('change', function () {
+        //     if (this.checked) {
+        //         $(this).removeClass('error-border');
+        //     }
+        // });
 
         // Auto-format US phone number: 123-456-7890
         $('#cell_phone').on('input', function () {
