@@ -1,9 +1,13 @@
 from django.urls import path
 from . import views
+from .dashboard_views import dashboard_view
 
 app_name = 'retainer_app'
 
 urlpatterns = [
+    # Dashboard
+    path('dashboard/', dashboard_view, name='dashboard'),
+    
     # Webhook endpoint for NextKeySign
     path('webhook/nextkeysign/', views.DocumentWebhookAPIView.as_view(), name='nextkeysign_webhook'),
     

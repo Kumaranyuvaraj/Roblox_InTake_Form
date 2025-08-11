@@ -41,18 +41,45 @@ class LawFirmFilteredModelAdmin(admin.ModelAdmin):
             return None
         
         try:
+            # Try retainer app law firm user first (direct association)
+            try:
+                law_firm_user = LawFirmUser.objects.get(user=request.user)
+                return law_firm_user.law_firm
+            except LawFirmUser.DoesNotExist:
+                pass
+            
             # Import here to avoid circular imports
             from roblex_app.models import LawFirmUser as RoblexLawFirmUser
             try:
-                law_firm_user = RoblexLawFirmUser.objects.get(user=request.user)
-                # Find corresponding retainer app law firm
-                retainer_law_firm = LawFirm.objects.get(name=law_firm_user.law_firm.name)
-                return retainer_law_firm
+                roblex_law_firm_user = RoblexLawFirmUser.objects.get(user=request.user)
+                roblex_firm_name = roblex_law_firm_user.law_firm.name
+                
+                # Try exact match first
+                try:
+                    retainer_law_firm = LawFirm.objects.get(name=roblex_firm_name)
+                    return retainer_law_firm
+                except LawFirm.DoesNotExist:
+                    pass
+                
+                # Try partial match (for cases like "Bullock Legal" vs "Bullock Legal Group")
+                # Look for retainer law firm containing the roblex firm name
+                retainer_firms = LawFirm.objects.filter(name__icontains=roblex_firm_name)
+                if retainer_firms.exists():
+                    return retainer_firms.first()
+                
+                # Try the reverse - roblex firm name containing retainer firm name
+                retainer_firms = LawFirm.objects.all()
+                for firm in retainer_firms:
+                    if firm.name.lower() in roblex_firm_name.lower() or roblex_firm_name.lower() in firm.name.lower():
+                        return firm
+                
+                return None
+                
             except RoblexLawFirmUser.DoesNotExist:
-                # Try retainer app law firm user
-                law_firm_user = LawFirmUser.objects.get(user=request.user)
-                return law_firm_user.law_firm
-        except (LawFirmUser.DoesNotExist, LawFirm.DoesNotExist):
+                return None
+                
+        except Exception as e:
+            # Log the error for debugging but don't crash
             return None
     
     def get_queryset(self, request):
@@ -531,3 +558,98 @@ class DocumentWebhookEventAdmin(SuperuserOnlyModelAdmin):
 admin.site.site_header = "Retainer Document Management"
 admin.site.site_title = "Retainer Admin"
 admin.site.index_title = "Welcome to Retainer Document Management System"
+
+# ====================
+# Dashboard Link in Admin Menu
+# ====================
+
+class DashboardLinkAdmin(admin.ModelAdmin):
+    """Fake admin to show dashboard link in admin menu"""
+    
+    def has_module_permission(self, request):
+        return True
+    
+    def has_view_permission(self, request, obj=None):
+        return True
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    def changelist_view(self, request, extra_context=None):
+        # Redirect to dashboard instead of showing changelist
+        from django.shortcuts import redirect
+        return redirect('/admin/retainer_dashboard/')
+
+# Override the app's model ordering to put dashboard first
+def get_app_list(self, request, app_label=None):
+    """
+    Return a sorted list of all the installed apps that have been
+    registered in this site.
+    """
+    app_dict = self._build_app_dict(request, app_label)
+    
+    # Sort the apps alphabetically
+    app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+    
+    # Special handling for retainer_app to put dashboard first
+    for app in app_list:
+        if app['app_label'] == 'retainer_app':
+            models = app['models']
+            dashboard_model = None
+            other_models = []
+            
+            for model in models:
+                if model['object_name'] == 'DashboardLink':
+                    dashboard_model = model
+                else:
+                    other_models.append(model)
+            
+            # Put dashboard first, then sort others alphabetically
+            if dashboard_model:
+                app['models'] = [dashboard_model] + sorted(other_models, key=lambda x: x['name'])
+            break
+    
+    return app_list
+
+# Apply the custom ordering to admin site
+from django.contrib.admin import AdminSite
+AdminSite.get_app_list = get_app_list
+
+# Create a fake model for dashboard link
+from django.db import models
+class DashboardLink(models.Model):
+    class Meta:
+        verbose_name = "📊 Dashboard"
+        verbose_name_plural = "📊 Dashboard"
+        app_label = 'retainer_app'
+        managed = False  # Don't create actual database table
+
+# Register the dashboard link
+admin.site.register(DashboardLink, DashboardLinkAdmin)
+
+# Add custom dashboard link to admin index
+from django.urls import reverse
+from django.utils.html import format_html
+
+def get_admin_urls():
+    from django.urls import path
+    from .dashboard_views import dashboard_view
+    
+    return [
+        path('retainer_dashboard/', dashboard_view, name='retainer_dashboard'),
+    ]
+
+# Register the custom admin URLs
+from django.contrib.admin import site
+original_get_urls = site.get_urls
+
+def get_urls():
+    return get_admin_urls() + original_get_urls()
+
+site.get_urls = get_urls
