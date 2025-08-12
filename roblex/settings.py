@@ -209,6 +209,6 @@ FILE_UPLOAD_HANDLERS = [
 ]
 
 # Temporary file upload directory
-FILE_UPLOAD_TEMP_DIR = '/tmp/'
+# FILE_UPLOAD_TEMP_DIR = '/tmp/'
 
 

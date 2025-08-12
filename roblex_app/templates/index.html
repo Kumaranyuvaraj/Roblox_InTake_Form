@@ -438,6 +438,20 @@
                     <label>Additional Notes (optional)</label>
                     <input type="text" id="additional_notes" placeholder="Any additional details">
                 </div>
+
+                <!-- Consent Box Label & Instructions -->
+                <label>
+                    <strong>
+                        <a href="#" id="openConsentBox">Consent Box</a>
+                    </strong>
+                </label>
+                <br>
+                <small id="consent-hint" style="color:gray;">
+                    Please read the consent box before making a choice.
+                </small>
+                <br>
+
+                <!-- Checkboxes -->
                 <div class="input-group d-flex">
                     <label>
                         <input type="checkbox" id="agreecheck" name="agreement_status" value="agree" disabled> I Agree
@@ -445,16 +459,11 @@
                     <label>
                         <input type="checkbox" id="notAgreecheck" name="agreement_status" value="not_agree" disabled> I Do Not Agree
                     </label>
-
-                    
-
                 </div>
 
+                <!-- Consent Box Link -->
                 <br>
-                <a href="#" id="openConsentBox">Consent Box</a>
-                <small id="consent-hint" style="color:gray;">
-                    Please read the consent box before making a choice.
-                </small>
+               
 
 
                 <div class="form-footer ">
@@ -666,21 +675,41 @@
     //     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     // }
 
+    // Open consent box popup
     document.getElementById("openConsentBox").addEventListener("click", function (e) {
-    e.preventDefault();
-    window.consentWindow = window.open(
-        "/consent-box",
-        "ConsentWindow",
-        "width=800,height=600"
-    );
-});
+        e.preventDefault();
+        window.consentWindow = window.open(
+            "/consent-box",
+            "ConsentWindow",
+            "width=800,height=600"
+        );
+    });
 
+    // Listen for message from consent box window
     window.addEventListener("message", function (event) {
         if (event.data && event.data.allowAgreement) {
-            document.getElementById("agreecheck").disabled = false;
-            document.getElementById("notAgreecheck").disabled = false;
+            const agreeCheck = document.getElementById("agreecheck");
+            const notAgreeCheck = document.getElementById("notAgreecheck");
+
+            // Enable both checkboxes
+            agreeCheck.disabled = false;
+            notAgreeCheck.disabled = false;
+
+            // Make them mutually exclusive
+            agreeCheck.addEventListener("change", function () {
+                if (this.checked) {
+                    notAgreeCheck.checked = false;
+                }
+            });
+
+            notAgreeCheck.addEventListener("change", function () {
+                if (this.checked) {
+                    agreeCheck.checked = false;
+                }
+            });
         }
     });
+
 
     function submitForm() {
 
@@ -767,6 +796,7 @@
                 email,
                 zipcode,
                 working_with_attorney,
+
                 gamer_dob,
                 additional_notes,
                 agreement_status
@@ -788,6 +818,17 @@
                 // ✅ Step 2: Store guardian names for form prefilling (still needed for forms.html)
                 sessionStorage.setItem("guardian_first_name", first_name);
                 sessionStorage.setItem("guardian_last_name", last_name);
+
+                // if (working_with_attorney === "yes") {
+                //     showModal(
+                //         "Thank you for your interest. Based on the information provided, your case does not currently meet the eligibility criteria.",
+                //         "error"
+                //     );
+                //     setTimeout(() => {
+                //         window.location.href = "/gratitude/?eligible=false";
+                //     }, 1500);
+                //     return; // Stop further processing
+                // }
 
                 // ✅ Step 3: Determine eligibility from DOB
                 const dobValue = $("#gamer_dob").val()?.trim();
@@ -811,6 +852,7 @@
 
                 let matchedOption = null;
                 if (ageQuestion) {
+                    debugger;
                     ageQuestion.options.forEach(opt => {
                         const text = opt.text.trim();
                         if (text.includes("+")) {
@@ -841,7 +883,7 @@
                 }
 
                 // ✅ Step 5: Handle based on eligibility
-                if (!matchedOption.is_eligible) {
+                if (!matchedOption.is_eligible || working_with_attorney === "yes") {
                     // Send rejection email template
                     $.ajax({
                         url: `/api/email-template/${templateType}/`,
@@ -920,7 +962,7 @@
 
 
     // $("#userForm")[0].reset();
-let questionsData = [];
+    let questionsData = [];
 
     /**
      * Check URL parameters for document signing status and show appropriate message
@@ -1262,7 +1304,7 @@ let questionsData = [];
         if (ageOptionData.requires_parental_signature) {
         // Show modal with "Continue" button
         showModal(
-            "Thank you for answering the prequalification questions. Based on your responses, your case appears to be eligible for a Roblox minor gamer claim. Please click Continue to complete the retainer agreement signing.",
+            "Congrats! Your case is eligible for Video Game Sex abuse claim. Please click Continue to next step",
             "success",
             true
         );
