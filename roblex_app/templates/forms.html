@@ -573,8 +573,8 @@
                                     title="It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.">
                                 </button>
                             </label>
-                            <input type="text" name="xbox_gamertag" class="form-control" placeholder="Enter Xbox Gamertag">
-                            <div class="xboxValidationStatus"></div>
+                           <input type="text" id="xboxGamertag" name="xbox_gamertag" class="form-control" >
+                            <div class="xboxValidationStatus mt-1" style="font-size: 0.9em;"></div>
 
                         </div>
                         </div>
@@ -583,6 +583,7 @@
                         <div class="col-12 col-md-6">
                             <label>PlayStation Gamertag (if applicable)</label>
                             <input type="text" name="ps_gamertag" class="form-control" placeholder="Enter PlayStation Gamertag">
+                            <div class="psValidationStatus mt-1" style="font-size: 0.9em;"></div>
                         </div>
                     </div>
                 
@@ -1107,54 +1108,122 @@ $(document).ready(function () {
     });
 
 
-    // const xboxValidationStatus = {};
+    
+const xboxValidationStatus = {};
+console.log("**********************", xboxValidationStatus)
 
-    // $("input[name='xbox_gamertag']").on("input", function () {
-    //     const gamertag = $(this).val().trim();
-    //     const statusElement = $(this).siblings(".xboxValidationStatus");
+// Blur event → validate only when leaving the field
+$("input[name='xbox_gamertag']").on("blur", function () {
+    const $input = $(this);
+    const gamertag = $input.val().trim();
+    const statusElement = $input.siblings(".xboxValidationStatus");
+    const inputIndex = $("input[name='xbox_gamertag']").index(this); // Get unique identifier
 
-    //     if (!gamertag) {
-    //         statusElement.html('');
-    //         xboxValidationStatus[gamertag] = null;
-    //         return;
-    //     }
+    // Clear previous status
+    statusElement.html('');
 
-    //     // statusElement.html('<span class="text-info">Validating...</span>');
+    if (!gamertag) {
+        delete xboxValidationStatus[inputIndex]; // Remove entry instead of setting null
+        return;
+    }
 
-    //     // Example AJAX call to validate Xbox gamertag
-    //     $.ajax({
-    //         url: `/api/validate-xbox-gamertag/${encodeURIComponent(gamertag)}`,
-    //         type: "GET",
-    //         success: function (data) {
-    //             if (data.valid) {
-    //                 statusElement.html('<span class="text-success">Gamertag found.</span>');
-    //                 xboxValidationStatus[gamertag] = true;
-    //             } else {
-    //                 statusElement.html('<span class="text-danger">Gamertag not found.</span>');
-    //                 xboxValidationStatus[gamertag] = false;
-    //             }
-    //         },
-    //         error: function () {
-    //             // statusElement.html('<span class="text-danger">Error validating gamertag.</span>');
-    //             xboxValidationStatus[gamertag] = false;
-    //         }
-    //     });
-    // });
+    // Remove @ or other non-letter prefix
+    const strippedGamertag = gamertag.replace(/^[^A-Za-z]+/, '');
+    statusElement.html('<span style="color:green;">Validating...</span>');
+
+    $.ajax({
+        url: `/api/validate-xbox-gamertag/${encodeURIComponent(strippedGamertag)}/`,
+        type: "GET",
+        success: function (data) {
+            if (data.success && data.gamertag) {
+                statusElement.html(
+                    `<span style="color:green;">Gamertag found</span>`
+                );
+                xboxValidationStatus[inputIndex] = true;
+            } else {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+                xboxValidationStatus[inputIndex] = false;
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 404) {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+            }
+            xboxValidationStatus[inputIndex] = false;
+        }
+    });
+});
+
+const psValidationStatus = {};
+console.log("**********************", psValidationStatus)
+
+// Blur event → validate only when leaving the field
+$("input[name='ps_gamertag']").on("blur", function () {
+    const $input = $(this);
+    const gamertag = $input.val().trim();
+    const statusElement = $input.siblings(".psValidationStatus");
+    const inputIndex = $("input[name='ps_gamertag']").index(this); // Get unique identifier
+
+    // Clear previous status
+    statusElement.html('');
+
+    if (!gamertag) {
+        delete psValidationStatus[inputIndex]; // Remove entry instead of setting null
+        return;
+    }
+
+    // Remove @ or other non-letter prefix
+    const strippedGamertag = gamertag.replace(/^[^A-Za-z]+/, '');
+    statusElement.html('<span style="color:green;">Validating...</span>');
+
+    $.ajax({
+        url: `/api/validate-xbox-gamertag/${encodeURIComponent(strippedGamertag)}/`,
+        type: "GET",
+        success: function (data) {
+            if (data.success && data.gamertag) {
+                statusElement.html(
+                    `<span style="color:green;">Gamertag found</span>`
+                );
+                psValidationStatus[inputIndex] = true;
+            } else {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+                psValidationStatus[inputIndex] = false;
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 404) {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+            }
+            psValidationStatus[inputIndex] = false;
+        }
+    });
+});
 
 
-
-    // ✅ Prevent submission if any gamertag is invalid
+    // ✅ Form submission check
     $("#intakeForm").on("submit", function (e) {
         let isValid = true;
 
-        // $(".xbox-gamertag").each(function (i) {
-        //     const value = $(this).val().trim();
-        //     if (value && !xboxValidationStatus[i]) {
-        //         const $statusDiv = $(this).siblings(".xboxValidationStatus");
-        //         $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">Gamertag not found.</div>`);
-        //         isValid = false;
-        //     }
-        // });
+        $("input[name='xbox_gamertag']").each(function () {
+            const value = $(this).val().trim();
+            if (value && xboxValidationStatus[value] === false) {
+                const $statusDiv = $(this).siblings(".xboxValidationStatus");
+                $statusDiv.html('<span class="text-danger">Gamertag not found.</span>');
+                isValid = false;
+            }
+        });
+
+
+        $("input[name='ps_gamertag']").each(function () {
+            const value = $(this).val().trim();
+            if (value && xboxValidationStatus[value] === false) {
+                const $statusDiv = $(this).siblings(".psValidationStatus");
+                $statusDiv.html('<span class="text-danger">Gamertag not found.</span>');
+                isValid = false;
+            }
+        });
+
+
 
         $(".roblox-gamertag").each(function (i) {
             const value = $(this).val().trim();
@@ -1478,16 +1547,48 @@ $(document).ready(function () {
 $("#intakeForm").on("submit", function (e) {
     e.preventDefault();
 
-    // ✅ Check for invalid Roblox gamertags before proceeding
-    const hasInvalidGamertag = 
-    Object.values(robloxValidationStatus).some(status => status === false)
-    // Object.values(xboxValidationStatus).some(status => status === false);
+    // ✅ FIXED - Only check validation status for current input values
+    const hasInvalidRobloxGamertag = $("input[name='roblox_gamertag']").toArray().some((input, index) => {
+        const value = $(input).val().trim();
+        if (!value) return false; // Skip empty inputs
+        const status = robloxValidationStatus[index];
+        console.log(`Roblox input ${index}: value="${value}", status=${status}, isInvalid=${status === false}`);
+        return status === false;
+    });
+    
+    const hasInvalidXboxGamertag = $("input[name='xbox_gamertag']").toArray().some((input, index) => {
+        const value = $(input).val().trim();
+        if (!value) return false; // Skip empty inputs
+        const status = xboxValidationStatus[index];
+        console.log(`Xbox input ${index}: value="${value}", status=${status}, isInvalid=${status === false}`);
+        return status === false;
+    });
+
+    const hasInvalidPsGamertag = $("input[name='ps_gamertag']").toArray().some((input, index) => {
+        const value = $(input).val().trim();
+        if (!value) return false; // Skip empty inputs
+        const status = psValidationStatus[index];
+        console.log(`Xbox input ${index}: value="${value}", status=${status}, isInvalid=${status === false}`);
+        return status === false;
+    });
+    
+    // const hasInvalidGamertag = hasInvalidRobloxGamertag || hasInvalidXboxGamertag;
+
+    const hasInvalidGamertag = hasInvalidRobloxGamertag || hasInvalidXboxGamertag || hasInvalidPsGamertag;
+
+    // ✅ ADDITIONAL - Debug logging to see what's happening
+    console.log("=== VALIDATION DEBUG ===");
+    console.log("Xbox validation status object:", xboxValidationStatus);
+    console.log("Roblox validation status object:", robloxValidationStatus);
+    console.log("Has invalid Roblox gamertag:", hasInvalidRobloxGamertag);
+    console.log("Has invalid Xbox gamertag:", hasInvalidXboxGamertag);
+    console.log("Has invalid gamertag (final):", hasInvalidGamertag);
+    console.log("=== END DEBUG ===");
 
     if (hasInvalidGamertag) {
         $("#responseMessage").html('<div class="alert alert-danger">One or more gamertags are invalid. Please fix them before submitting.</div>');
         return; 
     }
-
 
     if (!validateIntakeForm()) return;
 
@@ -1511,7 +1612,24 @@ $("#intakeForm").on("submit", function (e) {
                     if (cleaned) allGamertags.push(cleaned);
                 });
                 formData[name] = allGamertags.join(", ");
-            } else {
+            // ✅ ADDITIONAL - Handle xbox_gamertag similar to roblox_gamertag
+            } else if (name === "xbox_gamertag") {
+                const allGamertags = [];
+                $(`input[name='${name}']`).each(function () {
+                    const cleaned = $(this).val().trim().replace(/^[^A-Za-z]+/, '');
+                    if (cleaned) allGamertags.push(cleaned);
+                });
+                formData[name] = allGamertags.join(", ");
+            }
+            else if (name === "ps_gamertag") {
+                const allGamertags = [];
+                $(`input[name='${name}']`).each(function () {
+                    const cleaned = $(this).val().trim().replace(/^[^A-Za-z]+/, '');
+                    if (cleaned) allGamertags.push(cleaned);
+                });
+                formData[name] = allGamertags.join(", ");
+            }
+            else {
                 formData[name] = value;
             }
         }
@@ -1535,7 +1653,19 @@ $("#intakeForm").on("submit", function (e) {
                         document.getElementById("intakeForm").reset();
                         $('#otherCustodyTextDiv').hide();
                         $(".text-danger").remove();
-                        $('.robloxValidationStatus').html('');
+                        // $('.robloxValidationStatus, .xboxValidationStatus').html('');
+                        $('.robloxValidationStatus, .xboxValidationStatus, .psValidationStatus').html('');
+                        
+                        // ✅ ADDITIONAL - Clear validation status objects by index
+                        $("input[name='roblox_gamertag']").each(function(index) {
+                            delete robloxValidationStatus[index];
+                        });
+                        $("input[name='xbox_gamertag']").each(function(index) {
+                            delete xboxValidationStatus[index];
+                        });
+                        $("input[name='ps_gamertag']").each(function(index) {
+                            delete psValidationStatus[index];
+                        });
                     }, 1000);
 
                     document.getElementById('spinnerOverlay').style.display = 'none';
@@ -1555,7 +1685,6 @@ $("#intakeForm").on("submit", function (e) {
             });
         });
     });
-
 });
 
 

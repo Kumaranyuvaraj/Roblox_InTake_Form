@@ -751,6 +751,31 @@ button {
     margin-top: 2px;
 }
 
+#consentModal.modal{
+    background: rgba(0, 0, 0, 0.85);
+}
+#consentModal .modal-dialog {
+    max-width: 90%; /* Or 100% for full width */
+}
+#consentModal .modal-content{
+    width: 700px;
+    padding-bottom: 0;
+}
+
+#consentModal .btn-blue{
+    border-radius: 4px;
+}
+#consentModal .btn-blue:hover{
+    background-color: #1F4068;
+    color: #fff;
+}
+.consentBtn{
+    background-color: transparent;
+    padding: 0;
+    text-decoration: underline;
+    color: blue;
+}
+
 #modalMessage {
     margin: 0;
     font-size: 16px;
@@ -864,7 +889,14 @@ button {
 
 
 
+.cb-label {
+    display: inline-flex;
+    align-items: baseline;
+    white-space: nowrap;
+    row-gap: 10px;
+    column-gap: 10px;
 
+}
 
 
 

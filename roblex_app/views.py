@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 from roblex_app.models import IntakeForm, EmailTemplate, UserDetail, Question, Option, UserAnswer, EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
+from roblex_app.ps_api import get_playstation_profile
 from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer, QuestionSerializer, UserAnswerSerializer, EmailLogSerializer
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
@@ -26,6 +27,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from .xbox_api import xbox_gamertag_lookup
+
+from psnawp_api import PSNAWP
 
 def requires_florida_disclosure(zipcode):
     """
@@ -235,80 +239,51 @@ def validate_roblox_username(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
-# OPENXBL_API_KEY = os.getenv("OPENXBL_API_KEY")
-OPENXBL_API_KEY = os.getenv("OPENXBL_API_KEY", "b8af71b4-6bb4-4eb7-b4ab-7a510082177a")
-print("[DEBUG] OPENXBL_API_KEY loaded:", OPENXBL_API_KEY)
-
-
 @api_view(['GET'])
-def validate_xbox_gamertag(request,gamertag):
-    # gamertag = request.data.get("gamertag", "").strip()
-    gamertag = gamertag.strip()
+def validate_xbox_gamertag(request, gamertag):
+    result = xbox_gamertag_lookup(gamertag)
+    if result["success"]:
+        return Response({"success": True, "gamertag": gamertag}, status=status.HTTP_200_OK)
+    else:
+        return Response({"success": False, "error": "Gamertag not found"}, status=status.HTTP_404_NOT_FOUND)
+    
 
-    print(f"[DEBUG] Received gamertag: '{gamertag}'")
+@api_view(["GET"])
+def validate_playstation_gamertag(request, gamertag):
+    """
+    Validate and fetch PlayStation user profile by gamertag.
+    """
+    profile = get_playstation_profile(gamertag)
 
-    if not gamertag:
-        print("[DEBUG] No gamertag provided")
-        return Response({"error": "Xbox Gamertag is required"}, status=status.HTTP_400_BAD_REQUEST)
+    if profile:
+        return Response({"success": True, "profile": profile}, status=status.HTTP_200_OK)
+    else:
+        return Response(
+            {"success": False, "error": "Gamertag not found or API error"},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
-    # Xbox format check: letters, numbers, spaces, underscores, max 15 chars
-    if not re.fullmatch(r"[A-Za-z0-9_ ]{1,15}", gamertag):
-        print("[DEBUG] Gamertag format failed regex check")
-        return Response({"valid": False, "error": "Invalid Xbox Gamertag format"}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        url = f"https://xbl.io/api/v2/search/{gamertag}"
-        headers = {"X-Authorization": OPENXBL_API_KEY}
-
-        print(f"[DEBUG] Calling URL: {url}")
-        print(f"[DEBUG] Using API Key: {OPENXBL_API_KEY}")
-
-        response = requests.get(url, headers=headers, timeout=5)
-
-        print(f"[DEBUG] Response code: {response.status_code}")
-        print(f"[DEBUG] Response text: {response.text}")
-
-        if response.status_code == 200:
-            data = response.json()
-            print(f"[DEBUG] Parsed JSON: {data}")
-
-            if data.get("people"):  # 'people' contains search results
-                print("[DEBUG] Gamertag found in API response")
-                return Response({"valid": True, "gamertag": gamertag, "data": data})
-            else:
-                print("[DEBUG] Gamertag not found in API response")
-                return Response({"valid": False, "error": "Gamertag not found"}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            print("[DEBUG] Non-200 status code from Xbox API")
-            return Response(
-                {"error": "Error from Xbox API", "status_code": response.status_code},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-    except Exception as e:
-        print(f"[DEBUG] Exception occurred: {e}")
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     
 
-OPENXBL_API_KEY = os.getenv("OPENXBL_API_KEY")
+# OPENXBL_API_KEY = os.getenv("OPENXBL_API_KEY")
+# OPENXBL_API_KEY = "b8af71b4-6bb4-4eb7-b4ab-7a510082177a"
 
 class SubmitIntakeIfValidAPIView(APIView):
     def post(self, request):
-        data = request.data.copy() 
-        
-        # Get user_detail_id from request data
+        data = request.data.copy()
+
+        # --- User detail check ---
         user_detail_id = data.get('user_detail_id')
         if not user_detail_id:
             return Response({'error': 'user_detail_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Verify UserDetail exists
+
         try:
             user_detail = UserDetail.objects.get(id=user_detail_id)
         except UserDetail.DoesNotExist:
             return Response({'error': 'Invalid user_detail_id'}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Check if intake already exists
+
+        # --- Prevent duplicate intake ---
         existing_intake = IntakeForm.objects.filter(user_detail=user_detail).first()
         if existing_intake:
             return Response({
@@ -316,19 +291,23 @@ class SubmitIntakeIfValidAPIView(APIView):
                 'already_submitted': True,
                 'intake_id': existing_intake.id
             }, status=status.HTTP_409_CONFLICT)
-            
-        if 'client_ip' in data and data['client_ip']:
-            client_ip_raw = str(data['client_ip']).strip()
-            first_ip = client_ip_raw.split(',')[0].strip()
-            data['client_ip'] = first_ip
+
+        # --- Normalize client_ip ---
+        if data.get('client_ip'):
+            data['client_ip'] = str(data['client_ip']).split(',')[0].strip()
 
         serializer = IntakeFormSerializer(data=data)
-        if serializer.is_valid():
+        # print("intake_form:",serializer)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            # ---- Roblox Validation ----
-            raw_roblox_name = serializer.validated_data.get("roblox_gamertag", "")
-            usernames = [re.sub(r'^[^A-Za-z]+', '', name.strip()) for name in raw_roblox_name.split(",") if name.strip()]
-
+        # === ROBLOX VALIDATION (required if entered) ===
+        raw_roblox_name = serializer.validated_data.get("roblox_gamertag", "")
+        if raw_roblox_name:
+            usernames = [
+                re.sub(r'^[^A-Za-z]+', '', name.strip())
+                for name in raw_roblox_name.split(",") if name.strip()
+            ]
             try:
                 for username in usernames:
                     roblox_response = requests.post(
@@ -338,69 +317,79 @@ class SubmitIntakeIfValidAPIView(APIView):
                         timeout=5
                     )
                     roblox_data = roblox_response.json()
-                    if "data" not in roblox_data or not roblox_data["data"]:
+                    # print("roblox_data:",roblox_data)
+                    if not roblox_data.get("data"):
                         return Response(
                             {"error": f"Invalid Roblox username: {username}. Cannot save."},
                             status=status.HTTP_400_BAD_REQUEST
                         )
             except Exception as e:
-                return Response({"error": f"Roblox validation failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({"error": f"Roblox validation failed: {str(e)}"},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            # # ---- Xbox Validation ----
-                      
-            # raw_xbox_name = serializer.validated_data.get("xbox_gamertag", "")
-            # xbox_tags = [re.sub(r'^[^A-Za-z]+', '', name.strip()) for name in raw_xbox_name.split(",") if name.strip()]
+        # === XBOX VALIDATION (optional) ===
+       
+        raw_xbox_name = serializer.validated_data.get("xbox_gamertag", None)
+        # print("📌 Raw xbox_gamertag from serializer:", repr(raw_xbox_name))
 
-            # for gamertag in xbox_tags:
-            #     # Optional: format validation
-            #     if not re.fullmatch(r"[A-Za-z0-9 ]{1,15}", gamertag):
-            #         return Response({"error": f"Invalid Xbox Gamertag format: {gamertag}"}, status=status.HTTP_400_BAD_REQUEST)
+        invalid_xbox_tags = []
 
-            #     try:
-            #         url = f"https://xbl.io/api/v2/search/{gamertag}"
-            #         headers = {"X-Authorization": OPENXBL_API_KEY}
-            #         response = requests.get(url, headers=headers, timeout=5)
+        if raw_xbox_name is not None:
+            # Keep original for saving
+            original_xbox_tags = [name.strip() for name in str(raw_xbox_name).split(",")]
+            # print("📌 Original Xbox tags list:", original_xbox_tags)
 
-            #         if response.status_code != 200:
-            #             return Response(
-            #                 {"error": f"Xbox API error for {gamertag}", "status_code": response.status_code},
-            #                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            #             )
+            for original_tag in original_xbox_tags:
+                stripped_tag = re.sub(r'^[^A-Za-z]+', '', original_tag).strip()
+                # print(f"🔹 Original: '{original_tag}' → Stripped: '{stripped_tag}'")
 
-            #         data_json = response.json()
-            #         if not data_json.get("people"):
-            #             return Response(
-            #                 {"error": f"Xbox Gamertag not found: {gamertag}"},
-            #                 status=status.HTTP_404_NOT_FOUND
-            #             )
+                if stripped_tag:
+                    try:
+                        result = xbox_gamertag_lookup(stripped_tag)
+                        # print(f"🔍 Xbox lookup result for '{stripped_tag}':", result)
+                        if not result.get("success", False):
+                            invalid_xbox_tags.append({
+                                "gamertag": stripped_tag,
+                                "error": result.get("error", "Unknown error")
+                            })
+                    except Exception as e:
+                       pass
+        #                 print(f"❌ Error looking up Xbox gamertag '{stripped_tag}': {str(e)}")
+        #         else:
+        #             print(f"⚠️ Skipping empty gamertag after stripping: '{original_tag}'")
+        # else:
+        #     print("⚠️ xbox_gamertag key not found in serializer data — skipping validation.")
 
-            #     except Exception as e:
-            #         return Response({"error": f"Xbox validation failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-            # ---- Save Intake ----
-            intake_instance = serializer.save(user_detail=user_detail)
-            intake_instance.client_ip = data.get("client_ip")
-            intake_instance.submitted_at = data.get("submitted_at") or timezone.now()
+        # === SAVE ===
+        intake_instance = serializer.save(user_detail=user_detail)
+        intake_instance.client_ip = data.get("client_ip")
+        intake_instance.submitted_at = data.get("submitted_at") or timezone.now()
 
-            pdf_data = data.get("pdf_data")
-            if pdf_data:
-                try:
-                    format, pdfstr = pdf_data.split(';base64,')
-                    file_name = f"intake_{uuid.uuid4().hex[:8]}.pdf"
-                    file_content = ContentFile(base64.b64decode(pdfstr), name=file_name)
-                    intake_instance.pdf_file = file_content
-                except Exception as e:
-                    return Response({"error": f"Failed to decode PDF: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        if invalid_xbox_tags:
+            intake_instance.invalid_xbox_tags = invalid_xbox_tags  # assumes JSONField
 
-            intake_instance.save()
+        # Save PDF
+        pdf_data = data.get("pdf_data")
+        if pdf_data:
+            try:
+                format, pdfstr = pdf_data.split(';base64,')
+                file_name = f"intake_{uuid.uuid4().hex[:8]}.pdf"
+                file_content = ContentFile(base64.b64decode(pdfstr), name=file_name)
+                intake_instance.pdf_file = file_content
+            except Exception as e:
+                return Response({"error": f"Failed to decode PDF: {str(e)}"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({
-                "message": "Form submitted successfully.",
-                "data": IntakeFormSerializer(intake_instance).data
-            }, status=status.HTTP_201_CREATED)
+        intake_instance.save()
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            "message": "Form submitted successfully.",
+            "data": IntakeFormSerializer(intake_instance).data
+        }, status=status.HTTP_201_CREATED)
+
+
     
     
 class UserDetailCreateView(APIView):

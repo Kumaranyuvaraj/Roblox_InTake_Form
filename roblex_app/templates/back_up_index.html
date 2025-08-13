@@ -25,6 +25,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <meta name="csrf-token" content="{{ csrf_token }}">
     
 
@@ -442,30 +444,31 @@
                 <!-- Consent Box Label & Instructions -->
                 <!-- <label>Please read the
                     <strong>
-                        <a href="#" id="showConsentModal">Consent box</a>
+                        <a href="#" id="openConsentBox">Consent box </a>
                     </strong> before making a choice.
                 </label> -->
-
-                <!-- <small id="consent-hint" style="color:gray;">
-                    Please read the consent box before making a choice.
-                </small> -->
 
                     <p>
                         Please read the <button class="consentBtn" onclick="showConsentModal()">Consent Box</button> before making a choice.
                     </p>
-
+                
+                <!-- <small id="consent-hint" style="color:gray;">
+                    Please read the consent box before making a choice.
+                </small> -->
+              
 
                 <!-- Checkboxes -->
                 <div class="input-group d-flex">
-                    <label class="cb-label me-4">
-                        <input type="checkbox" id="agreecheck" name="agreement_status" value="agree" disabled> Yes, I Agree and Consent
+                    <label>
+                        <input type="checkbox" id="agreecheck" name="agreement_status" value="agree" disabled> I Agree
                     </label>
-                    <label class="cb-label me-4">
-                        <input type="checkbox" id="notAgreecheck" name="agreement_status" value="not_agree" disabled> No, I don't agree 
+                    <label>
+                        <input type="checkbox" id="notAgreecheck" name="agreement_status" value="not_agree" disabled> I Do Not Agree
                     </label>
                 </div>
 
-           
+                <!-- Consent Box Link -->
+                <br>
                
 
 
@@ -497,7 +500,28 @@
 </div>
 
 
+    <!-- modal popup end -->
+    <!-- Congratulations Start -->
 
+     <!-- <div class="congrats-modal" id="congratsModal">
+        <div class="congrats-content">
+            <div class="top-margin">
+
+           
+            <div class="firework"></div>
+            <div class="firework" style="left: 30%; animation-delay: 0.2s"></div>
+            <div class="firework" style="right: 30%; animation-delay: 0.4s"></div>
+            <h2 style="color: #096ae994;">🎉 Congratulations! 🎉</h2>
+            <p style="color: #096ae994;">You've successfully submitted!</p>
+            <button class="continue-btn" onclick="showLoading()">Continue</button>
+            <div class="loading-container center" id="loadingContainer">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="preparing-text" id="preparingText">Preparing your prequalifying Form...</div>
+        </div>
+        </div>
+    </div> -->
+    <!-- Congratulations End -->
 
 
     
@@ -510,30 +534,42 @@
   </div>
 </div>
 
+<!-- add this somewhere in your HTML if you don't already have it -->
+<!-- <div id="loadingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; font-family:system-ui;">
+  <div style="background:#fff; border-radius:12px; padding:2rem; max-width:420px; width:90%; text-align:center; position:relative; box-shadow:0 30px 60px -10px rgba(0,0,0,0.3);">
+    <div style="margin-bottom:1rem;">
+      <div class="spinner" aria-label="Loading" role="status" style="width:60px; height:60px; margin:0 auto 1rem; border:6px solid #e5e5e5; border-top-color:#667eea; border-radius:50%; animation:spin 1s linear infinite;"></div>
+      <h2 style="margin:0; font-size:1.5rem;">Preparing Retainer</h2>
+      <p id="loadingMessage" style="margin:8px 0 0; font-size:0.95rem; color:#555;">This may take up to 10 seconds. Redirecting in <span id="countdown">10</span>s...</p>
+    </div>
+  </div>
+</div> -->
 
 <!-- Consent Modal -->
-<div class="modal fade" id="consentModal" tabindex="-1" aria-labelledby="consentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
+    <div class="modal fade" id="consentModal" tabindex="-1" aria-labelledby="consentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title" id="consentModalLabel">NEXTKEY LITIGATION CONSENT BOX</h5>
-                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="consentModalLabel">NEXTKEY LITIGATION CONSENT BOX</h5>
+                    <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                </div>
+
+                <div class="modal-body">
+                    By checking the box below that says <strong>"Yes, I Agree and Consent"</strong> and clicking the <strong>"Submit"</strong> button, I represent that I am 18+ years of age and have read and agreed to the NextKey Litigation’s <a href="{% url 'terms_of_service' %}" target="_blank">Terms of Service</a> and <a href="{% url 'privacy_policy' %}" target="_blank">Privacy Policy</a>. I consent to the transfer of information that I provide on this site to third-party legal service providers and non-legal service providers, third party partners and their affiliates and service providers; I agree to be contacted with marketing by email & telephone, which may include artificial or pre-recorded calls and/or SMS text messages, delivered via automated technology, to the email and phone number that I have provided. I understand that my consent is not a condition of receipt of services.
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-blue" data-bs-dismiss="modal">Close</button>
+                </div>
+
             </div>
-
-            <div class="modal-body">
-                By checking the box below that says <strong>"Yes, I Agree and Consent"</strong> and clicking the <strong>"Submit"</strong> button, I represent that I am 18+ years of age and have read and agreed to the NextKey Litigation’s <a href="{% url 'terms_of_service' %}" target="_blank">Terms of Service</a> and <a href="{% url 'privacy_policy' %}" target="_blank">Privacy Policy</a>. I consent to the transfer of information that I provide on this site to third-party legal service providers and non-legal service providers, third party partners and their affiliates and service providers; I agree to be contacted with marketing by email & telephone, which may include artificial or pre-recorded calls and/or SMS text messages, delivered via automated technology, to the email and phone number that I have provided. I understand that my consent is not a condition of receipt of services.
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-blue" data-bs-dismiss="modal">Close</button>
-            </div>
-
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- <script src="https://unpkg.com/libphonenumber-js/bundle/libphonenumber-max.js"></script> -->
 
 
 <script>
@@ -570,41 +606,6 @@
         document.getElementById('modal').style.display = 'none';
     }
 
-   function showConsentModal() {
-    var modal = new bootstrap.Modal(document.getElementById('consentModal'));
-    modal.show();
-}
-
-    // When consent modal is closed → enable the checkboxes
-    document.getElementById('consentModal').addEventListener('hidden.bs.modal', function () {
-        const agreeCheck = document.getElementById("agreecheck");
-        const notAgreeCheck = document.getElementById("notAgreecheck");
-
-        // Enable both checkboxes
-        agreeCheck.disabled = false;
-        notAgreeCheck.disabled = false;
-
-        // Make them mutually exclusive
-        agreeCheck.addEventListener("change", function () {
-            if (this.checked) {
-                notAgreeCheck.checked = false;
-            }
-        });
-        notAgreeCheck.addEventListener("change", function () {
-            if (this.checked) {
-                agreeCheck.checked = false;
-            }
-        });
-    });
-
-
-    function hideConsentModal() {
-        var modal = bootstrap.Modal.getInstance(document.getElementById('consentModal'));
-        if (modal) {
-            modal.hide();
-        }
-    }
-
     document.getElementById('openModal').addEventListener('click', () => {
         document.getElementById('modal').style.display = 'flex';
     });
@@ -617,6 +618,8 @@
         return false;
     }
 }
+
+
 
 
     // Modal Control
@@ -702,8 +705,8 @@
     //     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     // }
 
-    // // Open consent box popup
-    // document.getElementById("showConsentModal").addEventListener("click", function (e) {
+    // Open consent box popup
+    // document.getElementById("openConsentBox").addEventListener("click", function (e) {
     //     e.preventDefault();
     //     window.consentWindow = window.open(
     //         "/consent-box",
@@ -985,6 +988,19 @@
 
     function closeCustomModal() {
     $("#customModal").fadeOut();
+    }
+
+    
+    function showConsentModal() {
+        var modal = new bootstrap.Modal(document.getElementById('consentModal'));
+        modal.show();
+    }
+
+    function hideConsentModal() {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('consentModal'));
+        if (modal) {
+            modal.hide();
+        }
     }
 
 
