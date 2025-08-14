@@ -811,6 +811,19 @@
         // Block submission if any errors
         if (!isValid) return;
 
+        // const age = calcAge(dob);
+        // if (age > 20) {
+        //     showModal("Age of gamer is more than 20, so you're not eligible.");
+        //     return;
+        // }
+
+    //     if (working_with_attorney === "yes") {
+    //     showModal("You are currently working with an attorney for a gaming sex abuse claim, so you're not eligible.","error");
+    //     return;
+    // }
+
+
+
         // ✅ Step 1: Submit user details
         $.ajax({
             url: "/api/user-details/",
@@ -846,17 +859,6 @@
                 sessionStorage.setItem("guardian_first_name", first_name);
                 sessionStorage.setItem("guardian_last_name", last_name);
 
-                // if (working_with_attorney === "yes") {
-                //     showModal(
-                //         "Thank you for your interest. Based on the information provided, your case does not currently meet the eligibility criteria.",
-                //         "error"
-                //     );
-                //     setTimeout(() => {
-                //         window.location.href = "/gratitude/?eligible=false";
-                //     }, 1500);
-                //     return; // Stop further processing
-                // }
-
                 // ✅ Step 3: Determine eligibility from DOB
                 const dobValue = $("#gamer_dob").val()?.trim();
                 // if (!dobValue) {
@@ -876,6 +878,41 @@
                 const ageQuestion = questionsData.find(q =>
                     q.text.toLowerCase().includes("age of gamer")
                 );
+
+               // ✅ Check both conditions first
+                if (age > 20 && working_with_attorney === "yes") {
+                    showModal(
+                        "Age of gamer is more than 20 and you are currently working with an attorney for a gaming sex abuse claim, so you're not eligible.",
+                        "error"
+                    );
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 15000);
+                    return; // Stop further processing
+                }
+
+                // ✅ Then check individual conditions
+                if (age > 20) {
+                    showModal(
+                        "Age of gamer is more than 20, so you're not eligible.",
+                        "error"
+                    );
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 15000);
+                    return;
+                }
+
+                if (working_with_attorney === "yes") {
+                    showModal(
+                        "You are currently working with an attorney for a gaming sex abuse claim, so you're not eligible.",
+                        "error"
+                    );
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 15000);
+                    return;
+                }
 
                 let matchedOption = null;
                 if (ageQuestion) {
@@ -910,7 +947,7 @@
                 }
 
                 // ✅ Step 5: Handle based on eligibility
-                if (!matchedOption.is_eligible || working_with_attorney === "yes") {
+                if (!matchedOption.is_eligible) {
                     // Send rejection email template
                     $.ajax({
                         url: `/api/email-template/${templateType}/`,
@@ -934,11 +971,11 @@
                                 processData: false,
                                 contentType: false,
                                 success: function () {
-                                    showModal("Thank you for your interest. Based on the information provided, your case does not currently meet the eligibility criteria.", "error");
+                                    showModal("Age of gamer is more than 20, so you're not eligible.", "error");
                                     // Redirect to thank you page after short delay
                                     setTimeout(() => {
-                                       window.location.href = "/gratitude/?eligible=false";
-                                    }, 1500);
+                                       window.location.href = "/";
+                                    }, 15000);
                                                 },
                                 error: function (xhr) {
                                     const err = xhr.responseJSON?.error || "Error sending email.";
@@ -1331,7 +1368,7 @@
         if (ageOptionData.requires_parental_signature) {
         // Show modal with "Continue" button
         showModal(
-            "Congrats! Your case is eligible for Video Game Sex abuse claim. Please click Continue to next step",
+            "Congrats! Your case is potentially eligible for Video Game Sex abuse claim. Please click Continue to next step",
             "success",
             true
         );
