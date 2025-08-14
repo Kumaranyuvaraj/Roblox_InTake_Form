@@ -43,9 +43,9 @@ class SubdomainMiddleware:
         """
         Extract subdomain from host
         Examples:
-        - hilliard.roblox.nextkeylitigation.com -> hilliard
-        - bullocklegal.roblox.nextkeylitigation.com -> bullocklegal
-        - roblox.nextkeylitigation.com -> None (no subdomain)
+        - hilliard.nextkeylitigation.com -> hilliard
+        - bullocklegal.nextkeylitigation.com -> bullocklegal
+        - nextkeylitigation.com -> None (no subdomain)
         - localhost:8000 -> None (development)
         """
         # Remove port if present
@@ -58,13 +58,13 @@ class SubdomainMiddleware:
         # Split by dots
         parts = host.split('.')
         
-        # For production domains like hilliard.roblox.nextkeylitigation.com
-        if len(parts) >= 3 and parts[-3:] == ['roblox', 'nextkeylitigation', 'com']:
-            # If it's exactly roblox.nextkeylitigation.com (3 parts), no subdomain
-            if len(parts) == 3:
+        # For production domains like hilliard.nextkeylitigation.com
+        if len(parts) >= 2 and parts[-2:] == ['nextkeylitigation', 'com']:
+            # If it's exactly nextkeylitigation.com (2 parts), no subdomain
+            if len(parts) == 2:
                 return None
-            # If it's subdomain.roblox.nextkeylitigation.com (4+ parts), extract subdomain
-            elif len(parts) >= 4:
+            # If it's subdomain.nextkeylitigation.com (3+ parts), extract subdomain
+            elif len(parts) >= 3:
                 subdomain = parts[0]
                 return subdomain if subdomain not in ['www'] else None
             
