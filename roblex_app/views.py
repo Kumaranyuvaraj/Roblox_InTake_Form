@@ -1168,8 +1168,9 @@ class LandingPageLeadCreateAPIView(APIView):
                     'details': serializer.errors
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # Get law firm based on subdomain from request
-            law_firm = self.get_law_firm_from_request(request)
+            # Get law firm based on original domain from request data
+            original_domain = request.data.get('original_domain')
+            law_firm = self.get_law_firm_from_domain(original_domain or request.get_host())
             
             # Create the lead
             lead = serializer.save(
@@ -1198,13 +1199,13 @@ class LandingPageLeadCreateAPIView(APIView):
                 'details': str(e) if settings.DEBUG else 'Please try again later'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    def get_law_firm_from_request(self, request):
+    def get_law_firm_from_domain(self, domain):
         """
         Extract law firm from request subdomain or default
         """
         try:
             # Get subdomain from host header
-            host = request.get_host()
+            host = domain
             subdomain = host.split('.')[0] if '.' in host else 'default'
             
             # Handle localhost and dev environments

@@ -56,7 +56,9 @@ const KidsPage = () => {
           name: formData.name,
           email: formData.email,
           description: formData.description,
-          lead_source: 'kids'
+          lead_source: 'kids',
+          // Pass the original domain where the form was submitted
+          original_domain: window.location.hostname
         };
 
         const response = await fetch(`${apiUrl}/api/landing-page-leads/`, {

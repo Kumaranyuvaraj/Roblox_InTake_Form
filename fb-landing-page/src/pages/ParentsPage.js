@@ -101,7 +101,9 @@ const ParentsPage = () => {
           phone: formData.phone,
           state_location: formData.stateLocation,
           description: formData.description,
-          lead_source: 'parents'
+          lead_source: 'parents',
+          // Pass the original domain where the form was submitted
+          original_domain: window.location.hostname
         };
 
         const response = await fetch(`${apiUrl}/api/landing-page-leads/`, {

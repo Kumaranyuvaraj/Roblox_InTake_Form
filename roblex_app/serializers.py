@@ -142,6 +142,9 @@ class DocumentWebhookEventSerializer(serializers.ModelSerializer):
 
 # Landing Page Lead Serializers
 class LandingPageLeadSerializer(serializers.ModelSerializer):
+    # Add original_domain as a write-only field for domain detection
+    original_domain = serializers.CharField(write_only=True, required=False)
+    
     class Meta:
         model = LandingPageLead
         fields = '__all__'
@@ -167,6 +170,12 @@ class LandingPageLeadSerializer(serializers.ModelSerializer):
             if len(digits_only) != 10:
                 raise serializers.ValidationError("Phone number must be 10 digits.")
         return value
+    
+    def create(self, validated_data):
+        """Override create to handle original_domain field"""
+        # Remove original_domain from validated_data as it's not a model field
+        validated_data.pop('original_domain', None)
+        return super().create(validated_data)
 
 
 class LandingPageLeadListSerializer(serializers.ModelSerializer):
