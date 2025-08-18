@@ -1338,7 +1338,7 @@ class LandingPageLeadAdmin(LawFirmFilteredModelAdmin):
         'law_firm__name'
     ]
     date_hierarchy = 'created_at'
-    readonly_fields = ['created_at', 'updated_at', 'client_ip', 'user_agent', 'referrer', 'email_notifications']
+    readonly_fields = ['created_at', 'updated_at', 'client_ip', 'user_agent', 'referrer']
     list_per_page = 25
     
     fieldsets = (
@@ -1351,10 +1351,6 @@ class LandingPageLeadAdmin(LawFirmFilteredModelAdmin):
         }),
         ('Lead Management', {
             'fields': ('status', 'assigned_to', 'contacted_at', 'notes')
-        }),
-        ('Email Status', {
-            'fields': ('email_notifications',),
-            'classes': ('collapse',)
         }),
         ('Technical Information', {
             'fields': ('client_ip', 'user_agent', 'referrer'),
