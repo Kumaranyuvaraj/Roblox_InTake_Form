@@ -6,7 +6,7 @@ from roblex_app.models import LawFirm
 class SubdomainMiddleware:
     """
     Middleware to detect law firm from subdomain and make it available throughout the request
-    For URLs like: hilliard.roblox.nextkeylitigation.com or bullocklegal.roblox.nextkeylitigation.com
+    For URLs like: hilliard.nextkeylitigation.com or bullock.nextkeylitigation.com
     """
     
     def __init__(self, get_response):

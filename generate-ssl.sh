@@ -25,10 +25,11 @@ subjectAltName = @alt_names
 
 [alt_names]
 DNS.1 = roblox.nextkeylitigation.com
-DNS.2 = nextkeylitigation.com
-DNS.3 = www.nextkeylitigation.com
-DNS.4 = bullock.roblox.nextkeylitigation.com
-DNS.5 = hilliard.roblox.nextkeylitigation.com
+DNS.4 = bullock.nextkeylitigation.com
+DNS.5 = hilliard.nextkeylitigation.com
+DNS.6 = facebook.nextkeylitigation.com
+DNS.8 = bullock.nextkeystack.com
+DNS.9 = hilliard.nextkeystack.com
 EOF
 
 # Generate self-signed certificate for Cloudflare origin with multiple domains
@@ -46,3 +47,10 @@ chmod 644 /etc/nginx/ssl/nginx-selfsigned.crt
 rm /tmp/cert.conf
 
 echo "SSL certificates generated successfully for all domains!"
+echo "Domains included:"
+echo "  - roblox.nextkeylitigation.com"
+echo "  - bullock.nextkeylitigation.com"
+echo "  - hilliard.nextkeylitigation.com"
+echo "  - facebook.nextkeylitigation.com"
+echo "  - bullock.nextkeystack.com"
+echo "  - hilliard.nextkeystack.com"

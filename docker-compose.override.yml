@@ -11,5 +11,12 @@ services:
       - "8000:8000"
       - "5678:5678"  # debugpy port
 
+  # For local development, expose fb-landing-page directly
+  fb-landing-page:
+    ports:
+      - "3001:80"  # Access React app directly at localhost:3001
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+
 volumes:
   static_volume:

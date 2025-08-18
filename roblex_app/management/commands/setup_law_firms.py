@@ -57,7 +57,7 @@ class Command(BaseCommand):
             },
             {
                 'name': 'Bullock Legal',
-                'subdomain': 'bullocklegalgroup',
+                'subdomain': 'bullock',
                 'contact_email': 'contact@bullocklegalgroup.com',
                 'phone_number': '+1-555-0002',
                 'address': 'Bullock Legal Office Address',

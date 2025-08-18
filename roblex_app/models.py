@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 
 
 class LawFirm(models.Model):
@@ -12,7 +13,7 @@ class LawFirm(models.Model):
     subdomain = models.CharField(
         max_length=100, 
         unique=True, 
-        help_text="Subdomain identifier (e.g., 'hilliard' for hilliard.roblox.nextkeylitigation.com)"
+        help_text="Subdomain identifier (e.g., 'hilliard' for hilliard.nextkeylitigation.com)"
     )
     contact_email = models.EmailField(help_text="Primary contact email for the law firm")
     phone_number = models.CharField(max_length=20, blank=True, help_text="Contact phone number")
@@ -32,7 +33,7 @@ class LawFirm(models.Model):
     @property
     def full_domain(self):
         """Return the full subdomain URL"""
-        return f"{self.subdomain}.roblox.nextkeylitigation.com"
+        return f"{self.subdomain}.nextkeylitigation.com"
 
     def get_leads_count(self):
         """Return count of leads for this law firm"""
@@ -347,18 +348,41 @@ class UserAnswer(models.Model):
         unique_together = ('user', 'question')
 
 class EmailTemplate(models.Model):
-    TEMPLATE_TYPES = [
-        ('rejected', 'Rejected (>20 years)'),
-        ('eligible_no_parent', 'Eligible (18-20, no parent signature)'),
-        ('eligible_with_parent', 'Eligible (<=17, parent signature required)')
-    ]
-
-    name = models.CharField(max_length=50, choices=TEMPLATE_TYPES, unique=True)
+    """Dynamic email template model for various email types"""
+    
+    # Template type for categorization (flexible, no fixed choices)
+    template_type = models.CharField(
+        max_length=50,
+        help_text="Template type (e.g., rejection, followup, notification, etc.)"
+    )
+    
+    # Template name (unique identifier)
+    name = models.CharField(
+        max_length=100, 
+        unique=True,
+        help_text="Unique template name (e.g., 'landing_page_parents_followup', 'intake_rejection')"
+    )
+    
+    # Email content
     subject = models.CharField(max_length=255)
-    body = models.TextField()
+    body = models.TextField(
+        help_text="Supported placeholders: [NAME], [EMAIL], [PHONE], [STATE], [USER FIRST NAME], etc."
+    )
+    
+    # Template status
+    is_active = models.BooleanField(default=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Email Template"
+        verbose_name_plural = "Email Templates"
+        ordering = ['template_type', 'name']
 
     def __str__(self):
-        return self.get_name_display()
+        return f"{self.name} ({self.template_type})"
 
 
 class EmailLog(models.Model):
@@ -506,6 +530,162 @@ class DocumentWebhookEvent(models.Model):
 
     def __str__(self):
         return f"{self.event_type} - {self.document_submission}"
+
+
+class LandingPageLead(models.Model):
+    """
+    Model to store leads from landing page forms (ParentsPage and KidsPage)
+    """
+    LEAD_SOURCE_CHOICES = [
+        ('parents', 'Parents Page'),
+        ('kids', 'Kids Page'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('new', 'New Lead'),
+        ('contacted', 'Contacted'),
+        ('qualified', 'Qualified'),
+        ('converted', 'Converted to Intake'),
+        ('declined', 'Declined'),
+        ('inactive', 'Inactive'),
+    ]
+    
+    # Basic Information
+    name = models.CharField(max_length=200, help_text="Full name of the person submitting the form")
+    email = models.EmailField(help_text="Contact email address")
+    phone = models.CharField(max_length=20, blank=True, help_text="Phone number (only for Parents Page)")
+    state_location = models.CharField(max_length=100, blank=True, help_text="State/Location (only for Parents Page)")
+    description = models.TextField(blank=True, help_text="Description of concern or issue (optional)")
+    
+    # Lead Tracking
+    lead_source = models.CharField(
+        max_length=10, 
+        choices=LEAD_SOURCE_CHOICES, 
+        help_text="Which landing page the lead came from"
+    )
+    status = models.CharField(
+        max_length=15, 
+        choices=STATUS_CHOICES, 
+        default='new',
+        help_text="Current status of this lead"
+    )
+    
+    # Law Firm Association (based on subdomain where form was submitted)
+    law_firm = models.ForeignKey(
+        LawFirm, 
+        on_delete=models.CASCADE, 
+        related_name='landing_page_leads',
+        null=True,
+        blank=True,
+        help_text="Law firm this lead belongs to (auto-assigned based on subdomain)"
+    )
+    
+    # Technical Information
+    client_ip = models.GenericIPAddressField(null=True, blank=True, help_text="IP address of the submitter")
+    user_agent = models.TextField(blank=True, help_text="Browser user agent string")
+    referrer = models.URLField(max_length=500, blank=True, help_text="Referring page URL")
+    
+    # Follow-up Information
+    contacted_at = models.DateTimeField(null=True, blank=True, help_text="When the lead was first contacted")
+    notes = models.TextField(blank=True, help_text="Internal notes about this lead")
+    assigned_to = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='assigned_leads',
+        help_text="Staff member assigned to follow up with this lead"
+    )
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Landing Page Lead"
+        verbose_name_plural = "Landing Page Leads"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['law_firm', 'status']),
+            models.Index(fields=['lead_source', 'created_at']),
+            models.Index(fields=['email']),
+        ]
+
+    def __str__(self):
+        law_firm_name = self.law_firm.name if self.law_firm else "Unassigned"
+        return f"{self.name} ({self.get_lead_source_display()}) - {law_firm_name}"
+    
+    @property
+    def is_parents_page_lead(self):
+        """Check if this lead came from the Parents Page (has phone and state)"""
+        return self.lead_source == 'parents'
+    
+    @property
+    def is_kids_page_lead(self):
+        """Check if this lead came from the Kids Page"""
+        return self.lead_source == 'kids'
+    
+    def mark_contacted(self, user=None):
+        """Mark this lead as contacted"""
+        self.status = 'contacted'
+        self.contacted_at = timezone.now()
+        if user:
+            self.assigned_to = user
+        self.save()
+    
+    def convert_to_intake(self):
+        """Convert this lead to a UserDetail for the intake process"""
+        # Split name into first and last name
+        name_parts = self.name.strip().split(' ', 1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
+        
+        # Create UserDetail from this lead
+        user_detail = UserDetail.objects.create(
+            law_firm=self.law_firm,
+            first_name=first_name,
+            last_name=last_name,
+            email=self.email,
+            cell_phone=self.phone or '',  # Kids page might not have phone
+            zipcode='',  # Will be filled in intake form
+            working_with_attorney='no',  # Default value
+            additional_notes=f"Converted from landing page lead. Original description: {self.description}"
+        )
+        
+        # Update lead status
+        self.status = 'converted'
+        self.save()
+        
+        return user_detail
+
+
+class LandingPageLeadEmail(models.Model):
+    """
+    Track email notifications sent for landing page leads
+    """
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('sent', 'Sent'),
+        ('failed', 'Failed'),
+    ]
+    
+    lead = models.ForeignKey(LandingPageLead, on_delete=models.CASCADE, related_name='email_notifications')
+    email_type = models.CharField(max_length=50, help_text="Type of email (e.g., 'new_lead_notification', 'auto_reply')")
+    recipient_email = models.EmailField(help_text="Email address where notification was sent")
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    error_message = models.TextField(blank=True, null=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Landing Page Lead Email"
+        verbose_name_plural = "Landing Page Lead Emails"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.email_type} to {self.recipient_email} for {self.lead.name}"
 
 
     

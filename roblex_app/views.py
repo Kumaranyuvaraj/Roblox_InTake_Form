@@ -14,9 +14,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
-from roblex_app.models import IntakeForm, EmailTemplate, UserDetail, Question, Option, UserAnswer, EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
+from roblex_app.models import IntakeForm, EmailTemplate, UserDetail, Question, Option, UserAnswer, EmailLog, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent, LandingPageLead, LawFirm
 from roblex_app.ps_api import get_playstation_profile
-from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer, QuestionSerializer, UserAnswerSerializer, EmailLogSerializer
+from roblex_app.serializers import EmailTemplateSerializer, IntakeFormSerializer, UserDetailSerializer, QuestionSerializer, UserAnswerSerializer, EmailLogSerializer, LandingPageLeadSerializer, LandingPageLeadListSerializer
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
 from django.core.files.base import ContentFile
@@ -506,16 +506,18 @@ class SendEmailAPIView(APIView):
 class EmailTemplateAPIView(APIView):
     def get(self, request, template_type):
         try:
-            # Directly use template_type from the URL
-            template = EmailTemplate.objects.filter(name=template_type).first()
+            # Use dynamic template name lookup with is_active filter
+            template = EmailTemplate.objects.filter(name=template_type, is_active=True).first()
 
             if not template:
                 return Response(
-                    {"error": f"Template '{template_type}' not found."},
+                    {"error": f"Template '{template_type}' not found or is inactive."},
                     status=status.HTTP_404_NOT_FOUND
                 )
 
             return Response({
+                "name": template.name,
+                "template_type": template.template_type,
                 "subject": template.subject,
                 "body": template.body
             })
@@ -738,9 +740,9 @@ class CreateDocumentSubmissionAPIView(APIView):
             # Get email template for custom message
             email_template = None
             try:
-                email_template = EmailTemplate.objects.get(name=email_template_type)
+                email_template = EmailTemplate.objects.get(name=email_template_type, is_active=True)
             except EmailTemplate.DoesNotExist:
-                print(f"Warning: Email template '{email_template_type}' not found, will use default NextKeySign message")
+                print(f"Warning: Email template '{email_template_type}' not found or inactive, will use default NextKeySign message")
             
             # Prepare NextKeySign API request
             nextkeysign_url = f"{settings.NEXTKEYSIGN_BASE_URL}/api/submissions"
@@ -1147,3 +1149,425 @@ def privacy_policy_view(request):
 
 def terms_of_service_view(request):
     return render(request, 'terms.html')
+
+
+class LandingPageLeadCreateAPIView(APIView):
+    """
+    API endpoint for creating landing page leads from React app
+    Supports both ParentsPage and KidsPage form submissions
+    """
+    
+    def post(self, request):
+        try:
+            # Extract and validate data from request
+            serializer = LandingPageLeadSerializer(data=request.data)
+            
+            if not serializer.is_valid():
+                return Response({
+                    'error': 'Validation failed',
+                    'details': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Get law firm based on original domain from request data
+            original_domain = request.data.get('original_domain')
+            law_firm = self.get_law_firm_from_domain(original_domain or request.get_host())
+            
+            # Create the lead
+            lead = serializer.save(
+                law_firm=law_firm,
+                client_ip=self.get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                referrer=request.META.get('HTTP_REFERER', '')
+            )
+            
+            # Send email notifications (background processing)
+            self.send_lead_notifications(lead, request)
+            
+            # Return success response
+            response_serializer = LandingPageLeadSerializer(lead)
+            return Response({
+                'success': True,
+                'message': 'Your information has been submitted successfully. We will contact you soon.',
+                'lead': response_serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({
+                'error': 'An error occurred while processing your submission',
+                'details': str(e) if settings.DEBUG else 'Please try again later'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def get_law_firm_from_domain(self, domain):
+        """
+        Extract law firm from request subdomain or default
+        """
+        try:
+            # Get subdomain from host header
+            host = domain
+            subdomain = host.split('.')[0] if '.' in host else 'default'
+            
+            # Handle localhost and dev environments
+            if 'localhost' in host or '127.0.0.1' in host:
+                subdomain = 'default'
+            
+            law_firm = LawFirm.objects.filter(subdomain=subdomain, is_active=True).first()
+            
+            # Fallback to default law firm if subdomain not found
+            if not law_firm:
+                law_firm = LawFirm.objects.filter(subdomain='default', is_active=True).first()
+            
+            return law_firm
+            
+        except Exception as e:
+            print(f"Error getting law firm from request: {e}")
+            # Return default law firm as fallback
+            return LawFirm.objects.filter(subdomain='default', is_active=True).first()
+    
+    def get_client_ip(self, request):
+        """Extract client IP address from request"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            return x_forwarded_for.split(',')[0].strip()
+        return request.META.get('REMOTE_ADDR')
+    
+    def send_lead_notifications(self, lead, request):
+        """
+        Send email notifications for new lead using background tasks
+        """
+        try:
+            from roblex_app.tasks import send_landing_page_lead_email, send_law_firm_notification_email
+            
+            # Queue follow-up email to lead (using EmailTemplate)
+            send_landing_page_lead_email.delay(lead.id)
+            
+            # Queue notification to law firm (background processing)
+            send_law_firm_notification_email.delay(lead.id)
+            
+        except Exception as e:
+            print(f"Error sending lead notifications: {e}")
+            # Don't fail the main request if email fails
+    
+    def send_law_firm_notification(self, lead):
+        """
+        Send new lead notification to law firm (FALLBACK METHOD - use background task instead)
+        This method is kept as a fallback in case background tasks are not available
+        """
+        try:
+            if not lead.law_firm or not lead.law_firm.contact_email:
+                return
+            
+            subject = f"New Landing Page Lead: {lead.name}"
+            
+            body = f"""
+New landing page lead submitted:
+
+Name: {lead.name}
+Email: {lead.email}
+Phone: {lead.phone or 'Not provided'}
+State/Location: {lead.state_location or 'Not provided'}
+Lead Source: {lead.get_lead_source_display()}
+Description: {lead.description}
+
+Submitted: {lead.created_at.strftime('%Y-%m-%d %H:%M:%S')}
+IP Address: {lead.client_ip or 'Unknown'}
+
+Please check your admin panel to view and manage this lead.
+"""
+            
+            # Use existing email infrastructure
+            email_log = EmailLog.objects.create(
+                from_email=lead.law_firm.contact_email,
+                to_email=lead.law_firm.contact_email,
+                subject=subject,
+                body=body,
+                status='pending'
+            )
+            
+            # Try to send email using SMTP
+            try:
+                msg = MIMEMultipart()
+                msg['From'] = lead.law_firm.contact_email
+                msg['To'] = lead.law_firm.contact_email
+                msg['Subject'] = subject
+                msg.attach(MIMEText(body, 'plain'))
+                
+                # Use default SMTP for now (can be enhanced with Brevo later)
+                server = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
+                server.starttls()
+                server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+                server.send_message(msg)
+                server.quit()
+                
+                email_log.status = 'sent'
+                email_log.save()
+                
+            except Exception as e:
+                email_log.status = 'failed'
+                email_log.error_message = str(e)
+                email_log.save()
+                
+        except Exception as e:
+            print(f"Error sending law firm notification: {e}")
+    
+    def send_auto_reply_to_lead(self, lead):
+        """
+        Send auto-reply confirmation to the lead
+        """
+        try:
+            subject = "Thank you for contacting us"
+            
+            body = f"""
+Dear {lead.name},
+
+Thank you for reaching out to us regarding your concerns. We have received your submission and will review it promptly.
+
+Your submission details:
+- Submitted: {lead.created_at.strftime('%B %d, %Y at %I:%M %p')}
+- Reference: Lead #{lead.id}
+
+Our team will contact you within 1-2 business days to discuss your case further.
+
+If you have any urgent questions, please contact us at {lead.law_firm.contact_email if lead.law_firm else 'info@example.com'}.
+
+Best regards,
+{lead.law_firm.name if lead.law_firm else 'Legal Team'}
+"""
+            
+            # Create email log
+            email_log = EmailLog.objects.create(
+                from_email=lead.law_firm.contact_email if lead.law_firm else settings.DEFAULT_FROM_EMAIL,
+                to_email=lead.email,
+                subject=subject,
+                body=body,
+                status='pending'
+            )
+            
+            # Try to send email
+            try:
+                msg = MIMEMultipart()
+                msg['From'] = lead.law_firm.contact_email if lead.law_firm else settings.DEFAULT_FROM_EMAIL
+                msg['To'] = lead.email
+                msg['Subject'] = subject
+                msg.attach(MIMEText(body, 'plain'))
+                
+                server = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
+                server.starttls()
+                server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+                server.send_message(msg)
+                server.quit()
+                
+                email_log.status = 'sent'
+                email_log.save()
+                
+            except Exception as e:
+                email_log.status = 'failed'
+                email_log.error_message = str(e)
+                email_log.save()
+                
+        except Exception as e:
+            print(f"Error sending auto-reply: {e}")
+
+
+class LandingPageLeadListAPIView(APIView):
+    """
+    API endpoint for listing landing page leads (admin/dashboard use)
+    """
+    
+    def get(self, request):
+        """
+        Get list of landing page leads with filtering options
+        """
+        try:
+            # Get query parameters
+            law_firm_id = request.query_params.get('law_firm_id')
+            lead_source = request.query_params.get('lead_source')
+            status_filter = request.query_params.get('status')
+            limit = int(request.query_params.get('limit', 50))
+            offset = int(request.query_params.get('offset', 0))
+            
+            # Build queryset
+            queryset = LandingPageLead.objects.all()
+            
+            # Apply filters
+            if law_firm_id:
+                queryset = queryset.filter(law_firm_id=law_firm_id)
+            
+            if lead_source:
+                queryset = queryset.filter(lead_source=lead_source)
+            
+            if status_filter:
+                queryset = queryset.filter(status=status_filter)
+            
+            # Order by most recent
+            queryset = queryset.order_by('-created_at')
+            
+            # Apply pagination
+            total_count = queryset.count()
+            leads = queryset[offset:offset + limit]
+            
+            # Serialize data
+            serializer = LandingPageLeadListSerializer(leads, many=True)
+            
+            return Response({
+                'success': True,
+                'leads': serializer.data,
+                'pagination': {
+                    'total': total_count,
+                    'limit': limit,
+                    'offset': offset,
+                    'has_more': offset + limit < total_count
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': 'Error fetching leads',
+                'details': str(e) if settings.DEBUG else 'Please try again later'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LandingPageLeadDetailAPIView(APIView):
+    """
+    API endpoint for getting, updating, or deleting a specific landing page lead
+    """
+    
+    def get(self, request, lead_id):
+        """
+        Get details of a specific lead
+        """
+        try:
+            lead = get_object_or_404(LandingPageLead, id=lead_id)
+            serializer = LandingPageLeadSerializer(lead)
+            return Response({
+                'success': True,
+                'lead': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': 'Lead not found',
+                'details': str(e) if settings.DEBUG else 'Please check the lead ID'
+            }, status=status.HTTP_404_NOT_FOUND)
+    
+    def patch(self, request, lead_id):
+        """
+        Update lead status, notes, or assignment
+        """
+        try:
+            lead = get_object_or_404(LandingPageLead, id=lead_id)
+            
+            # Only allow updating certain fields
+            allowed_fields = ['status', 'notes', 'assigned_to']
+            update_data = {k: v for k, v in request.data.items() if k in allowed_fields}
+            
+            # Update fields
+            for field, value in update_data.items():
+                setattr(lead, field, value)
+            
+            lead.save()
+            
+            serializer = LandingPageLeadSerializer(lead)
+            return Response({
+                'success': True,
+                'message': 'Lead updated successfully',
+                'lead': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': 'Error updating lead',
+                'details': str(e) if settings.DEBUG else 'Please try again later'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LandingPageLeadEmailAPIView(APIView):
+    """
+    API endpoint for sending emails to landing page leads
+    """
+    
+    def post(self, request, lead_id=None):
+        """
+        Send email to a specific lead or bulk emails to multiple leads
+        """
+        try:
+            if lead_id:
+                # Send email to specific lead
+                return self.send_single_email(request, lead_id)
+            else:
+                # Send bulk emails
+                return self.send_bulk_emails(request)
+                
+        except Exception as e:
+            return Response({
+                'error': 'Error sending email(s)',
+                'details': str(e) if settings.DEBUG else 'Please try again later'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def send_single_email(self, request, lead_id):
+        """Send email to a single lead"""
+        try:
+            from roblex_app.tasks import send_landing_page_lead_email
+            
+            lead = get_object_or_404(LandingPageLead, id=lead_id)
+            
+            # Queue the email task
+            send_landing_page_lead_email.delay(lead.id)
+            
+            return Response({
+                'success': True,
+                'message': f'Email queued for {lead.name}',
+                'lead_id': lead.id
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': 'Error queuing email',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def send_bulk_emails(self, request):
+        """Send emails to multiple leads"""
+        try:
+            from roblex_app.tasks import send_landing_page_lead_email
+            
+            # Get lead IDs from request
+            lead_ids = request.data.get('lead_ids', [])
+            template_name = request.data.get('template_name', None)
+            
+            if not lead_ids:
+                return Response({
+                    'error': 'No lead IDs provided'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Validate lead IDs exist
+            valid_leads = LandingPageLead.objects.filter(id__in=lead_ids)
+            valid_lead_ids = list(valid_leads.values_list('id', flat=True))
+            
+            if not valid_lead_ids:
+                return Response({
+                    'error': 'No valid leads found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Queue emails for valid leads
+            queued_count = 0
+            for lead_id in valid_lead_ids:
+                try:
+                    send_landing_page_lead_email.delay(lead_id)
+                    queued_count += 1
+                except Exception as e:
+                    print(f"Failed to queue email for lead {lead_id}: {e}")
+            
+            return Response({
+                'success': True,
+                'message': f'Queued emails for {queued_count} leads',
+                'queued_leads': queued_count,
+                'total_requested': len(lead_ids)
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': 'Error queuing bulk emails',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

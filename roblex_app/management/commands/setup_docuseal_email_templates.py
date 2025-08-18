@@ -9,6 +9,7 @@ class Command(BaseCommand):
         templates = [
             {
                 'name': 'eligible_no_parent',
+                'template_type': 'notification',
                 'subject': 'Good News! Your Roblox Case is Eligible - Complete Your Documents',
                 'body': '''Good news! Based on your responses, your case is eligible for the Roblox minor gamer claim.
 
@@ -29,6 +30,7 @@ class Command(BaseCommand):
 
             {
                 'name': 'eligible_with_parent',
+                'template_type': 'notification',
                 'subject': 'Your Roblox Case is Eligible - Parental Signature Required',
                 'body': '''Good news! Based on your responses, your case is eligible for the Roblox minor gamer claim.
 
@@ -47,6 +49,7 @@ class Command(BaseCommand):
             },
             {
                 'name': 'florida_disclosure',
+                'template_type': 'disclosure',
                 'subject': 'Florida Disclosure Required - Important Legal Notice',
                 'body': '''Dear [User First Name],
 
@@ -71,6 +74,7 @@ class Command(BaseCommand):
 
             {
                 'name': 'rejected',
+                'template_type': 'rejection',
                 'subject': 'Update on Your Roblox Case Inquiry',
                 'body': '''Thank you for reaching out to us regarding your Roblox case inquiry.
 
@@ -89,8 +93,10 @@ class Command(BaseCommand):
             template, created = EmailTemplate.objects.update_or_create(
                 name=template_data['name'],
                 defaults={
+                    'template_type': template_data['template_type'],
                     'subject': template_data['subject'],
-                    'body': template_data['body']
+                    'body': template_data['body'],
+                    'is_active': True
                 }
             )
             

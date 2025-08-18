@@ -24,12 +24,24 @@ services:
       - ssl_certs:/etc/nginx/ssl
     depends_on:
       - web
+      - fb-landing-page
     environment:
       - NGINX_SERVER_NAME=${NGINX_SERVER_NAME}
+      - FB_LANDING_DOMAIN=${FB_LANDING_DOMAIN}
     command: >
       sh -c "apk add --no-cache openssl &&
              sh /generate-ssl.sh &&
              nginx -g 'daemon off;'"
+
+  # React FB Landing Page
+  fb-landing-page:
+    build:
+      context: ./fb-landing-page
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
 
   db:
     image: postgres:13
