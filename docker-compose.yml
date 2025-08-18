@@ -42,8 +42,6 @@ services:
       - "80"
     environment:
       - REACT_APP_API_URL=${REACT_APP_API_URL}
-    volumes:
-      - fb_landing_static:/usr/share/nginx/html
 
   db:
     image: postgres:13
@@ -92,4 +90,3 @@ volumes:
   redis_data:
   static_volume:
   ssl_certs:
-  fb_landing_static:
