@@ -128,6 +128,41 @@
     100% { transform: rotate(360deg); }
     }
 
+
+    .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+    .btn-blue {
+        background-color: #1e3a8a;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-red {
+        background-color: #dc2626;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-blue:hover {
+        background-color: #3b82f6;
+    }
+
+    .btn-red:hover {
+        background-color: #ef4444;
+    }
+
+
     </style>
 </head>
    
@@ -502,13 +537,18 @@
 
     
 <div id="customModal" class="modal">
-  <div class="modal-content">
-    <img id="modalIcon" class="icon" src="" alt="icon" />
-    <p id="modalMessage"></p>
-    <!-- <span class="close-btn" onclick="closeCustomModal()">&times;</span> -->
-    <button class="btn-blue" onclick="closeCustomModal()">OK</button>
-  </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <img id="modalIcon" class="icon" src="" alt="icon" />
+            <p id="modalMessage"></p>
+            <div class="modal-buttons">
+            <button class="btn-blue" onclick="closeCustomModal()">YES</button>
+            <button class="btn-red" onclick="redirectToGratitude()">NO</button>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 
 <!-- Consent Modal -->
@@ -880,39 +920,18 @@
                 );
 
                // ✅ Check both conditions first
-                if (age > 20 && working_with_attorney === "yes") {
-                    showModal(
-                        "Age of gamer is more than 20 and you are currently working with an attorney for a gaming sex abuse claim, so you're not eligible.",
-                        "error"
-                    );
-                    setTimeout(() => {
-                        window.location.href = "/";
-                    }, 15000);
-                    return; // Stop further processing
-                }
+                // if (age > 20 && working_with_attorney === "yes") {
+                //     showModal(
+                //         "Age of gamer is more than 20 and you are currently working with an attorney for a gaming sex abuse claim, so you're not eligible.",
+                //         "error"
+                //     );
+                //     setTimeout(() => {
+                //         window.location.href = "/";
+                //     }, 15000);
+                //     return; // Stop further processing
+                // }
 
-                // ✅ Then check individual conditions
-                if (age > 20) {
-                    showModal(
-                        "Age of gamer is more than 20, so you're not eligible.",
-                        "error"
-                    );
-                    setTimeout(() => {
-                        window.location.href = "/";
-                    }, 15000);
-                    return;
-                }
-
-                if (working_with_attorney === "yes") {
-                    showModal(
-                        "You are currently working with an attorney for a gaming sex abuse claim, so you're not eligible.",
-                        "error"
-                    );
-                    setTimeout(() => {
-                        window.location.href = "/";
-                    }, 15000);
-                    return;
-                }
+      
 
                 let matchedOption = null;
                 if (ageQuestion) {
@@ -947,47 +966,69 @@
                 }
 
                 // ✅ Step 5: Handle based on eligibility
-                if (!matchedOption.is_eligible) {
-                    // Send rejection email template
-                    $.ajax({
-                        url: `/api/email-template/${templateType}/`,
-                        type: "GET",
-                        success: function (template) {
-                            // Replace placeholder with user name
-                            const subject = template.subject;
-                            const body = template.body.replace("[User First Name]", first_name);
+                if (!matchedOption.is_eligible || working_with_attorney === "yes") {
+             
+                $.ajax({
+                    url: `/api/email-template/${templateType}/`,
+                    type: "GET",
+                    success: function (template) {
+                        // Replace placeholder with user name
+                        const subject = template.subject;
+                        const body = template.body.replace("[User First Name]", first_name);
 
-                            // Send rejection email
-                            const emailFormData = new FormData();
-                            emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
-                            emailFormData.append("to_email", email);
-                            emailFormData.append("subject", subject);
-                            emailFormData.append("body", body);
+                        // Send rejection email
+                        const emailFormData = new FormData();
+                        emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
+                        emailFormData.append("to_email", email);
+                        emailFormData.append("subject", subject);
+                        emailFormData.append("body", body);
 
-                            $.ajax({
-                                url: "/send-email/",
-                                type: "POST",
-                                data: emailFormData,
-                                processData: false,
-                                contentType: false,
-                                success: function () {
-                                    showModal("Age of gamer is more than 20, so you're not eligible.", "error");
-                                    // Redirect to thank you page after short delay
-                                    setTimeout(() => {
-                                       window.location.href = "/";
-                                    }, 15000);
-                                                },
-                                error: function (xhr) {
-                                    const err = xhr.responseJSON?.error || "Error sending email.";
-                                    showModal("Error: " + err, "error");
+                        $.ajax({
+                            url: "/send-email/",
+                            type: "POST",
+                            data: emailFormData,
+                            processData: false,
+                            contentType: false,
+                            success: function () {
+                                // ✅ Show correct rejection message
+                                if (age > 20 && working_with_attorney === "yes") {
+                                    showModal(
+                                        "You are not eligible to file a new claim because you are already represented by an attorney and the age provided is over 20. Would you like to reapply with updated information?",
+                                        "error"
+                                    );
+                                } else if (age > 20) {
+                                    showModal(
+                                        "You are not eligible to file a new claim because the age provided is over 20. Would you like to reapply with updated information?",
+                                        "error"
+                                    );
+                                } else if (working_with_attorney === "yes") {
+                                    showModal(
+                                        "It looks like you are already represented by an attorney for this matter, so we cannot proceed with a new case. Would you like to reapply with updated information?",
+                                        "error"
+                                    );
+                                } else {
+                                    showModal(
+                                        "You're not eligible based on the provided details.",
+                                        "error"
+                                    );
                                 }
-                            });
-                        },
-                        error: function () {
-                            showModal("Could not process request. Please try again.", "error");
-                        }
-                    });
-                } else {
+
+                                // Redirect after showing modal
+                                setTimeout(() => {
+                                    window.location.href = "/";
+                                }, 15000);
+                            },
+                            error: function (xhr) {
+                                const err = xhr.responseJSON?.error || "Error sending email.";
+                                showModal("Error: " + err, "error");
+                            }
+                        });
+                    },
+                    error: function () {
+                        showModal("Could not process request. Please try again.", "error");
+                    }
+                });
+            } else {
                     // Eligible - proceed to document signing workflow
                     // Proceed with answers submission and document creation
                     submitAnswers(userId, function (redirectUrl) {
@@ -1023,6 +1064,10 @@
     function closeCustomModal() {
     $("#customModal").fadeOut();
     }
+
+    function redirectToGratitude() {
+    window.location.href = "/gratitude/";
+}
 
 
     // $("#userForm")[0].reset();
@@ -1352,6 +1397,7 @@
             `;
 
             $("#customModal").fadeIn();
+            // $("#customModal").style.display = 'flex';
         }
 
         // Main eligibility check and redirection logic

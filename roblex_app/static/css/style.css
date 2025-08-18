@@ -127,6 +127,7 @@ div img {
     font-family: 'Poppins', sans-serif;
 }
 
+
 .separator {
     width: 220px;
     height: 1px;
@@ -900,6 +901,8 @@ button {
 
 
 
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav-links {
@@ -1008,18 +1011,69 @@ button {
         font-size: 2rem;
     }
 
+   .hero {
+        padding: 0 0.5rem;
+    }
     .sub-heading {
-        font-size: 1rem;
+        font-size: 0.8rem;
+    }
+    .steps p {
+        font-size: 12px;
+        padding-bottom: 5px;
     }
 }
 
 @media (max-width: 376px) {
     .hero h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
 
     .separator {
         margin: 0.5rem auto;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1024px) and (max-height: 600px) {
+  .hero h1 {
+    max-width: 1000px;
+    font-size: 2.4rem;
+    padding-top: 1rem;
+    }
+    .sub-heading {
+        max-width: 960px;
+        font-size: 1rem;
+    }
+    .separator {
+        margin: 1rem auto;
+    }
+    .logo img{
+        width: 200px;
+    }
+    .step-wrapper {
+        margin-top: 1rem;
+    }
+}
+
+
+/* Small Laptop (1366×768) */
+@media (min-width: 1025px) and (max-width: 1366px) and (max-height: 800px) {
+  .hero h1 {
+    max-width: 1000px;
+    font-size: 2.5rem;
+    padding-top: 1rem;
+    }
+    .sub-heading {
+        max-width: 960px;
+        font-size: 1rem;
+    }
+    .separator {
+        margin: 1rem auto;
+    }
+    .logo img{
+        width: 200px;
+    }
+    .step-wrapper {
+        margin-top: 1rem;
     }
 }
 
