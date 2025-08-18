@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from roblex_app.models import EmailLog, EmailTemplate, IntakeForm,UserDetail,Question, Option, UserAnswer, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent
+from roblex_app.models import EmailLog, EmailTemplate, IntakeForm, UserDetail, Question, Option, UserAnswer, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent, LandingPageLead
 
 class IntakeFormSerializer(serializers.ModelSerializer):
     # Required text fields
@@ -106,7 +106,7 @@ class EmailLogSerializer(serializers.ModelSerializer):
 class EmailTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailTemplate
-        fields = ['name', 'subject', 'body']
+        fields = ['name', 'template_type', 'subject', 'body', 'is_active']
 
 
 # class EligibilityResultSerializer(serializers.Serializer):
@@ -138,3 +138,40 @@ class DocumentWebhookEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentWebhookEvent
         fields = ['id', 'event_type', 'document_submission', 'webhook_data', 'processed', 'created_at']
+
+
+# Landing Page Lead Serializers
+class LandingPageLeadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LandingPageLead
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at', 'email_sent', 'email_sent_at']
+    
+    def validate_email(self, value):
+        """Validate email format"""
+        if not value:
+            raise serializers.ValidationError("Email is required.")
+        return value.lower().strip()
+    
+    def validate_name(self, value):
+        """Validate name field"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Name is required.")
+        return value.strip()
+    
+    def validate_phone(self, value):
+        """Validate phone format for parents page"""
+        if value:  # Phone is optional for kids page
+            # Remove formatting and check if it's 10 digits
+            digits_only = ''.join(filter(str.isdigit, value))
+            if len(digits_only) != 10:
+                raise serializers.ValidationError("Phone number must be 10 digits.")
+        return value
+
+
+class LandingPageLeadListSerializer(serializers.ModelSerializer):
+    """Serializer for listing landing page leads in admin"""
+    class Meta:
+        model = LandingPageLead
+        fields = ['id', 'name', 'email', 'phone', 'state_location', 'lead_source', 
+                 'created_at', 'email_sent', 'email_sent_at']

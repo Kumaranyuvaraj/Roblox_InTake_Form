@@ -2,7 +2,7 @@ from django.contrib import admin
 from roblex_app.models import (
     IntakeForm, Question, Option, EmailLog, UserDetail, UserAnswer, 
     EmailTemplate, DocumentTemplate, DocumentSubmission, DocumentWebhookEvent,
-    LawFirm, LawFirmUser
+    LawFirm, LawFirmUser, LandingPageLead, LandingPageLeadEmail
 )
 
 from django.utils.html import format_html
@@ -758,8 +758,47 @@ class EmailTemplateAdmin(SuperuserOnlyModelAdmin):
         truncated = obj.body[:100] + "..." if len(obj.body) > 100 else obj.body
         return format_html('<div title="{}">{}</div>', obj.body, truncated)
     preview_body.short_description = "Body Preview"
+    
+    def template_type_badge(self, obj):
+        colors = {
+            'followup': '#28a745',
+            'notification': '#17a2b8', 
+            'rejection': '#dc3545',
+            'confirmation': '#6f42c1',
+            'reminder': '#ffc107'
+        }
+        color = colors.get(obj.template_type, '#6c757d')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">{}</span>',
+            color, obj.template_type.title()
+        )
+    template_type_badge.short_description = "Type"
+    
+    def status_badge(self, obj):
+        if obj.is_active:
+            return format_html('<span style="color: #28a745;">✅ Active</span>')
+        return format_html('<span style="color: #dc3545;">❌ Inactive</span>')
+    status_badge.short_description = "Status"
 
-    list_display = ('name', 'subject', 'preview_body', 'usage_count')
+    list_display = ('name', 'template_type_badge', 'subject', 'preview_body', 'status_badge', 'usage_count', 'created_at')
+    list_display_links = ('name',)
+    list_filter = ('template_type', 'is_active', 'created_at')
+    search_fields = ('name', 'subject', 'template_type')
+    readonly_fields = ('created_at', 'updated_at')
+    list_per_page = 25
+    
+    fieldsets = (
+        ('Template Information', {
+            'fields': ('name', 'template_type', 'is_active')
+        }),
+        ('Email Content', {
+            'fields': ('subject', 'body')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
     list_display_links = ('name', 'subject')
     search_fields = ('name', 'subject', 'body')
     readonly_fields = ('usage_count',)
@@ -1163,3 +1202,297 @@ class DocumentWebhookEventAdmin(SuperuserOnlyModelAdmin):
             'fields': ('created_at',)
         })
     )
+
+
+# ====================
+# Landing Page Lead Administration
+# ====================
+
+@admin.register(LandingPageLead)
+class LandingPageLeadAdmin(LawFirmFilteredModelAdmin):
+    
+    def get_law_firm_field_name(self):
+        """LandingPageLead uses 'law_firm' field directly"""
+        return 'law_firm'
+    
+    def lead_source_badge(self, obj):
+        colors = {
+            'parents': '#28a745',  # green
+            'kids': '#17a2b8',     # blue
+        }
+        color = colors.get(obj.lead_source, '#6c757d')
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">{}</span>',
+            color, obj.get_lead_source_display().upper()
+        )
+    lead_source_badge.short_description = "Source"
+    
+    def status_colored(self, obj):
+        colors = {
+            'new': '#ffc107',        # warning yellow
+            'contacted': '#17a2b8',  # info blue
+            'qualified': '#28a745',  # success green
+            'converted': '#6f42c1',  # purple
+            'declined': '#dc3545',   # danger red
+            'inactive': '#6c757d'    # secondary gray
+        }
+        color = colors.get(obj.status, '#000000')
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_colored.short_description = "Status"
+    
+    def contact_info(self, obj):
+        contact_parts = [f'📧 <a href="mailto:{obj.email}">{obj.email}</a>']
+        if obj.phone:
+            contact_parts.append(f'📱 {obj.phone}')
+        if obj.state_location:
+            contact_parts.append(f'📍 {obj.state_location}')
+        return format_html('<br/>'.join(contact_parts))
+    contact_info.short_description = "Contact Info"
+    
+    def law_firm_badge(self, obj):
+        if obj.law_firm:
+            return format_html(
+                '<span style="background-color: #007bff; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">{}</span>',
+                obj.law_firm.name
+            )
+        return format_html('<span style="background-color: #dc3545; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px;">No Law Firm</span>')
+    law_firm_badge.short_description = "Law Firm"
+    
+    def description_preview(self, obj):
+        if obj.description:
+            truncated = obj.description[:50] + "..." if len(obj.description) > 50 else obj.description
+            return format_html('<div title="{}">{}</div>', obj.description, truncated)
+        return format_html('<span style="color: #6c757d; font-style: italic;">No description</span>')
+    description_preview.short_description = "Description"
+    
+    def email_status(self, obj):
+        # Check if any emails have been sent for this lead
+        emails = obj.email_notifications.all()
+        if emails.exists():
+            sent_emails = emails.filter(status='sent')
+            if sent_emails.exists():
+                latest_sent = sent_emails.first()
+                return format_html(
+                    '<span style="color: #28a745;">✅ Sent<br/><small>{}</small></span>',
+                    latest_sent.sent_at.strftime('%m/%d/%Y %H:%M') if latest_sent.sent_at else 'Recently'
+                )
+            else:
+                return format_html('<span style="color: #ffc107;">📤 Queued</span>')
+        return format_html('<span style="color: #dc3545;">❌ Not Sent</span>')
+    email_status.short_description = "Email Status"
+    
+    def contacted_info(self, obj):
+        if obj.contacted_at:
+            return format_html(
+                '<span style="color: #28a745;">✅ {}</span>',
+                obj.contacted_at.strftime('%m/%d/%Y')
+            )
+        return format_html('<span style="color: #6c757d;">Not contacted</span>')
+    contacted_info.short_description = "Contacted"
+    
+    def time_since_created(self, obj):
+        from django.utils import timezone
+        diff = timezone.now() - obj.created_at
+        
+        if diff.days > 0:
+            return f"{diff.days} days ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours} hours ago"
+        else:
+            minutes = diff.seconds // 60
+            return f"{minutes} minutes ago"
+    time_since_created.short_description = "Time Since"
+
+    list_display = [
+        'id',
+        'name',
+        'law_firm_badge',
+        'lead_source_badge',
+        'contact_info',
+        'description_preview',
+        'status_colored',
+        'email_status',
+        'contacted_info',
+        'time_since_created'
+    ]
+    
+    list_display_links = ['id', 'name']
+    list_filter = [
+        'lead_source',
+        'status',
+        'law_firm',
+        'created_at',
+        'contacted_at',
+        'state_location'
+    ]
+    search_fields = [
+        'name',
+        'email',
+        'phone',
+        'state_location',
+        'description',
+        'law_firm__name'
+    ]
+    date_hierarchy = 'created_at'
+    readonly_fields = ['created_at', 'updated_at', 'client_ip', 'user_agent', 'referrer', 'email_notifications']
+    list_per_page = 25
+    
+    fieldsets = (
+        ('Law Firm Assignment', {
+            'fields': ('law_firm',),
+            'description': 'This field is automatically set based on the subdomain when the lead is created.'
+        }),
+        ('Lead Information', {
+            'fields': ('name', 'email', 'phone', 'state_location', 'description', 'lead_source')
+        }),
+        ('Lead Management', {
+            'fields': ('status', 'assigned_to', 'contacted_at', 'notes')
+        }),
+        ('Email Status', {
+            'fields': ('email_notifications',),
+            'classes': ('collapse',)
+        }),
+        ('Technical Information', {
+            'fields': ('client_ip', 'user_agent', 'referrer'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    actions = [
+        'mark_as_contacted',
+        'mark_as_qualified', 
+        'mark_as_converted',
+        'send_follow_up_email',
+        'export_leads'
+    ]
+    
+    def mark_as_contacted(self, request, queryset):
+        from django.utils import timezone
+        updated = queryset.filter(status='new').update(
+            status='contacted',
+            contacted_at=timezone.now()
+        )
+        self.message_user(request, f'{updated} leads marked as contacted.')
+    mark_as_contacted.short_description = "Mark selected leads as contacted"
+    
+    def mark_as_qualified(self, request, queryset):
+        updated = queryset.update(status='qualified')
+        self.message_user(request, f'{updated} leads marked as qualified.')
+    mark_as_qualified.short_description = "Mark selected leads as qualified"
+    
+    def mark_as_converted(self, request, queryset):
+        updated = queryset.update(status='converted')
+        self.message_user(request, f'{updated} leads marked as converted to intake.')
+    mark_as_converted.short_description = "Mark selected leads as converted"
+    
+    def send_follow_up_email(self, request, queryset):
+        # This will be implemented with Celery task
+        from roblex_app.tasks import send_landing_page_lead_email
+        
+        count = 0
+        for lead in queryset:
+            # Check if email hasn't been sent yet
+            if not lead.email_notifications.filter(status='sent').exists():
+                send_landing_page_lead_email.delay(lead.id)
+                count += 1
+        
+        self.message_user(request, f'Queued follow-up emails for {count} leads.')
+    send_follow_up_email.short_description = "Send follow-up emails to selected leads"
+    
+    def export_leads(self, request, queryset):
+        # Export functionality would be implemented here
+        self.message_user(request, f"Export functionality for {queryset.count()} leads would be implemented here.")
+    export_leads.short_description = "Export selected leads"
+
+
+@admin.register(LandingPageLeadEmail)
+class LandingPageLeadEmailAdmin(SuperuserOnlyModelAdmin):
+    
+    def lead_info(self, obj):
+        return format_html(
+            '<strong>{}</strong><br/>📧 {}<br/>📱 {}',
+            obj.lead.name,
+            obj.lead.email,
+            obj.lead.phone or 'No phone'
+        )
+    lead_info.short_description = "Lead Information"
+    
+    def template_used(self, obj):
+        return format_html(
+            '<span style="background-color: #e9ecef; padding: 2px 6px; border-radius: 3px;">{}</span>',
+            obj.email_type or 'No template'
+        )
+    template_used.short_description = "Email Type"
+    
+    def status_colored(self, obj):
+        colors = {
+            'pending': '#ffc107',
+            'sent': '#28a745',
+            'failed': '#dc3545'
+        }
+        color = colors.get(obj.status, '#000000')
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, obj.get_status_display()
+        )
+    status_colored.short_description = "Status"
+
+    list_display = [
+        'id',
+        'lead_info',
+        'template_used',
+        'subject',
+        'status_colored',
+        'sent_at',
+        'created_at'
+    ]
+    
+    list_display_links = ['id']
+    list_filter = ['status', 'email_type', 'sent_at', 'created_at']
+    search_fields = [
+        'lead__name',
+        'lead__email',
+        'subject',
+        'email_type'
+    ]
+    date_hierarchy = 'created_at'
+    readonly_fields = ['created_at', 'sent_at']
+    list_per_page = 30
+    
+    fieldsets = (
+        ('Email Information', {
+            'fields': ('lead', 'email_type', 'subject', 'recipient_email')
+        }),
+        ('Content', {
+            'fields': ('body',)
+        }),
+        ('Status', {
+            'fields': ('status', 'error_message')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'sent_at')
+        })
+    )
+    
+    actions = ['retry_failed_emails']
+    
+    def retry_failed_emails(self, request, queryset):
+        from roblex_app.tasks import send_landing_page_lead_email
+        
+        failed_emails = queryset.filter(status='failed')
+        count = 0
+        for email_obj in failed_emails:
+            # Queue a new email for the lead instead of retrying specific email
+            send_landing_page_lead_email.delay(email_obj.lead.id)
+            count += 1
+        
+        self.message_user(request, f'Queued retry for {count} failed emails.')
+    retry_failed_emails.short_description = "Retry selected failed emails"

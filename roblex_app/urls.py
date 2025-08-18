@@ -2,7 +2,8 @@ from django.urls import path
 
 from roblex_app.views import IntakeFormAPIView, intake_form_view,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
 QuestionListAPIView, SubmitAnswerAPIView,landing_page,SendEmailAPIView,EmailTemplateAPIView,\
-CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView, CheckIntakeStatusAPIView
+CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView, CheckIntakeStatusAPIView, \
+LandingPageLeadCreateAPIView, LandingPageLeadListAPIView, LandingPageLeadDetailAPIView, LandingPageLeadEmailAPIView
 
 from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,about_us_view,consent_box_view,disclaimer_view,\
 participating_firms_view,privacy_policy_view,terms_of_service_view,validate_xbox_gamertag,validate_playstation_gamertag
@@ -47,6 +48,15 @@ urlpatterns = [
     path('participating-firms/', participating_firms_view, name='participating_firms'),
     path('privacy-policy/', privacy_policy_view, name='privacy_policy'),
     path('terms-of-service/', terms_of_service_view, name='terms_of_service'),
+
+    # Landing Page Lead API endpoints
+    path('api/landing-page-leads/', LandingPageLeadCreateAPIView.as_view(), name='landing-page-lead-create'),
+    path('api/landing-page-leads/list/', LandingPageLeadListAPIView.as_view(), name='landing-page-lead-list'),
+    path('api/landing-page-leads/<int:lead_id>/', LandingPageLeadDetailAPIView.as_view(), name='landing-page-lead-detail'),
+    
+    # Landing Page Lead Email API endpoints
+    path('api/landing-page-leads/<int:lead_id>/send-email/', LandingPageLeadEmailAPIView.as_view(), name='landing-page-lead-send-email'),
+    path('api/landing-page-leads/send-bulk-email/', LandingPageLeadEmailAPIView.as_view(), name='landing-page-lead-bulk-email'),
 
 
 ]

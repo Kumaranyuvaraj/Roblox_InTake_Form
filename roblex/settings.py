@@ -51,10 +51,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'roblex_app.apps.RoblexAppConfig',
     'retainer_app.apps.RetainerAppConfig',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -103,10 +105,35 @@ DATABASES = {
     }
 }
 
+# CORS Configuration for React App
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="http://localhost:3000,http://127.0.0.1:3000", cast=Csv())
 
+# Allow CORS for all origins in development (less secure but useful for testing)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
 
+# Allow specific headers that might be needed
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
-# CORS settings removed - not needed when serving form through Django
+# Allow specific methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 
 # Password validation
@@ -195,6 +222,10 @@ CELERY_TASK_ROUTES = {
     'retainer_app.tasks.*': {'queue': 'retainer_processing'},
     'retainer_app.tasks.create_nextkeysign_submission': {'queue': 'retainer_submissions'},
     'retainer_app.tasks.retry_failed_submission': {'queue': 'retainer_submissions'},
+    # Route roblex_app email tasks to submissions queue
+    'roblex_app.tasks.send_landing_page_lead_email': {'queue': 'retainer_submissions'},
+    'roblex_app.tasks.send_law_firm_notification_email': {'queue': 'retainer_submissions'},
+    'roblex_app.tasks.auto_follow_up_new_leads': {'queue': 'retainer_submissions'},
 }
 
 # File Upload Settings for Large Excel Files (200MB)
