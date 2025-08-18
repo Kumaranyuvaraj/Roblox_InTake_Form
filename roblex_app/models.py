@@ -13,7 +13,7 @@ class LawFirm(models.Model):
     subdomain = models.CharField(
         max_length=100, 
         unique=True, 
-        help_text="Subdomain identifier (e.g., 'hilliard' for hilliard.roblox.nextkeylitigation.com)"
+        help_text="Subdomain identifier (e.g., 'hilliard' for hilliard.nextkeylitigation.com)"
     )
     contact_email = models.EmailField(help_text="Primary contact email for the law firm")
     phone_number = models.CharField(max_length=20, blank=True, help_text="Contact phone number")
