@@ -1,0 +1,483 @@
+body {
+    margin: 0;
+    padding: 0;
+
+}
+
+input::-webkit-input-placeholder {
+    color: #cccccc;
+}
+
+input:-moz-placeholder {
+    color: #cccccc;
+}
+
+input::-moz-placeholder {
+    color: #cccccc;
+}
+
+input:-ms-input-placeholder {
+    color: #cccccc;
+}
+
+textarea::placeholder {
+    color: #ccc;
+    opacity: 1;
+}
+
+.font-popins {
+    font-family: 'Poppins', sans-serif;
+}
+
+.text-blue {
+    color: #7397FB;
+}
+
+.text-white {
+    color: #FFFFFF;
+}
+
+.text-black {
+    color: #000000;
+}
+.logo {
+    
+    margin-bottom: 20px;
+}
+.logo img {
+    width: 100px;
+    height: auto;
+}
+.banner-content {
+    padding-top: 0px;
+    position: relative;
+}
+
+.banner-head {
+    font-size: 3rem;
+    font-weight: 600;
+    line-height: 1.35;
+    padding-right: 60px;
+}
+
+.banner-head span {
+    background: #F8F09D;
+}
+
+.banner-text {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 2;
+    padding-right: 100px;
+}
+
+.banner-text span {
+    font-weight: 600;
+    color: #7397FB;
+}
+
+.banner-icons {
+    margin-top: 40px;
+}
+
+.banner-icons img {
+    margin-right: 80px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #7397FB;
+}
+
+.arrowRounded {
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+}
+
+.form-box {
+    width: 100%;
+    border-radius: 20px;
+    border: 2px solid #56FAFB;
+    box-shadow: 0px 0px 40px 0px #00000026;
+    padding: 20px;
+    background-color: #56fafb14;
+}
+
+.form-container {
+    font-family: 'poppins', sans-serif;
+}
+
+.form-label {
+    font-size: 16px;
+    margin-bottom: 0px;
+}
+
+/* Only red border on invalid fields */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: none;
+}
+
+.btn-guidance {
+    font-size: 1.4rem;
+    background: linear-gradient(270deg, #64FFDA, #02e0e0, #64FFDA);
+    border: 1px solid #64FFDA;
+    color: #000000;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 30px;
+    background-size: 400% 400%;
+    box-shadow: inset 0px 0px 0px 5px rgba(255, 255, 255, 1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-guidance:hover {
+    animation: gradientShift 3s linear infinite;
+}
+
+/* Gradient animation */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-family: 'poppins', sans-serif;
+    color: #7397FB;
+}
+
+.blue-box {
+    background: linear-gradient(0deg, #7397FB 0%, #A6BDFF 100%);
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'poppins', sans-serif;
+    height: 180px;
+}
+
+.blue-box img {
+
+    margin-bottom: 10px;
+}
+
+.list-text {
+    font-family: 'poppins', sans-serif;
+    list-style: none;
+    padding-left: 0;
+}
+
+.list-text li {
+    padding-left: 40px;
+    background: url('../img/blue-tick.svg') no-repeat left center;
+    background-size: 30px 30px;
+    margin-bottom: 20px;
+}
+
+.bg-light-blue {
+    background-color: #F0F8FF;
+}
+
+.step-header {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    color: #7397FB;
+    font-weight: 600;
+    width: min-content;
+}
+
+.stepNo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    color: #7397FB;
+    height: 40px;
+    width: 40px;
+    background: #ffffff;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 20px 0px #0000001A;
+
+}
+
+.bg-child-sefety {
+    background: url('../img/bg-child-safety.png') top center no-repeat;
+    background-size: cover;
+}
+
+.child-safety-content {
+    /* max-width: 800px; */
+    margin: 0 auto;
+    /* padding: 20px; */
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+.kids-section-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-family: 'poppins', sans-serif;
+    color: #000000;
+}
+
+.section-sefty {
+    font-family: 'Poppins', sans-serif;
+}
+
+.section-sefty .list-text,
+.what-you-can-do .list-text {
+    list-style: disc;
+    line-height: 2;
+}
+
+/* KIDS Page */
+.kids-hero {
+    height: 600px;
+    background: linear-gradient(45deg, rgba(10, 25, 47, 0.9), rgba(31, 64, 104, 0.3)) no-repeat,
+        url("../img/img-kids-banner.png") center/cover;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    padding: 0 2rem;
+}
+
+.kids-hero-title {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 1rem;
+    font-family: 'Poppins', sans-serif;
+    vertical-align: middle;
+    text-shadow: 0px 0px 24px rgba(255, 255, 255, 0.6);
+    text-align: left;
+}
+
+.kids-hero-subtitle {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 400;
+    text-align: left;
+}
+
+.kids-form {
+    position: relative;
+}
+
+.kids-form .form-box {
+    position: absolute;
+    background-color: #ffffff;
+}
+/*  */
+
+.footer {
+    background-color: #000;
+
+}
+
+.footer p {
+    color: #C5C5C5;
+    padding: 15px 0;
+}
+.modal{
+    font-family: 'Poppins', sans-serif;
+}
+
+.modal .btn-primary{
+    background-color: #0E233F;
+    padding: 7px 30px;
+}
+.mmodal .btn-primary:hover{
+    background-color: #144381;
+}
+.modal .modal-header{
+    padding-top: 40px;
+}
+/* MEDIA QURIES */
+@media screen and (max-width: 1400px) {
+    .banner-head {
+        /* font-size: 2rem;
+        font-weight: 600; */
+        padding-right: 0px;
+    }
+
+}
+
+@media screen and (max-width: 1200px) {
+    .banner-content {
+        padding-top: 30px;
+    }
+
+    .banner-head {
+        font-size: 2rem;
+        font-weight: 600;
+
+    }
+
+    .banner-text {
+
+        line-height: 1.5;
+        padding-right: 0;
+    }
+
+    .arrowRounded {
+        /* display: none; */
+        bottom: 110px;
+        right: 0px;
+    }
+
+    .arrowRounded img {
+        width: 140px;
+    }
+
+    .blue-box {
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .banner-content {
+        padding-top: 20px;
+    }
+
+    /* .banner-head {
+        font-size: 2rem;
+        font-weight: 600;
+       margin-right: 0;
+    } */
+
+    .banner-icons {
+        margin-top: 20px;
+        margin-bottom: 40px;
+    }
+
+    .banner-icons img {
+        margin: 0 auto;
+    }
+
+    .arrowRounded {
+        display: none;
+
+    }
+
+    .blue-box {
+        height: 245px;
+    }
+
+    /* KIDS Page */
+    .kids-hero {
+        /* height: auto; */
+        align-items: normal;
+    }
+
+    .kids-hero-title {
+        padding-top: 10%;
+    }
+
+    .kids-form .form-box {
+        position: unset;
+    }
+
+    .section-sefty {
+        padding-top: 290px;
+    }
+
+}
+
+
+@media screen and (max-width: 768px) {
+    .form-box {
+        padding: 15px;
+    }
+
+    .btn-guidance {
+        width: 100%;
+        font-size: 1.2rem;
+    }
+
+    .blue-box {
+        margin-bottom: 20px;
+        height: auto;
+    }
+
+    .section-sefty {
+        padding-top: 330px;
+    }
+
+
+}
+
+@media screen and (max-width: 576px) {
+    .kids-hero {
+        background-position: left 0px;
+    }
+    .blue-box {
+
+        height: auto;
+    }
+
+    .btn-guidance {
+        font-size: 1rem;
+    }
+
+    .btn-guidance img {
+        width: 22px;
+    }
+
+    .kids-hero-title {
+        font-size: 2.5rem;
+    }
+
+    .kids-hero-subtitle {
+        font-size: 1.5rem;
+
+    }
+
+    .kids-section-title {
+        font-size: 1.5rem;
+    }
+    .footer p {
+        font-size: 0.85rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .kids-hero {
+        padding: 0 0.5rem;
+    }
+
+    .blue-box {
+
+        height: auto;
+    }
+
+    .kids-hero-title {
+        font-size: 1.5rem;
+    }
+
+    .kids-hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .section-sefty {
+        padding-top: 80px;
+    }
+}
+
+@media screen and (max-width: 344px) {
+    .kids-hero-subtitle {
+        padding-bottom: 0 !important;
+    }
+
+    .btn-guidance {
+        font-size: 0.9rem;
+    }
+}
