@@ -33,7 +33,7 @@ class LawFirm(models.Model):
     @property
     def full_domain(self):
         """Return the full subdomain URL"""
-        return f"{self.subdomain}.roblox.nextkeylitigation.com"
+        return f"{self.subdomain}.nextkeylitigation.com"
 
     def get_leads_count(self):
         """Return count of leads for this law firm"""
