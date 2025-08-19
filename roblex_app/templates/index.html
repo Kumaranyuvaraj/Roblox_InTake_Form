@@ -475,9 +475,9 @@
                         </div>
 
                         <div class="input-group">
-                            <label>After the incident was the abuse or injury reported to any of the following:</label>
+                            <label>After the incident(s), was the abuse or injury reported to any of the following:</label>
                             <select id="question_14" class="question-dropdown"
-                                data-question-text="After the incident was the abuse or injury reported to any of the following:"></select>
+                                data-question-text="After the incident(s), was the abuse or injury reported  to any of the following:"></select>
 
                         </div>
 
@@ -756,28 +756,6 @@
         return false;
     }
 }
-    document.addEventListener("DOMContentLoaded", function() {
-    const dropdown14 = document.getElementById("question_14");
-
-    if (dropdown14) {
-        const options = ["-- Select --","School", "Therapist", "Medical Facility", "Police", "Roblox", "Other"];
-        
-        options.forEach((opt, index) => {
-            const option = document.createElement("option");
-            option.value = opt.toLowerCase().replace(/\s+/g, "_");
-
-            // Make the first one ("-- Select --") a placeholder
-            // if (index === 0) {
-            //     option.value = "";
-            //     option.disabled = true;
-            //     option.selected = true;
-            // }
-
-            option.textContent = opt;
-            dropdown14.appendChild(option);
-        });
-    }
-});
 
 
 
@@ -936,7 +914,9 @@
         const cell_phone = $("#cell_phone").val().trim();
         const email = $("#email").val().trim();
         const zipcode = $("#zipcode").val().trim();
-        const working_with_attorney = $("#working_with_attorney").val();
+        // const working_with_attorney = $("#working_with_attorney").val();
+        const question_10 = $("#question_10 option:selected").text();
+
         const gamer_dob = $("#gamer_dob").val();
         // const consent = $("#consent_checkbox").is(":checked");
 
@@ -1021,7 +1001,8 @@
                 cell_phone,
                 email,
                 zipcode,
-                working_with_attorney,
+                // working_with_attorney,
+                // question_10,
             
 
                 gamer_dob,
@@ -1114,7 +1095,8 @@
 
                 // ✅ Step 5: Handle based on eligibility
                 // if (!matchedOption.is_eligible || working_with_attorney === "yes") {
-                if (question_10 === "yes") {
+                console.log("result:",question_10);
+                if (question_10 === "Yes") {
              
                 $.ajax({
                     url: `/api/email-template/${templateType}/`,
@@ -1139,7 +1121,7 @@
                             contentType: false,
                             success: function () {
                                 // ✅ Show correct rejection message
-                                if (question_10 === "yes") {
+                                if (question_10 === "Yes") {
                                     showModal(
                                         "You are not eligible to file a new claim because you are already represented by an attorney and the age provided is over 20. Would you like to reapply with updated information?",
                                         "error"
@@ -1296,7 +1278,7 @@
                     if (matchingQuestion) {
                         $select.attr("data-question-id", matchingQuestion.id);
                         $select.append(`<option value="">-- Select --</option>`);
-
+                        console.log("matchingQuestion", matchingQuestion);
                         matchingQuestion.options.forEach(opt => {
                             $select.append(`<option value="${opt.id}">${opt.text}</option>`);
                         });
@@ -1425,7 +1407,7 @@
         if (!questionId) return;
 
         // If this is the Age question, we override with the DOB-matched option (when available).
-        if (ageQuestion && questionId === Number(ageQuestion.id)) {
+        if (questionId === Number(ageQuestion.id)) {
             if (matchedAgeOption && matchedAgeOption.id) {
                 const p = $.ajax({
                     url: "/api/answers/submit/",

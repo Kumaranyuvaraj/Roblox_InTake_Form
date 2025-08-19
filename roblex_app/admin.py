@@ -627,20 +627,20 @@ class UserDetailAdmin(LawFirmFilteredModelAdmin):
         )
     contact_info.short_description = "Contact"
 
-    def age_eligibility(self, obj):
-        if obj.gamer_dob:
-            from datetime import date
-            today = date.today()
-            age = today.year - obj.gamer_dob.year - ((today.month, today.day) < (obj.gamer_dob.month, obj.gamer_dob.day))
+    # def age_eligibility(self, obj):
+    #     if obj.gamer_dob:
+    #         from datetime import date
+    #         today = date.today()
+    #         age = today.year - obj.gamer_dob.year - ((today.month, today.day) < (obj.gamer_dob.month, obj.gamer_dob.day))
             
-            if age <= 17:
-                return format_html('<span style="background-color: #ffc107; color: black; padding: 2px 8px; border-radius: 3px;">{}y - Parent Sig Required</span>', age)
-            elif age <= 20:
-                return format_html('<span style="background-color: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">{}y - Eligible</span>', age)
-            else:
-                return format_html('<span style="background-color: #dc3545; color: white; padding: 2px 8px; border-radius: 3px;">{}y - Not Eligible</span>', age)
-        return "Age Unknown"
-    age_eligibility.short_description = "Age & Eligibility"
+    #         if age <= 17:
+    #             return format_html('<span style="background-color: #ffc107; color: black; padding: 2px 8px; border-radius: 3px;">{}y - Parent Sig Required</span>', age)
+    #         elif age <= 20:
+    #             return format_html('<span style="background-color: #28a745; color: white; padding: 2px 8px; border-radius: 3px;">{}y - Eligible</span>', age)
+    #         else:
+    #             return format_html('<span style="background-color: #dc3545; color: white; padding: 2px 8px; border-radius: 3px;">{}y - Not Eligible</span>', age)
+    #     return "Age Unknown"
+    # age_eligibility.short_description = "Age & Eligibility"
 
     def document_status_summary(self, obj):
         submissions = obj.document_submissions.all()
@@ -685,8 +685,6 @@ class UserDetailAdmin(LawFirmFilteredModelAdmin):
         'contact_info', 
         'zipcode',
         'florida_disclosure_required',
-        'age_eligibility',
-        'working_with_attorney', 
         'document_status_summary',
         'submitted_answers_count',
         'created_at'
@@ -696,7 +694,6 @@ class UserDetailAdmin(LawFirmFilteredModelAdmin):
     search_fields = ('first_name', 'last_name', 'email', 'zipcode', 'cell_phone', 'law_firm__name')
     list_filter = (
         'law_firm',
-        'working_with_attorney', 
         'created_at',
         'zipcode',
         'document_submissions__status',
@@ -713,13 +710,13 @@ class UserDetailAdmin(LawFirmFilteredModelAdmin):
             'description': 'This field is automatically set based on the subdomain when the user is created.'
         }),
         ('Personal Information', {
-            'fields': ('first_name', 'last_name', 'gamer_dob')
+            'fields': ('first_name', 'last_name')
         }),
         ('Contact Information', {
             'fields': ('email', 'cell_phone', 'zipcode')
         }),
         ('Legal Status', {
-            'fields': ('working_with_attorney', 'additional_notes')
+            'fields': ('additional_notes',)
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
