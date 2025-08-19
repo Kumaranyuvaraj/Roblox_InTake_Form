@@ -1579,36 +1579,96 @@ class RobloxIntakeFormAPIView(APIView):
     """
     
     def post(self, request):
-        try:
-            # Use the existing IntakeFormSerializer
-            serializer = IntakeFormSerializer(data=request.data)
-            
-            if serializer.is_valid():
-                # Get law firm based on domain
-                law_firm = self.get_law_firm_from_domain(request.get_host())
-                
-                # Save without user_detail (it's nullable)
-                intake_form = serializer.save(
-                    user_detail=None,  # No UserDetail association
-                    law_firm=law_firm,  # Set based on domain
-                    submitted_at=timezone.now()
-                )
-                
-                return Response({
-                    "message": "Roblox intake form submitted successfully.",
-                    "intake_id": intake_form.id,
-                    "data": IntakeFormSerializer(intake_form).data
-                }, status=status.HTTP_201_CREATED)
-            
-            return Response({
-                "error": "Validation failed",
-                "details": serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-            
-        except Exception as e:
-            return Response({
-                "error": f"Internal server error: {str(e)}"
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data = request.data.copy()
+
+        # --- Normalize client_ip ---
+        if data.get('client_ip'):
+            data['client_ip'] = str(data['client_ip']).split(',')[0].strip()
+
+        serializer = IntakeFormSerializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # === ROBLOX VALIDATION (required if entered) ===
+        raw_roblox_name = serializer.validated_data.get("roblox_gamertag", "")
+        if raw_roblox_name:
+            usernames = [
+                re.sub(r'^[^A-Za-z]+', '', name.strip())
+                for name in raw_roblox_name.split(",") if name.strip()
+            ]
+            try:
+                for username in usernames:
+                    roblox_response = requests.post(
+                        "https://users.roblox.com/v1/usernames/users",
+                        json={"usernames": [username], "excludeBannedUsers": False},
+                        headers={"Content-Type": "application/json"},
+                        timeout=5
+                    )
+                    roblox_data = roblox_response.json()
+                    if not roblox_data.get("data"):
+                        return Response(
+                            {"error": f"Invalid Roblox username: {username}. Cannot save."},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+            except Exception as e:
+                return Response({"error": f"Roblox validation failed: {str(e)}"},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # === XBOX VALIDATION (optional) ===
+        raw_xbox_name = serializer.validated_data.get("xbox_gamertag", None)
+        invalid_xbox_tags = []
+
+        if raw_xbox_name is not None:
+            # Keep original for saving
+            original_xbox_tags = [name.strip() for name in str(raw_xbox_name).split(",")]
+
+            for original_tag in original_xbox_tags:
+                stripped_tag = re.sub(r'^[^A-Za-z]+', '', original_tag).strip()
+
+                if stripped_tag:
+                    try:
+                        result = xbox_gamertag_lookup(stripped_tag)
+                        if not result.get("success", False):
+                            invalid_xbox_tags.append({
+                                "gamertag": stripped_tag,
+                                "error": result.get("error", "Unknown error")
+                            })
+                    except Exception as e:
+                        pass
+
+        # Get law firm based on domain
+        law_firm = self.get_law_firm_from_domain(request.get_host())
+
+        # === SAVE ===
+        intake_instance = serializer.save(
+            user_detail=None,  # No UserDetail association
+            law_firm=law_firm,  # Set based on domain
+        )
+        intake_instance.client_ip = data.get("client_ip")
+        intake_instance.submitted_at = data.get("submitted_at") or timezone.now()
+
+        if invalid_xbox_tags:
+            intake_instance.invalid_xbox_tags = invalid_xbox_tags  # assumes JSONField
+
+        # Save PDF
+        pdf_data = data.get("pdf_data")
+        if pdf_data:
+            try:
+                format, pdfstr = pdf_data.split(';base64,')
+                file_name = f"intake_{uuid.uuid4().hex[:8]}.pdf"
+                file_content = ContentFile(base64.b64decode(pdfstr), name=file_name)
+                intake_instance.pdf_file = file_content
+            except Exception as e:
+                return Response({"error": f"Failed to decode PDF: {str(e)}"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        intake_instance.save()
+
+        return Response({
+            "message": "Roblox intake form submitted successfully.",
+            "intake_id": intake_instance.id,
+            "data": IntakeFormSerializer(intake_instance).data
+        }, status=status.HTTP_201_CREATED)
     
     def get_law_firm_from_domain(self, domain):
         """
