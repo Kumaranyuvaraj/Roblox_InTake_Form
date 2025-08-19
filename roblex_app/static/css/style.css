@@ -495,7 +495,7 @@ div img {
 }
 
 .modal-content {
-    max-width: 1150px;
+    max-width: 1170px;
     background: #fff;
     color: #000;
     width: 550px;
@@ -788,7 +788,12 @@ button {
     text-decoration: underline;
     color: blue;
 }
-
+.consent-cbs{
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    justify-content: center;
+}
 #modalMessage {
     margin: 0;
     font-size: 16px;
@@ -911,7 +916,34 @@ button {
 
 }
 
+.dd-btn {
+      width: 100%;
+      text-align: left;
+      white-space: normal;
+      color: #000;
+      border: 1px solid #254b8f;
+      padding-right: 0px;
+    }
+    .dd-btn:hover {
+      color: #000;
+      background-color: transparent;
+      border-color: #254b8f;
+    }
+    .dd-btn.btn.show {
+      background-color: transparent;
+      color: #000;
+    }
+    .dropdown-toggle::after {
+      display: none;
+    }
 
+    /* Custom arrow image */
+    .custom-arrow {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
+      
+    }
 
 /* Responsive Design */
 @media (max-width: 768px) {

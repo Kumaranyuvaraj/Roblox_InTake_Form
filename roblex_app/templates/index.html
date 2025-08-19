@@ -447,7 +447,7 @@
 
                         </div>
 
-                        <div class="input-group">
+                        <!-- <div class="input-group">
                             <label>
                                 After the encounter with the online predator, did you or your child experience any of the following (Please select all that apply):
                             </label>
@@ -483,7 +483,75 @@
                                 <label for="grooming">Grooming or messaging child multiple times in a sexual/inappropriate way</label>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
+
+                        <div class="input-group dropdown w-100">
+  <label class="form-label fw-semibold mb-2">
+    After the encounter with the online predator, did you or your child experience any of the following (Please select all that apply):
+  </label>
+
+  <button class="btn btn-outline-primary dropdown-toggle dd-btn d-flex justify-content-between align-items-center w-100"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false">
+    <span class="dropdown-label text-truncate">--Select--</span>
+    <img src="../static/img/down_arrow.jpg" alt="" class="custom-arrow ms-2">
+  </button>
+
+  <ul id="question_13" class="dropdown-menu p-2 w-100"
+      style="max-height: 250px; overflow-y: auto;">
+    <li>
+      <label class="dropdown-item">
+        <input id="sexual_contact" name="question_13" type="checkbox"
+               value="Sexual contact (rape or attempted rape)"
+               class="form-check-input me-2"/>
+        Sexual contact (rape or attempted rape)
+      </label>
+    </li>
+    <li>
+      <label class="dropdown-item">
+        <input id="touching" name="question_13" type="checkbox"
+               value="Sexual touching or inappropriate physical contact"
+               class="form-check-input me-2"/>
+        Sexual touching or inappropriate physical contact
+      </label>
+    </li>
+    <li>
+      <label class="dropdown-item">
+        <input id="photos_videos" name="question_13" type="checkbox"
+               value="Request for sexual photos/videos"
+               class="form-check-input me-2"/>
+        Request for sexual photos/videos
+      </label>
+    </li>
+    <li>
+      <label class="dropdown-item">
+        <input id="manipulated" name="question_13" type="checkbox"
+               value="Manipulated/pressured into a sexual relationship"
+               class="form-check-input me-2"/>
+        Manipulated/pressured into a sexual relationship
+      </label>
+    </li>
+    <li>
+      <label class="dropdown-item">
+        <input id="travel" name="question_13" type="checkbox"
+               value="Travel to performing sexual acts"
+               class="form-check-input me-2"/>
+        Travel to performing sexual acts
+      </label>
+    </li>
+    <li>
+      <label class="dropdown-item">
+        <input id="grooming" name="question_13" type="checkbox"
+               value="Grooming or messaging child multiple times in a sexual/inappropriate way"
+               class="form-check-input me-2"/>
+        Grooming or messaging child multiple times in a sexual/inappropriate way
+      </label>
+    </li>
+  </ul>
+</div>
+
+
 
                         <div class="input-group">
                             <label>After the incident(s), was the abuse or injury reported to any of the following:</label>
@@ -569,44 +637,56 @@
                             <!-- <small id="consent-hint" style="color:gray;">
                                     Please read the <a href="#" id="openConsentBox">Consent Box</a> before making a choice.
                                 </small> -->
-                                <p>
+                                <!-- <p>
                                     Please read the <button class="consentBtn" onclick="showConsentModal()">Consent Box</button> before making a choice.
-                                </p>
-                            
-                            
-                            <!-- Checkboxes -->
-                            <div class="input-group d-flex">
-                                <label class="cb-label me-4">
-                                    <input type="checkbox" id="agreecheck" name="agreement_status" value="agree" disabled> Yes, I Agree and Consent
-                                </label>
-                                <label class="cb-label">
-                                    <input type="checkbox" id="notAgreecheck" name="agreement_status" value="not_agree" disabled> I
-                                    Do Not Agree
-                                </label>
+                                </p> -->
 
+                        </div>
+                    </div>
+
+                    <div class="col-12 pe-4">
+                        <!-- <small id="consent-hint" style="color:gray;">
+                                    Please read the <a href="#" id="openConsentBox">Consent Box</a> before making a choice.
+                                </small> -->
                                 
+                            
+                        <!-- Checkboxes -->
+                        <div class="input-group d-flex align-items-center gap-3 py-3 shadow-lg consent-cbs">
+                            <p class="mb-0">
+                                Please read the <button class="consentBtn" onclick="showConsentModal()">Consent Box</button> before making a choice.
+                            </p>
+                            
+                            <label class="cb-label me-4">
+                                <input type="checkbox" id="agreecheck" name="agreement_status" value="agree" disabled> Yes, I Agree and Consent
+                            </label>
+                            <label class="cb-label">
+                                <input type="checkbox" id="notAgreecheck" name="agreement_status" value="not_agree" disabled> I
+                                Do Not Agree
+                            </label>
 
-                                <!-- <a id="openConsentModalBtn" class="btn btn-primary" onclick="showConsentModal()">
-                                    Open Modal
-                                </a> -->
-                                <!-- <form class="d-flex gap-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="agreement_status" id="agreecheck"
-                                            value="yes">
-                                        <label class="form-check-label" for="agreecheck">
-                                            Yes, I Agree and Consent
-                                        </label>
-                                    </div>
+                            
 
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="agreement_status" id="notAgreecheck"
-                                            value="no">
-                                        <label class="form-check-label" for="notAgreecheck">
-                                            No, I do NOT Agree
-                                        </label>
-                                    </div>
-                                </form> -->
-                            </div>
+                            <!-- <a id="openConsentModalBtn" class="btn btn-primary" onclick="showConsentModal()">
+                                Open Modal
+                            </a> -->
+                            <!-- <form class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="agreement_status" id="agreecheck"
+                                        value="yes">
+                                    <label class="form-check-label" for="agreecheck">
+                                        Yes, I Agree and Consent
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="agreement_status" id="notAgreecheck"
+                                        value="no">
+                                    <label class="form-check-label" for="notAgreecheck">
+                                        No, I do NOT Agree
+                                    </label>
+                                </div>
+                            </form> -->
+                        </div>
 
 
 
@@ -926,17 +1006,26 @@
             //     dobVisibleInput.classList.remove("error-border");
             // }
            
-
+        
         // Reset error borders
         $('#screen2 input, #screen2 select').removeClass('error-border');
+
+        // collecting user data
 
         const first_name = $("#first_name").val().trim();
         const last_name = $("#last_name").val().trim();
         const cell_phone = $("#cell_phone").val().trim();
         const email = $("#email").val().trim();
         const zipcode = $("#zipcode").val().trim();
+        const additional_notes = $("#additional_notes").val().trim();
+
+        // collecting the question data:
+
+
+
         // const working_with_attorney = $("#working_with_attorney").val();
         const question_10 = $("#question_10 option:selected").text();
+        const question_13 = $("#question_13 option:selected").text();
 
         const gamer_dob = $("#gamer_dob").val();
         // const consent = $("#consent_checkbox").is(":checked");
@@ -950,7 +1039,7 @@
             agreement_status = checkedAgreements.val(); // will be "agree" or "not_agree"
         }
 
-        const additional_notes = $("#additional_notes").val().trim();
+        
 
           // Required field check
         if (!first_name) {
@@ -1714,7 +1803,30 @@ window.addEventListener("scroll", function () {
                 location.reload(); // Reset for demo
             }, 2500);
         }
-    // Congartulations Popup Script End
+   
+
+        document.addEventListener("DOMContentLoaded", () => {
+        const dropdown = document.querySelector(".dropdown");
+        const buttonLabel = dropdown.querySelector(".dropdown-label");
+        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+
+        function updateLabel() {
+            const selected = [...checkboxes]
+            .filter(c => c.checked)
+            .map(c => c.value);
+
+            buttonLabel.textContent = selected.length === 0
+            ? "--Select--"
+            : selected.join(", ");
+        }
+
+        // prevent dropdown from closing on checkbox click
+        dropdown.querySelectorAll(".dropdown-item input").forEach(cb => {
+            cb.addEventListener("click", e => e.stopPropagation());
+            cb.addEventListener("change", updateLabel);
+        });
+        });
+
 
     </script>
 
