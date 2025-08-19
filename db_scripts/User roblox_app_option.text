@@ -1,0 +1,77 @@
+11,Sexual Assault,3,f,f,f
+12,Grooming,3,f,f,f
+13,Exchanging of Sexual Explicit Images,3,f,f,f
+14,Sex Trafficking,3,f,f,f
+15,Hacking,3,f,f,f
+16,Economic Loss,3,f,f,f
+17,Other,3,f,f,f
+18,None,3,f,f,f
+19,Yes,4,f,f,f
+20,No,4,f,f,f
+21,0,5,f,f,f
+22,1-2,5,f,f,f
+23,3,5,f,f,f
+24,4,5,f,f,f
+25,5+,5,f,f,f
+26,ADHD/ADD,6,f,f,f
+27,Oppositional Defiant Disorder (OOD),6,f,f,f
+28,Depression,6,f,f,f
+29,Anxiety,6,f,f,f
+30,Autism after playing video games,6,f,f,f
+31,Individualized Education Plan (IEP),6,f,f,f
+32,Homeshooled due to gaming,6,f,f,f
+33,Loss of education (High School or College dropout),6,f,f,f
+34,Attempted Suicide,6,f,f,f
+35,Suicide,6,f,f,f
+36,Changes in CT/MRI Brain,6,f,f,f
+37,Seizures,6,f,f,f
+38,Loss of income (Gamer unable to work full- time),6,f,f,f
+39,Lives at home due to inability to support self due to gaming,6,f,f,f
+40,Criminal Record- Stealing to get money for games,6,f,f,f
+41,Sleep Deprivation,6,f,f,f
+42,Psychosis,6,f,f,f
+43,Computer Vision Syndrome,6,f,f,f
+44,Gamer’s Rage/Aggression,6,f,f,f
+45,Prioritizes gaming over other activities (sports/hobbies\, etc.),6,f,f,f
+46,Loss or Lack of Friends at School (Socially withdrawn),6,f,f,f
+47,Orthopedic Injury - (Gamer's Thumb\, Carpal tunnel syndrome\, Tennis Elbow\, Neck Sprain/Herniation),6,f,f,f
+48,Very Poor Hygiene due to game-playing time,6,f,f,f
+49,None of the above,6,f,f,f
+50,Hospitalized,7,f,f,f
+51,Emergency Room,7,f,f,f
+52,Did not know treatment was available No access to treatment,7,f,f,f
+53,Did not seek treatment,7,f,f,f
+54,Other,7,f,f,f
+55,1-3,8,t,t,t
+56,4-9,8,t,t,t
+57,10-12,8,t,t,t
+58,13-16,8,t,t,t
+61,20-21,8,f,f,f
+60,18-20,8,t,t,f
+62,26+,8,f,f,f
+59,17-18,8,t,t,f
+63,Yes,9,t,t,f
+64,No,9,t,t,f
+65,Yes,10,t,t,f
+66,No,10,t,t,f
+67,Yes,11,t,t,f
+68,No,11,t,t,t
+69,Yes,12,t,t,t
+70,No,12,f,f,f
+71,sexual contact (rape or attempted rape),13,f,f,f
+72,sexual touching or inappropriate physical contact,13,f,f,f
+73,request for sexual photos/videos,13,f,f,f
+74,manipulated/pressured into a sexual relationship,13,f,f,f
+75,travel to performing sexual acts,13,f,f,f
+76,grooming or message child multiple times in a sexual/inappropriate way,13,f,f,f
+77,School,14,f,f,f
+78,Therapist,14,f,f,f
+79,Medical Facility,14,f,f,f
+80,Police,14,f,f,f
+81,Roblox,14,f,f,f
+82,Other,14,f,f,f
+83,Yes,15,f,f,f
+84,No,15,f,f,f
+85,Unsure,15,f,f,f
+86,Yes,16,t,t,f
+87,No,16,f,f,f
