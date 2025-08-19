@@ -123,6 +123,17 @@
     animation: spin 1s linear infinite;
     }
 
+    .inline-spinner {
+        border: 2px solid transparent;
+        border-top: 2px solid #ffffff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-left: 8px;
+    }
+
     @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -601,7 +612,10 @@
 
                             <div class="form-footer ">
                                 <!-- <button type="button" class="btn-blue-outline" onclick="showScreen(1)">Back</button> -->
-                                <button type="button" class="btn-blue" onclick="submitForm()">Submit</button>
+                                <button type="button" id="submitBtn" class="btn-blue" onclick="submitForm()">
+                                    <span id="submitBtnText">Submit</span>
+                                    <span id="submitBtnLoader" class="inline-spinner" style="display: none;"></span>
+                                </button>
                                 <!-- <button class="btn-blue" onclick="showCongrats()">Submit</button> -->
                             </div>
                         </div>
@@ -640,8 +654,7 @@
             <img id="modalIcon" class="icon" src="" alt="icon" />
             <p id="modalMessage"></p>
             <div class="modal-buttons">
-            <button class="btn-blue" onclick="closeCustomModal()">YES</button>
-            <button class="btn-red" onclick="redirectToGratitude()">NO</button>
+            <button class="btn-blue" onclick="closeCustomModal()">OK</button>
             </div>
         </div>
     </div>
@@ -879,6 +892,14 @@
 
 
     function submitForm() {
+        // Clear any existing redirect timeout from previous submissions
+        if (window.redirectTimeout) {
+            clearTimeout(window.redirectTimeout);
+            window.redirectTimeout = null;
+        }
+        
+        // Show loading state on submit button
+        showSubmitLoader();
 
         let isValid = true;
 
@@ -975,7 +996,10 @@
 
         
         // Block submission if any errors
-        if (!isValid) return;
+        if (!isValid) {
+            hideSubmitLoader();
+            return;
+        }
 
         // const age = calcAge(dob);
         // if (age > 20) {
@@ -1001,11 +1025,6 @@
                 cell_phone,
                 email,
                 zipcode,
-                // working_with_attorney,
-                // question_10,
-            
-
-                gamer_dob,
                 additional_notes,
                 agreement_status
             }),
@@ -1083,92 +1102,98 @@
                 //     return;
                 // }
 
-                // ✅ Step 4: Determine templateType dynamically
-                let templateType = "";
-                // if (!matchedOption.is_eligible) {
-                //     templateType = "rejected";
-                // } else if (!matchedOption.requires_parental_signature) {
-                //     templateType = "eligible_no_parent";
-                // } else {
-                    templateType = "eligible_with_parent";
-                // }
+                // ✅ Step 4: Get the 4 decision-making questions and apply logic
+                const question_10 = $("#question_10 option:selected").text(); // Attorney
+                const question_11 = $("#question_11 option:selected").text(); // Over 18
+                const question_16 = $("#question_16 option:selected").text(); // Predator contact
+                const question_12 = $("#question_12 option:selected").text(); // Under 18 when incidents began
 
-                // ✅ Step 5: Handle based on eligibility
-                // if (!matchedOption.is_eligible || working_with_attorney === "yes") {
-                console.log("result:",question_10);
-                if (question_10 === "Yes") {
-             
-                $.ajax({
-                    url: `/api/email-template/${templateType}/`,
-                    type: "GET",
-                    success: function (template) {
-                        // Replace placeholder with user name
-                        const subject = template.subject;
-                        const body = template.body.replace("[User First Name]", first_name);
+                console.log("Decision Making Answers:");
+                console.log("1. Attorney:", question_10);
+                console.log("2. Over 18:", question_11);
+                console.log("3. Predator contact:", question_16);
+                console.log("4. Under 18 when incidents began:", question_12);
 
-                        // Send rejection email
-                        const emailFormData = new FormData();
-                        emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
-                        emailFormData.append("to_email", email);
-                        emailFormData.append("subject", subject);
-                        emailFormData.append("body", body);
+                // Apply decision logic based on the 4 questions
+                const hasAttorney = question_10 === "Yes";
+                const isOver18 = question_11 === "Yes";
+                const hasPredatorContact = question_16 === "Yes";
+                const wasUnder18WhenIncidentsBegan = question_12 === "Yes";
 
-                        $.ajax({
-                            url: "/send-email/",
-                            type: "POST",
-                            data: emailFormData,
-                            processData: false,
-                            contentType: false,
-                            success: function () {
-                                // ✅ Show correct rejection message
-                                if (question_10 === "Yes") {
-                                    showModal(
-                                        "You are not eligible to file a new claim because you are already represented by an attorney and the age provided is over 20. Would you like to reapply with updated information?",
-                                        "error"
-                                    );
-                                // } else if (age > 20) {
-                                //     showModal(
-                                //         "You are not eligible to file a new claim because the age provided is over 20. Would you like to reapply with updated information?",
-                                //         "error"
-                                //     );
-                                // } else if (working_with_attorney === "yes") {
-                                //     showModal(
-                                //         "It looks like you are already represented by an attorney for this matter, so we cannot proceed with a new case. Would you like to reapply with updated information?",
-                                //         "error"
-                                //     );
-                                // } 
-                                // else {
-                                    showModal(
-                                        "You're not eligible based on the provided details.",
-                                        "error"
-                                    );
+                // Determine disqualification reasons
+                let disqualified = false;
+                let disqualificationMessage = "";
+
+                // Check all combinations and set appropriate message
+                if (hasAttorney && !hasPredatorContact && !wasUnder18WhenIncidentsBegan) {
+                    disqualified = true;
+                    disqualificationMessage = "You are already represented by an attorney, no predator contact was indicated, and incidents began at 18 or older. We cannot proceed. Reapply only if your situation changes.";
+                } else if (hasAttorney && !hasPredatorContact) {
+                    disqualified = true;
+                    disqualificationMessage = "You are already represented by an attorney, and no contact with a Roblox predator was indicated. We cannot proceed. Reapply only if your representation changes.";
+                } else if (hasAttorney && !wasUnder18WhenIncidentsBegan) {
+                    disqualified = true;
+                    disqualificationMessage = "You are already represented by an attorney, and the incidents began at 18 or older. We cannot proceed. Reapply only if your situation changes.";
+                } else if (!hasPredatorContact && !wasUnder18WhenIncidentsBegan) {
+                    disqualified = true;
+                    disqualificationMessage = "No contact with a Roblox predator was indicated, and incidents began at 18 or older. This case is not eligible. Update your answers if this was selected in error.";
+                } else if (hasAttorney) {
+                    disqualified = true;
+                    disqualificationMessage = "You are already represented by an attorney for this matter, so we cannot proceed with a new case. If your representation changes, you may reapply.";
+                } else if (!hasPredatorContact) {
+                    disqualified = true;
+                    disqualificationMessage = "No contact with a Roblox predator was indicated. This case does not meet eligibility. Update your answers if this was selected in error.";
+                } else if (!wasUnder18WhenIncidentsBegan) {
+                    disqualified = true;
+                    disqualificationMessage = "Incidents began when you/your child were 18 or older, which falls outside eligibility. Update your answers if this was selected in error.";
+                }
+
+                if (disqualified) {
+                    // Send rejection email and show disqualification message
+                    $.ajax({
+                        url: `/api/email-template/rejected/`,
+                        type: "GET",
+                        success: function (template) {
+                            // Replace placeholder with user name
+                            const subject = template.subject;
+                            const body = template.body.replace("[User First Name]", first_name);
+
+                            // Send rejection email
+                            const emailFormData = new FormData();
+                            emailFormData.append("from_email", "kumaranyuvaraj007@gmail.com");
+                            emailFormData.append("to_email", email);
+                            emailFormData.append("subject", subject);
+                            emailFormData.append("body", body);
+
+                            $.ajax({
+                                url: "/send-email/",
+                                type: "POST",
+                                data: emailFormData,
+                                processData: false,
+                                contentType: false,
+                                success: function () {
+                                    hideSubmitLoader();
+                                    showModal(disqualificationMessage, "error");
+                                },
+                                error: function (xhr) {
+                                    hideSubmitLoader();
+                                    const err = xhr.responseJSON?.error || "Error sending email.";
+                                    showModal("Error: " + err, "error");
                                 }
-
-                                // Redirect after showing modal
-                                setTimeout(() => {
-                                    window.location.href = "/";
-                                }, 15000);
-                            },
-                            error: function (xhr) {
-                                const err = xhr.responseJSON?.error || "Error sending email.";
-                                showModal("Error: " + err, "error");
-                            }
-                        });
-                    },
-                    error: function () {
-                        showModal("Could not process request. Please try again.", "error");
-                    }
-                });
-            } else {
-                    // Eligible - proceed to document signing workflow
-                    // Proceed with answers submission and document creation
-                    submitAnswers(userId, function (redirectUrl) {
-                        // After answers are submitted, trigger document creation
-                        // This will be handled by the submitAnswers callback
+                            });
+                        },
+                        error: function () {
+                            hideSubmitLoader();
+                            showModal("Could not process request. Please try again.", "error");
+                        }
                     });
+                } else {
+                    // User is eligible - proceed with document workflow
+                    submitAnswers(userId);
                 }
             },
             error: function (xhr) {
+                hideSubmitLoader();
                 console.error(xhr.responseJSON);
                 alert("Error submitting the form.");
             }
@@ -1193,12 +1218,46 @@
 
 
     function closeCustomModal() {
-    $("#customModal").fadeOut();
+        $("#customModal").fadeOut();
+        
+        // Clear any pending redirect timeout when modal is closed
+        if (window.redirectTimeout) {
+            clearTimeout(window.redirectTimeout);
+            window.redirectTimeout = null;
+        }
     }
 
     function redirectToGratitude() {
-    window.location.href = "/gratitude/";
-}
+        window.location.href = "/gratitude/";
+    }
+
+    function redirectToHomepage() {
+        window.location.href = "/";
+    }
+
+    function showSubmitLoader() {
+        const submitBtn = document.getElementById('submitBtn');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const submitBtnLoader = document.getElementById('submitBtnLoader');
+        
+        if (submitBtn && submitBtnText && submitBtnLoader) {
+            submitBtn.disabled = true;
+            submitBtnText.textContent = 'Processing...';
+            submitBtnLoader.style.display = 'inline-block';
+        }
+    }
+
+    function hideSubmitLoader() {
+        const submitBtn = document.getElementById('submitBtn');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const submitBtnLoader = document.getElementById('submitBtnLoader');
+        
+        if (submitBtn && submitBtnText && submitBtnLoader) {
+            submitBtn.disabled = false;
+            submitBtnText.textContent = 'Submit';
+            submitBtnLoader.style.display = 'none';
+        }
+    }
 
 
     // $("#userForm")[0].reset();
@@ -1261,8 +1320,6 @@
     $(document).ready(function () {
         // Backend now handles document signing redirects directly
 
-    
-        
         $.ajax({
             url: "/api/questions/",
             type: "GET",
@@ -1333,124 +1390,18 @@
 
 
 
-    function submitAnswers(userId, callback) {
+    function submitAnswers(userId) {
+        const promises = [];
+        const csrf = (typeof getCookie === "function") ? getCookie("csrftoken") : null;
 
-    const promises = [];
-    const csrf = (typeof getCookie === "function") ? getCookie("csrftoken") : null;
+        // Save all dropdown answers to database
+        $(".question-dropdown").each(function () {
+            const $select = $(this);
+            const questionId = Number($select.data("question-id"));
+            const selectedOptionId = $select.val();
 
-    // --- 1) Prepare DOB → age → age option (dynamic from questionsData) ---
-    const dobValue = $("#gamer_dob").val()?.trim();
-    let matchedAgeOption = null;  // the Option object chosen for DOB
-    let ageQuestion = null;       // the Question object for "Age of gamer?"
+            if (!questionId || !selectedOptionId) return;
 
-    // Find age question from questionsData (once)
-    if (Array.isArray(questionsData) && questionsData.length) {
-        ageQuestion = questionsData.find(q => (q.text || "").toLowerCase().includes("age of gamer"));
-    }
-
-    // Helper to try matching by min_age/max_age if present; otherwise parse "18-20" / "26+"
-    function matchOptionByAge(options, age) {
-        // Prefer min_age / max_age when provided
-        const withRange = options.filter(o => (o.min_age !== undefined && o.min_age !== null) || (o.max_age !== undefined && o.max_age !== null));
-        if (withRange.length) {
-            for (const opt of withRange) {
-                const min = (opt.min_age != null) ? Number(opt.min_age) : -Infinity;
-                const max = (opt.max_age != null) ? Number(opt.max_age) : Infinity;
-                if (age >= min && age <= max) return opt;
-            }
-            return null;
-        }
-        // Fallback: parse text labels
-        for (const opt of options) {
-            const t = (opt.text || "").trim();
-            if (!t) continue;
-            if (t.includes("+")) {
-                // e.g., "26+"
-                const min = parseInt(t, 10);
-                if (!isNaN(min) && age >= min) return opt;
-            } else if (t.includes("-")) {
-                // e.g., "18-20"
-                const [minStr, maxStr] = t.split("-").map(s => s.trim());
-                const min = parseInt(minStr, 10);
-                const max = parseInt(maxStr, 10);
-                if (!isNaN(min) && !isNaN(max) && age >= min && age <= max) return opt;
-            }
-        }
-        return null;
-    }
-
-    // Compute age & find matching option from DOB (if DOB provided and ageQuestion exists)
-    if (dobValue && ageQuestion) {
-        const dob = new Date(dobValue);
-        if (!isNaN(dob.getTime())) {
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const m = today.getMonth() - dob.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-
-            matchedAgeOption = matchOptionByAge(ageQuestion.options || [], age);
-            if (!matchedAgeOption) {
-                alert("No matching age range found for this date of birth.");
-            }
-        } else {
-            alert("Invalid DOB format. Please use a valid date.");
-        }
-    }
-
-    // --- 2) Save ALL other dropdown answers (and override age Q with matchedAgeOption if present) ---
-    $(".question-dropdown").each(function () {
-        const $select = $(this);
-        const questionId = Number($select.data("question-id"));
-        const selectedOptionId = $select.val();
-        const questionText = ($select.data("question-text") || "").trim();
-
-        if (!questionId) return;
-
-        // If this is the Age question, we override with the DOB-matched option (when available).
-        if (questionId === Number(ageQuestion.id)) {
-            if (matchedAgeOption && matchedAgeOption.id) {
-                const p = $.ajax({
-                    url: "/api/answers/submit/",
-                    type: "POST",
-                    contentType: "application/json",
-                    headers: csrf ? { "X-CSRFToken": csrf } : {},
-                    data: JSON.stringify({
-                        user: userId,
-                        question: questionId,
-                        selected_option: matchedAgeOption.id
-                    })
-                }).fail(xhr => {
-                    console.error(`Failed to submit age answer for Question ID ${questionId}:`, xhr.responseJSON || xhr.responseText);
-                });
-                promises.push(p);
-            } else {
-                // If no match, and user picked a value manually, you may choose to save it;
-                // but since you said DOB should drive it, we skip saving the manual selection.
-                // If you want to save manual selection as a fallback, uncomment the block below:
-                /*
-                if (selectedOptionId) {
-                    const p = $.ajax({
-                        url: "/api/answers/submit/",
-                        type: "POST",
-                        contentType: "application/json",
-                        headers: csrf ? { "X-CSRFToken": csrf } : {},
-                        data: JSON.stringify({
-                            user: userId,
-                            question: questionId,
-                            selected_option: selectedOptionId
-                        })
-                    }).fail(xhr => {
-                        console.error(`Failed to submit manual age selection for Question ID ${questionId}:`, xhr.responseJSON || xhr.responseText);
-                    });
-                    promises.push(p);
-                }
-                */
-            }
-            return; // handled age question
-        }
-
-        // Normal questions (non-age): save if user selected something
-        if (selectedOptionId) {
             const p = $.ajax({
                 url: "/api/answers/submit/",
                 type: "POST",
@@ -1465,137 +1416,71 @@
                 console.error(`Failed to submit answer for Question ID ${questionId}:`, xhr.responseJSON || xhr.responseText);
             });
             promises.push(p);
-        }
-    });
+        });
 
-    // If there is no visible "Age of gamer?" dropdown on the page (you removed it),
-    // but we still have a matchedAgeOption from DOB, submit it explicitly.
-    if (matchedAgeOption && ageQuestion) {
-        const alreadyQueued = promises.some(req =>
-            // Not trivial to inspect $.ajax object; we’ll assume not duplicated if no dropdown existed.
-            false
-        );
-        if (!alreadyQueued) {
-            const p = $.ajax({
-                url: "/api/answers/submit/",
-                type: "POST",
-                contentType: "application/json",
-                headers: csrf ? { "X-CSRFToken": csrf } : {},
-                data: JSON.stringify({
-                    user: userId,
-                    question: ageQuestion.id,
-                    selected_option: matchedAgeOption.id
-                })
-            }).fail(xhr => {
-                console.error(`Failed to submit DOB-derived age answer for Question ID ${ageQuestion.id}:`, xhr.responseJSON || xhr.responseText);
-            });
-            promises.push(p);
-        }
+        // After ALL answers saved, show success modal with continue button
+        $.when.apply($, promises).done(function () {
+            console.log("All answers submitted successfully");
+            
+            // Get age determination from the 4-question logic in submitForm
+            const question_11 = $("#question_11 option:selected").text(); // Over 18
+            const isOver18 = question_11 === "Yes";
+            
+            // Determine template type based on age
+            let templateType = isOver18 ? 'retainer_adult' : 'retainer_minor';
+            let emailTemplateType = isOver18 ? 'eligible_no_parent' : 'eligible_with_parent';
+            
+            // Show Modal function with Continue button
+            function showSuccessModal(message, withContinueBtn = true) {
+                const modal = document.getElementById('customModal');
+                
+                // Dynamically update modal content with message and button
+                const footer = modal.querySelector('.modal-content');
+                footer.innerHTML = `
+                    <img id="modalIcon" class="icon" src="../static/img/tick.jpg" alt="success" />
+                    <p id="modalMessage">${message}</p>
+                    ${withContinueBtn
+                        ? `<div class="modal-buttons"><button id="modal-continue-btn" class="btn-blue">Continue</button></div>` 
+                        : `<div class="modal-buttons"><button class="btn-blue" onclick="closeCustomModal()">OK</button></div>`}
+                `;
+                
+                $("#customModal").fadeIn();
+                $("#customModal").css("display", "flex");
+            }
+            
+            // Hide submit loader and show modal with Continue button
+            hideSubmitLoader();
+            showSuccessModal("Congrats! Your case is potentially eligible for Video Game Sex abuse claim. Please click Continue to next step", true);
+            
+            // Attach event AFTER modal is rendered
+            setTimeout(() => {
+                const continueBtn = document.getElementById("modal-continue-btn");
+                
+                if (continueBtn) {
+                    continueBtn.addEventListener("click", () => {
+                        // Show loading spinner
+                        const spinnerOverlay = document.getElementById("spinnerOverlay");
+                        if (spinnerOverlay) {
+                            spinnerOverlay.style.display = "flex";
+                        }
+                        
+                        // Close the modal
+                        closeCustomModal();
+                        
+                        // Create document submission for signing
+                        createDocumentSubmission(templateType, emailTemplateType);
+                    });
+                } else {
+                    console.error("Continue button not found!");
+                }
+            }, 200);
+            
+        }).fail(function () {
+            hideSubmitLoader();
+            console.error("Failed to submit some answers");
+            alert("There was an error submitting your answers. Please try again.");
+        });
     }
-
-    // --- 3) After ALL answers saved, apply eligibility logic from the matched age option ---
-    // $.when.apply($, promises).done(function () {
-        // If no DOB or no matched option, we still saved other answers; just stop here
-        // if (!dobValue) {
-        //     alert("Please enter the gamer's Date of Birth to evaluate eligibility.");
-        //     if (typeof callback === "function") callback(null);
-        //     return;
-        // }
-        // if (!ageQuestion) {
-        //     alert("Age question data not found. Please refresh and try again.");
-        //     if (typeof callback === "function") callback(null);
-        //     return;
-        // }
-        // if (!matchedAgeOption) {
-        //     // Already alerted earlier that no matching range was found
-        //     if (typeof callback === "function") callback(null);
-        //     return;
-        // }
-
-        // Use DB flags on the matched option
-        
-        // Show Modal function integrated with Continue button option
-        function showModal(message, withContinueBtn = false) {
-            const modal = document.getElementById('customModal');
-
-            // Dynamically update modal content with message and button
-            const footer = modal.querySelector('.modal-content');
-            footer.innerHTML = `
-                <p id="modalMessage">${message}</p>
-                ${withContinueBtn
-                    ? `<button id="modal-continue-btn" class="btn-blue">Continue</button>` 
-                    : `<button class="btn-blue" onclick="closeCustomModal()">OK</button>`}
-            `;
-
-            $("#customModal").fadeIn();
-            // $("#customModal").style.display = 'flex';
-        }
-
-        // Main eligibility check and redirection logic
-        // const ageOptionData = matchedAgeOption;
-
-        // if (!ageOptionData.is_eligible) {
-        //     // Redirect to thank-you / gratitude page instead of showing modal
-        //     if (typeof callback === "function") {
-        //         callback(null); // prevent any further redirection from callback
-        //     }
-        //     window.location.href = "/gratitude"; // adjust path if needed
-        //     return;
-        // }
-    //     if (ageOptionData.requires_parental_signature) {
-    //     // Show modal with "Continue" button
-    //     showModal(
-    //         "Congrats! Your case is potentially eligible for Video Game Sex abuse claim. Please click Continue to next step",
-    //         "success",
-    //         true
-    //     );
-
-    //     // Attach event AFTER modal is rendered
-    //     setTimeout(() => {
-    //         const continueBtn = document.getElementById("modal-continue-btn");
-
-    //         if (continueBtn) {
-    //             continueBtn.addEventListener("click", () => {
-    //                 // Show loading spinner
-    //                 const spinnerOverlay = document.getElementById("spinnerOverlay");
-    //                 if (spinnerOverlay) {
-    //                     spinnerOverlay.style.display = "flex";
-    //                 }
-
-    //                 // Close the modal
-    //                 closeCustomModal();
-
-    //                     // Create document submission for signing
-    //                     // if (ageOptionData.redirect_to_retainer) {
-    //                     createDocumentSubmission('retainer_agreement', 'eligible_with_parent');
-    //                     // } else if (typeof callback === "function") {
-    //                     //     callback("/retainer-form/");
-    //                     // }
-    //             });
-    //         } else {
-    //             console.error("Continue button not found!");
-    //         }
-    //     }, 200);
-
-    // } else {
-    //     // No parental signature needed
-    //     // Show loading spinner
-    //     const spinnerOverlay = document.getElementById("spinnerOverlay");
-    //     if (spinnerOverlay) {
-    //         spinnerOverlay.style.display = "flex";
-    //     }
-        
-    //     // if (ageOptionData.redirect_to_retainer) {
-    //     createDocumentSubmission('retainer_agreement', 'eligible_no_parent');
-    //     // } else if (typeof callback === "function") {
-    //     //     callback("/retainer-form/");
-    //     // }
-    // }
-
-        // // Default: stay on the same page
-        // if (typeof callback === "function") callback(null);
-    // });
-}
 
 window.addEventListener("scroll", function () {
         const button = document.getElementById("fixBtnRow");

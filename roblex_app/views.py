@@ -584,14 +584,8 @@ class CreateDocumentSubmissionAPIView(APIView):
                 # Create both Florida disclosure and retainer documents
                 print(f"Florida zipcode {user_detail.zipcode} detected - creating both documents")
                 
-                # Determine correct retainer type based on age
-                retainer_template_type = 'retainer_adult'  # Default
-                if user_detail.gamer_dob:
-                    from datetime import date
-                    today = date.today()
-                    dob = user_detail.gamer_dob
-                    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-                    retainer_template_type = 'retainer_minor' if age < 18 else 'retainer_adult'
+                # Default to retainer_minor since gamer_dob field has been removed
+                retainer_template_type = 'retainer_minor'
                 
                 # Create both documents
                 documents_created = self._create_florida_workflow_documents(user_detail, retainer_template_type, email_template_type, request)
@@ -682,17 +676,10 @@ class CreateDocumentSubmissionAPIView(APIView):
         Create a single document for non-Florida residents
         """
         try:
-            # Determine correct retainer type based on age if needed
+            # Determine correct retainer type - default to minor since gamer_dob field has been removed
             actual_template_type = template_type
             if template_type == 'retainer_agreement':
-                if user_detail.gamer_dob:
-                    from datetime import date
-                    today = date.today()
-                    dob = user_detail.gamer_dob
-                    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-                    actual_template_type = 'retainer_minor' if age < 18 else 'retainer_adult'
-                else:
-                    actual_template_type = 'retainer_minor'  # Default to minor if no DOB
+                actual_template_type = 'retainer_minor'  # Default to minor
             
             submission = self._create_document_submission(
                 user_detail, 
