@@ -1,0 +1,1766 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WCBZJQFX');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Intake Form</title>
+
+    <!-- html2canvas must come first -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+    
+    <!-- CSRF Token -->
+    <!-- <meta name="csrf-token" content="{{ csrf_token }}"> -->
+     <meta name="csrf-token" content="{{ csrf_token }}">
+
+</head>
+<style>
+    body {
+        background-color: rgb(249 250 251 / var(--tw-bg-opacity,1))#fff;
+
+    }
+
+    .form-bg {
+        /* border: 1px solid #ccc; */
+        border-top: 5px solid #003947;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1),0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+    .bg-light {
+        background:#e9ecefd4 !important;
+    }
+
+    .input-group {
+        flex-wrap: nowrap !important;
+    }
+
+    .input-group .text-danger {
+        position: absolute;
+        top: 37px;
+        left: 0;
+        z-index: 1;
+    }
+    .input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+    margin-left: calc(var(--bs-border-width) * -2);
+    }
+
+    label {
+        font-weight: 600;
+    }
+
+    .btn{
+    text-wrap: nowrap;
+}
+
+    .btn-plus {
+        background: #04c15f;
+        font-size: 14px;
+        font-weight: 600;
+        /* margin-top: 30px !important; */
+        padding: 8px 24px;
+    }
+
+    .btn-plus:hover {
+
+        background: #ccc;
+        font-size: 14px;
+        font-weight: 600;
+        /* margin-top: 30px !important; */
+        padding: 8px 24px;
+    }
+    .remove-btn{
+         background: #ccc;
+    }
+
+    .btn-submit {
+        background: #495057;
+        color: #fff;
+        width: 10rem;
+    }
+
+    .btn-plus:focus{
+        background:#04c15f;
+        border: 1px solid #000000;
+        /* padding-bottom: ; */
+    }
+
+    .btn-submit:hover {
+        background: #64686b;
+        color: #fff;
+        width: 10rem;
+    }
+
+
+    .form-check-label {
+        font-weight: 400;
+    }
+
+    .btn-ico {
+        margin: 0px !important;
+        padding: 1px 15px !important;
+    }
+
+     .info-icon {
+            cursor: pointer;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* Modal styling */
+        .modal-overlay-image {
+            display: none;
+            position: fixed;
+            top: 16%;
+            left: 25%;
+            width: 250px;
+            height: 250px;
+            /* background-color: rgba(0,0,0,0.8); */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-image {
+            max-width: 80%;
+            max-height: 80%;
+            position: relative;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -25px;
+            right: -25px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        /* Show modal on hover */
+        .info-icon:hover + .modal-overlay-image,
+        .modal-overlay-image:hover {
+            display: flex;
+        }
+        .Heading-color{
+           
+            color: #003947;
+    font-weight: 700;
+        }
+        .max-w-4xl {
+    max-width: 56rem;
+}
+    .mx-auto {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    label{
+        font-size: 14px;
+    }
+    input::placeholder,textarea::placeholder {
+        font-size: 13px;
+        color: #ccc;
+    }
+
+    #inputContainer .robloxValidationStatus {
+    position: absolute;
+    top: 32px;
+
+
+    }
+
+    .des-mg-tp{
+    margin: 33px 3px;
+    font-size: 12px;
+    color: red;
+    }
+
+    .err-msg-mt{
+        margin-top: 35px;
+    }
+    .msg-min-width{
+        min-width: 200px;
+    }
+    .game-info-img{
+        position: absolute;
+    }
+
+    .rb-err-msg{
+        position: unset;
+        
+    }
+
+    .text-danger {
+        font-size: 14px;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center; align-items: center;
+    }
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 400px;
+        text-align: center;
+    }
+    .close-btn {
+        margin-top: 15px;
+        background-color: #495057;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .tick-icon {
+        display: block;
+        margin: 0 auto;
+        width: 60px;
+        height: auto;
+    }
+
+    .robloxValidationStatus{
+        position: relative;
+    }
+
+    @media (min-width: 768px) {
+    .rb-err-msg{
+        position: absolute;
+        /* left: -713px; */
+        top: 16px;
+        }
+    }
+
+    .top0{
+        top: 0 !important;
+    }
+    .error-border {
+        border: 1px solid red !important;
+        box-shadow: 0 0 5px red;
+        transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    #documentStatusBanner {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 9999;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                font-family: 'Poppins', sans-serif;
+                min-height: 60px;
+                transition: opacity 0.5s ease-in-out;
+                opacity: 0;
+                padding: 20px;
+                margin: 0;
+                border-radius: 0;
+                text-align: center;
+                border: none;
+                width: 100%;
+            }
+            
+            #documentStatusBanner.success {
+                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                border: 2px solid #c3e6cb;
+                color: #155724;
+            }
+            
+            #documentStatusBanner.warning {
+                background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+                border: 2px solid #ffeaa7;
+                color: #856404;
+            }
+            
+            #documentStatusBanner #statusTitle {
+                font-weight: 600;
+                margin-bottom: 8px;
+                margin-top: 0;
+            }
+            
+            #documentStatusBanner #statusMessage {
+                font-weight: 400;
+                opacity: 0.9;
+                margin-bottom: 8px;
+            }
+            
+            #documentStatusBanner .container {
+                position: relative;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            #documentStatusBanner .btn-close {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                font-weight: bold;
+                color: inherit;
+                opacity: 0.5;
+                cursor: pointer;
+                padding: 0;
+                margin: 0;
+                line-height: 1;
+            }
+            
+            #documentStatusBanner .btn-close:hover {
+                opacity: 1;
+            }
+
+             #spinnerOverlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.4);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                }
+
+                .spinner {
+                border: 6px solid #f3f3f3;
+                border-top: 6px solid #4a90e2;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                animation: spin 1s linear infinite;
+                }
+
+                @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+                }
+
+</style>
+
+<body class="bg-light">
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCBZJQFX"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+      <!-- Success/Decline Message Banner -->
+    <div id="documentStatusBanner" style="display: none;">
+        <div class="container">
+            <h4 id="statusTitle"></h4>
+            <p id="statusMessage"></p>
+            
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+        </div>
+    </div>
+
+
+    <!-- <div class=" mt-4 mb-5 px-3"> -->
+
+        <!-- <div class="row"> -->
+<!-- 
+            <div class="col-2"></div> -->
+              <form id="intakeForm" class="form-bg max-w-4xl mx-auto py-8 px-4 my-3" novalidate>
+                  <div class="container">
+                    <div class="row" style="border-bottom: 2px solid #495057;">
+                        <div class="col-12 text-center">
+                        <img src="{% static 'img/Bullock.png' %}" alt="Bullock Image" class="py-2"><h2 class="mb-4 mt-3 px-5 Heading-color">Roblox Intake Form</h2>
+                    </div>
+                        <!-- <div class="col-2 mt-2">
+                            <img src="{% static 'img/Bullock.png' %}" alt="Bullock Image">
+                        </div>
+                        <div class="col-10 text-left">
+                            <h2 class="mb-4 mt-3 px-5">Roblox Intake Form</h2>
+                        </div> -->
+                    </div>
+                    <!-- <div class="row mb-3 mt-4">
+                        <div class="col-3">
+                            <label>Date</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                    </div> -->
+
+                    <label class="pt-4 pb-2"> Gamers Name </label>
+                    <div class="row mb-3">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <label class="form-check-label">First Name</label>
+                            <input type="text" name="gamer_first_name" class="form-control" placeholder="Enter Gamers First Name" required>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <label class="form-check-label">Last Name</label>
+                            <input type="text" name="gamer_last_name" class="form-control" placeholder="Enter Gamers Last Name" required>
+                        </div>
+                    </div>
+
+                    <label class="pb-2"> Parent or Legal Guardian's Name </label>
+                    <div class="row ">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <label class="form-check-label">First Name</label>
+                            <input type="text" name="guardian_first_name" class="form-control"  placeholder="Enter Parent First Name" required>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <label class="form-check-label">Last Name</label>
+                            <input type="text" name="guardian_last_name" class="form-control" placeholder="Enter Parent Last Name" required>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <label class="pb-2">Do you have legal custody of the gamer (if gamer is a minor)</label><br>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custody_type"
+                                            value="married_parent" id="custody1">
+                                        <label class="form-check-label" for="custody1">Biological parent, married</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custody_type"
+                                            value="divorced_parent" id="custody2">
+                                        <label class="form-check-label" for="custody2">Biological parent, divorced with
+                                            custody order</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custody_type"
+                                            value="adoptive_parent" id="custody3">
+                                        <label class="form-check-label" for="custody3">Adoptive parent(s)</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custody_type"
+                                            value="legal_guardian" id="custody4">
+                                        <label class="form-check-label" for="custody4">Legal Guardian with custody
+                                            order</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custody_type"
+                                            value="no_custody" id="custody5">
+                                        <label class="form-check-label" for="custody5">Do not have legal custody</label>
+                                    </div>
+                                </div>
+
+                            <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="custody_type" value="other" id="custody6">
+                                        <label class="form-check-label" for="custody6">Other</label>
+                                    </div>
+                                    </div>
+                            </div>
+
+                                <!-- Hidden Textbox -->
+                                <div id="otherCustodyTextDiv" class="mt-2" style="display: none;">
+                                    <label>Please specify:</label>
+                                    <input type="text" name="custody_other_detail" class="form-control">
+                                </div>
+
+                        </div>
+
+
+                    </div>
+
+                    <!-- <div class="md-3 row">
+                        <div class="col-12">
+                            <label >Type a Question</label>
+                            <textarea name="question" class="form-control" rows="2" required></textarea>
+                        </div>
+                    </div> -->
+
+
+                    <div class="row mt-2">
+                        <label class="position-relative">Roblox Gamertag 
+                            <span class="px-1">(Gamertag start with @ symbol)
+                                <span class="info-icon"> 
+                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                        width="16" height="16" viewBox="0 0 24 24">
+                                        <path
+                                            d="M 12 0 C 5.371094 0 0 5.371094 0 12 C 0 18.628906 5.371094 24 12 24 C 18.628906 24 24 18.628906 24 12 C 24 5.371094 18.628906 0 12 0 Z M 12 2 C 17.523438 2 22 6.476563 22 12 C 22 17.523438 17.523438 22 12 22 C 6.476563 22 2 17.523438 2 12 C 2 6.476563 6.476563 2 12 2 Z M 12 5.8125 C 11.816406 5.8125 11.664063 5.808594 11.5 5.84375 C 11.335938 5.878906 11.183594 5.96875 11.0625 6.0625 C 10.941406 6.15625 10.851563 6.285156 10.78125 6.4375 C 10.710938 6.589844 10.6875 6.769531 10.6875 7 C 10.6875 7.226563 10.710938 7.40625 10.78125 7.5625 C 10.851563 7.71875 10.941406 7.84375 11.0625 7.9375 C 11.183594 8.03125 11.335938 8.085938 11.5 8.125 C 11.664063 8.164063 11.816406 8.1875 12 8.1875 C 12.179688 8.1875 12.371094 8.164063 12.53125 8.125 C 12.691406 8.085938 12.816406 8.03125 12.9375 7.9375 C 13.058594 7.84375 13.148438 7.71875 13.21875 7.5625 C 13.289063 7.410156 13.34375 7.226563 13.34375 7 C 13.34375 6.769531 13.289063 6.589844 13.21875 6.4375 C 13.148438 6.285156 13.058594 6.15625 12.9375 6.0625 C 12.816406 5.96875 12.691406 5.878906 12.53125 5.84375 C 12.371094 5.808594 12.179688 5.8125 12 5.8125 Z M 10.78125 9.15625 L 10.78125 18.125 L 13.21875 18.125 L 13.21875 9.15625 Z">
+                                        </path>
+                                    </svg>
+                                
+                                </span>
+                                <div class="modal-overlay-image">
+                                    <div class="modal-content-image">
+                                        <!-- <span class="close-btn">&times;</span> -->
+                                        <img src="{% static 'img/roblox_game_img.jpg' %}" alt="roblox_gamer image">
+                                        <!-- <img src="../../roblex_app/static/img/roblox_game_img.jpg" alt="roblox_gamer image" class="game-info-img"> -->
+                                        
+                                    </div>
+                                </div>
+
+                            </span>
+                        </label>
+
+
+
+
+                        <div class="col-6">
+                            <input type="text" name="roblox_gamertag" class="form-control roblox-gamertag" placeholder="Enter Roblox Gamertag">
+                            <div class="robloxValidationStatus"></div>
+                        </div>
+
+
+                        <div class=" col-3">
+                            <button type="button" class="btn btn-plus" onclick="addInputField()" title="Add another Tag">Add another Tag</button>
+                        </div>
+                        <div class="row">
+
+                            <div id="inputContainer"  class="col-8"></div>
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="row mt-3">
+                            <div class="col-12 col-md-6">
+
+                                <label>Xbox Gamertag (if applicable)
+                                    <button type="button" class="btn btn-ico" data-toggle="tooltip" data-placement="bottom"
+                                        title="It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.">
+                                    </button>
+                                </label>
+                                <input type="text" id="xboxGamertag" name="xbox_gamertag" class="form-control" placeholder="Enter Xbox Gamertag" >
+                            <div class="xboxValidationStatus mt-1" style="font-size: 0.9em;"></div>
+
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-12 col-md-6">
+                            <label>PlayStation Gamertag (if applicable)</label>
+                            <input type="text" name="ps_gamertag" class="form-control" placeholder="Enter PlayStation Gamertag">
+                            <div class="psValidationStatus mt-1" style="font-size: 0.9em;"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <label>Discord Profile Name (if applicable)</label>
+                        <input type="text" name="discord_profile" class="form-control" placeholder="Enter Discord Gamertag">
+                    </div>
+                
+
+
+
+                    <div class="mb-3 row mt-3">
+                        <div class="col-12">
+                            <label>Brief Description of Sexual Predator's Conduct (lying about age, avatar customization,
+                                role playing in
+                                Roblox, etc) including methods of communication.How did the predator groom the
+                                minor? (if applicable)</label>
+                            <textarea name="description_predators" class="form-control" rows="2" placeholder="Enter Brief Description of Sexual Predator's"></textarea>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col-12">
+                            <label>Brief description of any medical/psychological treatment (if applicable)</label>
+                            <textarea name="description_medical_psychological" class="form-control" rows="2"
+                                required placeholder="Enter Brief description of any medical treatment"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-12">
+                            <label>Brief description of any economic loss (if applicable)</label>
+                            <textarea name="description_economic_loss" class="form-control" rows="2" required placeholder="Brief description of any economic loss"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="md-3 row">
+                        <div class="col-6">
+                            <label>Date of first known contact with sexual predator</label>
+                            <input type="text" id="first_contact" name="first_contact" class="form-control" placeholder="MM-DD-YYYY">
+                        </div>
+                        <div class="col-6">
+                            <label>Date of last known contact with sexual predator</label>
+                            <input type="text" id="last_contact" name="last_contact" class="form-control" placeholder="MM-DD-YYYY">
+                        </div>
+                    </div>
+
+                    <div class="md-3 row pt-3">
+                        <div class="col-12">
+                            <label>If you complained to your credit card company, please identify the names of the credit card companies involved.
+                            </label>
+                            <textarea name="cc_names" class="form-control" rows="2" required placeholder="Enter complained to your credit card company"></textarea>
+                        </div>
+                    </div>
+
+                      <div class="md-3 row pt-3">
+                        <div class="col-12">
+                            <label>Provide the name of the Police Department and Case Number.Also provide the current status
+                                of
+                                the complaint if known
+                            </label>
+                            <textarea name="police_details" class="form-control" required placeholder="Enter the name police Department"></textarea>
+                        </div>
+                    </div>
+                    <div class="md-3 row pt-3">
+                        <div class="col-12">
+                            <label>Have you made any complaints to Internet Service Providers or others about the predator?
+                                If so,
+                                please provide more details.</label>
+                            <textarea name="other_complaints" class="form-control" required placeholder="Enter any complaints"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row pt-3">
+                        <div class="col-12">
+                            <label>Did the predator meet the minor in person? If so, describe and provide approximate dates</label>
+                            <textarea name="in_person_meeting" class="form-control" required placeholder="Enter the predator meet the minor in person.."></textarea>
+                        </div>
+                    </div>
+                    <div class="pt-3 row">
+                        <div class="col-12">
+                            <label>Provide any other additional information that was not asked or that you think would be helpful.</label>
+                            <textarea name="additional_info" class="form-control" required placeholder="Provide any other additional information that was not asked or that you think would be helpful"></textarea>
+                        </div>
+                    </div>
+                    <div class="pt-3 row">
+                        <div class="col-12">
+                            <label>For parents/guardians-Describe app roximate date you discovered the predator's conduct
+                                and
+                                describe how you discovered the predator's conduct (did the minor child tell you, you found
+                                evidence, etc.). (if applicable)
+                            </label>
+                            <textarea name="discovery_info" class="form-control" placeholder=" parents/guardians-Describe app roximate date you discovered the predator's conduct"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 pt-3">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did you complain about the predator to Roblox?</label>
+                                <div class="d-flex gap-4 position-relative  rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="complained_to_roblox" value="Yes"
+                                            id="robloxYes">
+                                        <label class="form-check-label" for="robloxYes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="complained_to_roblox" value="No"
+                                            id="robloxNo_0">
+                                        <label class="form-check-label" for="robloxNo_0">No</label>
+                                    </div>
+                                </div>       
+                            
+                            </div>
+                            
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Do you have emails or call logs to document the Complaint to Roblox?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_roblox" value="Yes"
+                                            id="robloxYes_1">
+                                        <label class="form-check-label" for="robloxYes_1">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_roblox" value="No"
+                                            id="robloxNo_2">
+                                        <label class="form-check-label" for="robloxNo_2">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did you complain to Apple about the predator?</label>
+                                 <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="complained_to_apple" value="Yes"
+                                            id="robloxNo_3">
+                                        <label class="form-check-label" for="robloxNo_3">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="complained_to_apple" value="No"
+                                            id="robloxNo_4">
+                                        <label class="form-check-label" for="robloxNo_4">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Do you have emails or call logs to document the Complaint to Apple?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_apple" value="Yes"
+                                            id="robloxNo_5">
+                                        <label class="form-check-label" for="robloxNo_5">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_apple" value="No"
+                                            id="robloxNo_6">
+                                        <label class="form-check-label" for="robloxNo_6">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did you complain to any credit card company about the predator?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="complained_to_cc" value="Yes"
+                                            id="robloxNo_7">
+                                        <label class="form-check-label" for="robloxNo_7">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="complained_to_cc" value="No"
+                                            id="robloxNo_8">
+                                        <label class="form-check-label" for="robloxNo_8">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Do you have emails or call logs to document the Complaint to your credit card company?</label>
+                                 <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_cc" value="Yes"
+                                            id="robloxNo_9">
+                                        <label class="form-check-label" for="robloxNo_9">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_cc" value="No"
+                                            id="robloxNo_10">
+                                        <label class="form-check-label" for="robloxNo_10">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md-3 row mt-3">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did you contact the Police about the predator?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="contacted_police" value="Yes"
+                                            id="robloxNo_11">
+                                        <label class="form-check-label" for="robloxNo_11">Yes</label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="contacted_police" value="No"
+                                            id="robloxNo_12">
+                                        <label class="form-check-label" for="robloxNo_12">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md-3 row mt-2">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Do you have emails or call logs to document the Complaint to the Police?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_police" value="Yes"
+                                            id="robloxNo_13">
+                                        <label class="form-check-label" for="robloxNo_13">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="emails_to_police" value="No"
+                                            id="robloxNo_14">
+                                        <label class="form-check-label" for="robloxNo_14">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md-3 row mt-3">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did the predator ask for photos or videos of the minor?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="asked_for_photos" value="Yes"
+                                            id="robloxNo_15">
+                                        <label class="form-check-label" for="robloxNo_15">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="asked_for_photos" value="No"
+                                            id="robloxNo_16">
+                                        <label class="form-check-label" for="robloxNo_16">No</label>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="md-3 row mt-2">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did the minor provide any photos or videos to the predator?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="minor_sent_photos" value="Yes"
+                                            id="robloxNo_17">
+                                        <label class="form-check-label" for="robloxNo_17">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="minor_sent_photos" value="No"
+                                            id="robloxNo_18">
+                                        <label class="form-check-label" for="robloxNo_18">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md-3 row mt-2">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did the predator distribute the minor's photos or videos to others?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="predator_distributed" value="Yes"
+                                            id="robloxNo_19">
+                                        <label class="form-check-label" for="robloxNo_19">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="predator_distributed" value="No"
+                                            id="robloxNo_20">
+                                        <label class="form-check-label" for="robloxNo_20">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="predator_distributed" value="Unknown"
+                                            id="robloxUnknown_21">
+                                        <label class="form-check-label" for="robloxUnknown_21">Unknown</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="md-3 row mt-2">
+                        <div class="col-12">
+                            <div class="d-md-flex justify-content-between position-relative">
+                                <label>Did the predator threaten the minor with public distribution of photos or videos?</label>
+                                <div class="d-flex gap-4 position-relative rb-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="predator_threatened" value="Yes"
+                                            id="robloxNo_22">
+                                        <label class="form-check-label" for="robloxNo_22">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="predator_threatened" value="No"
+                                            id="robloxNo_23">
+                                        <label class="form-check-label" for="robloxNo_23">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="predator_threatened" value="Unknown"
+                                            id="robloxUnknown_24">
+                                        <label class="form-check-label" for="robloxUnknown_24">Unknown</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    
+
+                       
+                        <div class="col-12 d-flex justify-content-center pb-3">
+                            <form id="myForm">
+                                <button type="submit" class="btn btn-submit mt-3">Submit</button>
+                            </form> 
+                        </div>
+                        <!-- <div class="col-6">
+                    <button type="button" id="exportBtn" class="btn btn-success mt-3">Export to PDF</button>
+                    </div> -->
+                    
+
+                    <div id="responseMessage" class="mt-3"></div>
+                  </div>
+
+                    <!-- Spinner Overlay -->
+                    <div id="spinnerOverlay" style="display: none; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255,255,255,0.8); z-index: 9999;">
+                        <div class="spinner"></div>
+                        <div id="spinnerMessage" style="margin-top: 20px; font-size: 18px; color: #333; text-align: center;">
+                        The document is processing and just one step away...
+                    </div>
+               
+            <!-- <div class="col-2"></div> -->
+<!-- 
+        </div> -->
+
+    <!-- </div> -->
+
+ <script>
+  // ✅ Prefill guardian names from sessionStorage
+  window.onload = function () {
+    const firstName = sessionStorage.getItem("guardian_first_name");
+    const lastName = sessionStorage.getItem("guardian_last_name");
+
+    if (firstName) {
+      const guardianFirst = document.querySelector("input[name='guardian_first_name']");
+      if (guardianFirst) guardianFirst.value = firstName;
+    }
+
+    if (lastName) {
+      const guardianLast = document.querySelector("input[name='guardian_last_name']");
+      if (guardianLast) guardianLast.value = lastName;
+    }
+  };
+
+$(document).ready(function () {
+    const csrfToken = $('meta[name=csrf-token]').attr('content');
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            }
+        }
+    });
+
+    const dateFields = ["first_contact", "last_contact"];
+    const textFields = [
+        "gamer_first_name", "gamer_last_name",
+        "guardian_first_name", "guardian_last_name",
+        "roblox_gamertag", 
+        "custody_other_detail"
+    ];
+    const textareaFields = [
+        "cc_names", "police_details",
+        "other_complaints", "in_person_meeting", "additional_info"
+    ];
+    const radioFields = [
+        "custody_type", "complained_to_roblox", "emails_to_roblox",
+        "complained_to_apple", "emails_to_apple", "complained_to_cc",
+        "emails_to_cc", "contacted_police", "emails_to_police",
+        "asked_for_photos", "minor_sent_photos", "predator_distributed",
+        "predator_threatened"
+    ];
+
+   
+
+    // let robloxValidationStatus = {};
+
+    // // ✅ Roblox username validation
+    // $(document).on("blur", ".roblox-gamertag", function () {
+    //     const $input = $(this);
+    //     const username = $input.val().trim();
+    //     const $statusDiv = $input.siblings(".robloxValidationStatus");
+    //     if (!username) return;
+    //     $statusDiv.html("Validating...");
+    //     robloxValidationStatus[$input.index()] = false;
+
+    //     $.ajax({
+    //         url: "/api/validate-roblox/",
+    //         type: "POST",
+    //         contentType: "application/json",
+    //         data: JSON.stringify({ username }),
+    //         success: function (response) {
+    //         const message = response?.success || "Gamertag found.";
+        
+
+    //         $statusDiv.html(`<div class="text-success">${message}</div>`);
+    //         robloxValidationStatus[$input.index()] = true;
+    //         },
+    //         error: function (xhr) {
+    //             const message = xhr.responseJSON?.error || "Gamertag not found.";
+    //             // $statusDiv.html(`<div class="des-mg-tp">${message}</div>`);
+    //             $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">${message}</div>`);
+    //             robloxValidationStatus[$input.index()] = false;
+    //         }
+    //     });
+    // });
+
+
+    let robloxValidationStatus = {};
+
+    // ✅ Roblox username validation on blur
+    $(document).on("blur", ".roblox-gamertag", function () {
+        const $input = $(this);
+        const username = $input.val().trim();
+        const $statusDiv = $input.siblings(".robloxValidationStatus");
+
+        const index = $(".roblox-gamertag").index($input);
+        robloxValidationStatus[index] = false;
+
+        if (!username) {
+            $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">Field is required.</div>`);
+            return;
+        }
+
+        $statusDiv.html("Validating...");
+
+        $.ajax({
+            url: "/api/validate-roblox/",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ username }),
+            success: function (response) {
+                const message = response?.success || "Gamertag found.";
+                $statusDiv.html(`<div class="text-success">${message}</div>`);
+                robloxValidationStatus[index] = true;
+            },
+            error: function (xhr) {
+                const message = xhr.responseJSON?.error || "Gamertag not found.";
+                $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">${message}</div>`);
+                robloxValidationStatus[index] = false;
+            }
+        });
+    });
+
+
+    
+const xboxValidationStatus = {};
+console.log("**********************", xboxValidationStatus)
+
+// Blur event → validate only when leaving the field
+$("input[name='xbox_gamertag']").on("blur", function () {
+    const $input = $(this);
+    const gamertag = $input.val().trim();
+    const statusElement = $input.siblings(".xboxValidationStatus");
+    const inputIndex = $("input[name='xbox_gamertag']").index(this); // Get unique identifier
+
+    // Clear previous status
+    statusElement.html('');
+
+    if (!gamertag) {
+        delete xboxValidationStatus[inputIndex]; // Remove entry instead of setting null
+        return;
+    }
+
+    // Remove @ or other non-letter prefix
+    const strippedGamertag = gamertag.replace(/^[^A-Za-z]+/, '');
+    statusElement.html('<span style="color:green;">Validating...</span>');
+
+    $.ajax({
+        url: `/api/validate-xbox-gamertag/${encodeURIComponent(strippedGamertag)}/`,
+        type: "GET",
+        success: function (data) {
+            if (data.success && data.gamertag) {
+                statusElement.html(
+                    `<span style="color:green;">Gamertag found</span>`
+                );
+                xboxValidationStatus[inputIndex] = true;
+            } else {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+                xboxValidationStatus[inputIndex] = false;
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 404) {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+            }
+            xboxValidationStatus[inputIndex] = false;
+        }
+    });
+});
+
+const psValidationStatus = {};
+console.log("**********************", psValidationStatus)
+
+// Blur event → validate only when leaving the field
+$("input[name='ps_gamertag']").on("blur", function () {
+    const $input = $(this);
+    const gamertag = $input.val().trim();
+    const statusElement = $input.siblings(".psValidationStatus");
+    const inputIndex = $("input[name='ps_gamertag']").index(this); // Get unique identifier
+
+    // Clear previous status
+    statusElement.html('');
+
+    if (!gamertag) {
+        delete psValidationStatus[inputIndex]; // Remove entry instead of setting null
+        return;
+    }
+
+    // Remove @ or other non-letter prefix
+    const strippedGamertag = gamertag.replace(/^[^A-Za-z]+/, '');
+    statusElement.html('<span style="color:green;">Validating...</span>');
+
+    $.ajax({
+        url: `/api/validate-xbox-gamertag/${encodeURIComponent(strippedGamertag)}/`,
+        type: "GET",
+        success: function (data) {
+            if (data.success && data.gamertag) {
+                statusElement.html(
+                    `<span style="color:green;">Gamertag found</span>`
+                );
+                psValidationStatus[inputIndex] = true;
+            } else {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+                psValidationStatus[inputIndex] = false;
+            }
+        },
+        error: function (xhr) {
+            if (xhr.status === 404) {
+                statusElement.html('<span style="color:red;">Gamertag not found.</span>');
+            }
+            psValidationStatus[inputIndex] = false;
+        }
+    });
+});
+
+
+    // ✅ Form submission check
+    $("#intakeForm").on("submit", function (e) {
+        let isValid = true;
+
+        $("input[name='xbox_gamertag']").each(function () {
+            const value = $(this).val().trim();
+            if (value && xboxValidationStatus[value] === false) {
+                const $statusDiv = $(this).siblings(".xboxValidationStatus");
+                $statusDiv.html('<span class="text-danger">Gamertag not found.</span>');
+                isValid = false;
+            }
+        });
+
+
+        $("input[name='ps_gamertag']").each(function () {
+            const value = $(this).val().trim();
+            if (value && xboxValidationStatus[value] === false) {
+                const $statusDiv = $(this).siblings(".psValidationStatus");
+                $statusDiv.html('<span class="text-danger">Gamertag not found.</span>');
+                isValid = false;
+            }
+        });
+
+
+
+        $(".roblox-gamertag").each(function (i) {
+            const value = $(this).val().trim();
+            if (value && !robloxValidationStatus[i]) {
+                const $statusDiv = $(this).siblings(".robloxValidationStatus");
+                $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">Gamertag not found.</div>`);
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+
+    $('input[name="custody_type"]').on('change', function () {
+        $('#otherCustodyTextDiv').toggle($('#custody6').is(':checked'));
+        if (!$('#custody6').is(':checked')) {
+            $('input[name="custody_other_detail"]').val('');
+        }
+    });
+
+    $("input[type='date']").each(function () {
+        this.max = new Date().toISOString().split("T")[0];
+    });
+
+    function getFieldValues(fieldName) {
+        const inputs = $(`input[name="${fieldName}"]`);
+        if (inputs.length === 0) return null;
+        if (inputs.length === 1) return inputs.val();
+        return inputs.map(function () {
+            return $(this).val();
+        }).get().filter(Boolean).join(", ");
+    }
+
+        function validateIntakeForm() {
+        let isValid = true;
+        $(".text-danger").remove();
+        $('.invalid-feedback').remove();
+        $('.form-control').removeClass('is-invalid');
+
+        // ✅ Date fields
+        dateFields.forEach(field => {
+            const input = $(`input[name="${field}"]`);
+            const value = input.val();
+            input.removeClass('error-border')
+            if (!value) {
+                isValid = false;
+                // input.after('<div class="text-danger">This field is required</div>');
+               input.addClass('error-border');
+            } else {
+                const selectedDate = new Date(value + "T00:00:00");
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (selectedDate > today) {
+                    isValid = false;
+                    // input.after('<div class="text-danger">Future dates are not allowed</div>');
+                }
+            }
+
+            // Remove error on input
+            input.on('input', function () {
+                if ($(this).val().trim()) {
+                    $(this).removeClass('error-border');
+                }
+            });
+
+        });
+
+
+        // ✅ Validate first_contact vs last_contact dates
+        const firstContactValue = $('input[name="first_contact"]').val();
+        const lastContactValue = $('input[name="last_contact"]').val();
+        
+        if (firstContactValue && lastContactValue) {
+            // Parse MM-DD-YYYY format properly
+            const parseDate = (dateStr) => {
+                if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+                    const [month, day, year] = dateStr.split('-');
+                    return new Date(year, month - 1, day); // month is 0-indexed
+                }
+                return new Date(dateStr);
+            };
+            
+            const firstContactDate = parseDate(firstContactValue);
+            const lastContactDate = parseDate(lastContactValue);
+            
+            if (firstContactDate > lastContactDate) {
+                isValid = false;
+                $('input[name="first_contact"]').addClass('is-invalid');
+                $('input[name="last_contact"]').addClass('is-invalid');
+                $('input[name="first_contact"]').after('<div class="invalid-feedback">First contact date cannot be after last contact date</div>');
+            }
+        }
+
+       // Initialize Flatpickr with MM-DD-YYYY format
+        flatpickr("#first_contact", {
+            dateFormat: "m-d-Y"  // MM-DD-YYYY
+        });
+
+        flatpickr("#last_contact", {
+            dateFormat: "m-d-Y"  // MM-DD-YYYY
+        });
+
+        // Validate the input format on blur
+        ['first_contact', 'last_contact'].forEach(function(id) {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('blur', function () {
+                    const val = this.value.trim();
+                    const isValid = /^\d{2}-\d{2}-\d{4}$/.test(val);  // MM-DD-YYYY pattern
+                    if (!isValid) {
+                        // alert("Please enter date in MM-DD-YYYY format");
+                        this.value = '';
+                    }
+                });
+            }
+        });
+
+
+
+
+
+
+        // $(".roblox-gamertag").each(function (index) {
+        //     if (robloxValidationStatus[index] === false) {
+        //         isValid = false;
+        //     }
+        // });
+
+        // ✅ Text & Textarea
+        textFields.forEach(field => {
+            const input = $(`input[name="${field}"]`);
+            input.removeClass('error-border')
+            if (input.is(':visible') && !getFieldValues(field).trim()) {
+                isValid = false;
+                // input.after('<div class="text-danger">This field is required</div>');
+                input.addClass('error-border');
+            }
+               // Remove error on input
+                input.on('input', function () {
+                    if ($(this).val().trim()) {
+                        $(this).removeClass('error-border');
+                    }
+    });
+
+        });
+
+        textareaFields.forEach(field => {
+            const textarea = $(`textarea[name="${field}"]`);
+            textarea.removeClass('error-border')
+            if (!textarea.val().trim()) {
+                isValid = false;
+                // textarea.after('<div class="text-danger">This field is required</div>');
+                textarea.addClass('error-border');
+            }
+               // Remove error on input
+            textarea.on('input', function () {
+                if ($(this).val().trim()) {
+                    $(this).removeClass('error-border');
+        }
+    });
+
+        });
+
+        radioFields.forEach(field => {
+            const selected = $(`input[name="${field}"]:checked`);
+            if (selected.length === 0) {
+                const container = $(`input[name="${field}"]`).last().closest('.rb-group').parent();
+                container.append('<div class="text-danger rb-err-msg ">Please select an option</div>');
+                isValid = false;
+            }
+        });
+
+        if ($('#custody6').is(':checked')) {
+            const otherText = $(`input[name="custody_other_detail"]`);
+            if (!otherText.val().trim()) {
+                // otherText.after('<div class="text-danger">Please specify</div>');
+                isValid = false;
+            }
+        }
+
+        return isValid;
+    }
+
+    
+
+    function getSelectedRadioValues() {
+        const radioData = {};
+        $("input[type='radio']:checked").each(function () {
+            const name = $(this).attr("name");
+            const value = $(this).val();
+            radioData[name] = value;
+        });
+        return radioData;
+    }
+
+    let clientIP = '';
+    let localTimestamp = '';
+
+    function fetchIPAndTimestamp(callback) {
+        fetch('/get-ip')
+            .then(res => res.json())
+            .then(data => {
+            clientIP = data.ip;
+            localTimestamp = new Date().toISOString();   // Local time
+                if (typeof callback === "function") callback();
+            })
+            .catch(() => {
+                clientIP = "Unavailable";
+                localTimestamp = new Date().toLocaleString();
+                if (typeof callback === "function") callback();
+            });
+    }
+
+
+    function takeScreenshotPDF(callback) {
+    const form = document.querySelector("#intakeForm");
+
+    // ✅ Preserve radio button states
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        if (radio.checked) {
+            radio.setAttribute("checked", "checked");
+        }
+    });
+
+    // ✅ Clone form to avoid affecting live form
+    const clonedForm = form.cloneNode(true);
+    clonedForm.style.position = 'fixed';
+    clonedForm.style.top = '0';
+    clonedForm.style.left = '0';
+    clonedForm.style.width = '800px';
+    clonedForm.style.zIndex = '-9999';
+    clonedForm.style.backgroundColor = 'white';
+
+    // ✅ Add hidden IP + timestamp info (will appear in PDF only)
+    const metaInfoDiv = document.createElement("div");
+    metaInfoDiv.style.fontSize = "10px";
+    metaInfoDiv.style.color = "#333";
+    metaInfoDiv.style.marginTop = "10px";
+    metaInfoDiv.innerText = `Client IP: ${clientIP}`;
+    clonedForm.appendChild(metaInfoDiv);
+
+    const metaInfoDiv_1= document.createElement("div");
+    metaInfoDiv_1.style.fontSize = "10px";
+    metaInfoDiv_1.style.color = "#333";
+    metaInfoDiv_1.style.marginTop = "10px";
+    metaInfoDiv_1.innerText = `Submitted at: ${localTimestamp}`;
+    clonedForm.appendChild(metaInfoDiv_1);
+
+    document.body.appendChild(clonedForm);
+
+    // ✅ Hide error messages from cloned form
+    const clonedErrorBox = clonedForm.querySelector("#responseMessage");
+    if (clonedErrorBox) {
+        clonedErrorBox.style.display = "none";
+    }
+
+    html2canvas(clonedForm, {
+        scale: 2,
+        scrollY: 0,
+        scrollX: 0,
+        useCORS: true,
+        backgroundColor: "#fff",
+        windowWidth: clonedForm.scrollWidth,
+        windowHeight: clonedForm.scrollHeight
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        let position = 0;
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        while (position < pdfHeight) {
+            pdf.addImage(imgData, 'PNG', 0, -position, pdfWidth, pdfHeight);
+            position += pageHeight;
+            if (position < pdfHeight) pdf.addPage();
+        }
+
+        pdf.save("roblox_intake_form_full.pdf");
+
+        const pdfData = pdf.output('dataurlstring'); // ✅ Base64 PDF data
+        clonedForm.remove();
+
+        if (typeof callback === "function") {
+            callback(pdfData);  // ✅ Send base64 to callback
+        }
+    }).catch(err => {
+        console.error("PDF generation error:", err);
+        alert("Something went wrong while generating the PDF.");
+        if (typeof callback === "function") callback(null);
+    });
+}
+
+
+
+$("#intakeForm").on("submit", function (e) {
+    e.preventDefault();
+
+    // ✅ FIXED - Only check validation status for current input values
+    const hasInvalidRobloxGamertag = $("input[name='roblox_gamertag']").toArray().some((input, index) => {
+        const value = $(input).val().trim();
+        if (!value) return false; // Skip empty inputs
+        const status = robloxValidationStatus[index];
+        console.log(`Roblox input ${index}: value="${value}", status=${status}, isInvalid=${status === false}`);
+        return status === false;
+    });
+    
+    const hasInvalidXboxGamertag = $("input[name='xbox_gamertag']").toArray().some((input, index) => {
+        const value = $(input).val().trim();
+        if (!value) return false; // Skip empty inputs
+        const status = xboxValidationStatus[index];
+        console.log(`Xbox input ${index}: value="${value}", status=${status}, isInvalid=${status === false}`);
+        return status === false;
+    });
+
+    const hasInvalidPsGamertag = $("input[name='ps_gamertag']").toArray().some((input, index) => {
+        const value = $(input).val().trim();
+        if (!value) return false; // Skip empty inputs
+        const status = psValidationStatus[index];
+        console.log(`Xbox input ${index}: value="${value}", status=${status}, isInvalid=${status === false}`);
+        return status === false;
+    });
+    
+    // const hasInvalidGamertag = hasInvalidRobloxGamertag || hasInvalidXboxGamertag;
+
+    const hasInvalidGamertag = hasInvalidRobloxGamertag || hasInvalidXboxGamertag || hasInvalidPsGamertag;
+
+    // ✅ ADDITIONAL - Debug logging to see what's happening
+    console.log("=== VALIDATION DEBUG ===");
+    console.log("Xbox validation status object:", xboxValidationStatus);
+    console.log("Roblox validation status object:", robloxValidationStatus);
+    console.log("Has invalid Roblox gamertag:", hasInvalidRobloxGamertag);
+    console.log("Has invalid Xbox gamertag:", hasInvalidXboxGamertag);
+    console.log("Has invalid gamertag (final):", hasInvalidGamertag);
+    console.log("=== END DEBUG ===");
+
+    if (hasInvalidGamertag) {
+        $("#responseMessage").html('<div class="alert alert-danger">One or more gamertags are invalid. Please fix them before submitting.</div>');
+        return; 
+    }
+
+    if (!validateIntakeForm()) return;
+
+    document.getElementById('spinnerOverlay').style.display = 'flex';
+
+    const formData = {};
+    radioFields.forEach(field => {
+        const selected = [];
+        $(`input[name="${field}"]:checked`).each(function () {
+            selected.push($(this).val());
+        });
+        formData[field] = selected;
+    });
+
+    $(this).serializeArray().forEach(({ name, value }) => {
+        if (!radioFields.includes(name)) {
+            if (name === "roblox_gamertag") {
+                const allGamertags = [];
+                $(`input[name='${name}']`).each(function () {
+                    const cleaned = $(this).val().trim().replace(/[@_]/g, '');
+                    if (cleaned) allGamertags.push(cleaned);
+                });
+                formData[name] = allGamertags.join(", ");
+            // ✅ ADDITIONAL - Handle xbox_gamertag similar to roblox_gamertag
+            } else if (name === "xbox_gamertag") {
+                const allGamertags = [];
+                $(`input[name='${name}']`).each(function () {
+                    const cleaned = $(this).val().trim().replace(/^[^A-Za-z]+/, '');
+                    if (cleaned) allGamertags.push(cleaned);
+                });
+                formData[name] = allGamertags.join(", ");
+            }
+            else if (name === "ps_gamertag") {
+                const allGamertags = [];
+                $(`input[name='${name}']`).each(function () {
+                    const cleaned = $(this).val().trim().replace(/^[^A-Za-z]+/, '');
+                    if (cleaned) allGamertags.push(cleaned);
+                });
+                formData[name] = allGamertags.join(", ");
+            }
+            else {
+                formData[name] = value;
+            }
+        }
+    });
+
+    fetchIPAndTimestamp(() => {
+        takeScreenshotPDF((pdfData) => {
+            $.ajax({
+                url: "/api/roblox-intake/",
+                type: "POST",
+                data: JSON.stringify({
+                    ...formData,
+                    client_ip: clientIP,
+                    submitted_at: localTimestamp,
+                    pdf_data: pdfData
+                }),
+                contentType: "application/json",
+                success: function () {
+                    setTimeout(() => {
+                        document.getElementById("intakeForm").reset();
+                        $('#otherCustodyTextDiv').hide();
+                        $(".text-danger").remove();
+                        // $('.robloxValidationStatus, .xboxValidationStatus').html('');
+                        $('.robloxValidationStatus, .xboxValidationStatus, .psValidationStatus').html('');
+                        
+                        // ✅ ADDITIONAL - Clear validation status objects by index
+                        $("input[name='roblox_gamertag']").each(function(index) {
+                            delete robloxValidationStatus[index];
+                        });
+                        $("input[name='xbox_gamertag']").each(function(index) {
+                            delete xboxValidationStatus[index];
+                        });
+                        $("input[name='ps_gamertag']").each(function(index) {
+                            delete psValidationStatus[index];
+                        });
+                    }, 1000);
+
+                    document.getElementById('spinnerOverlay').style.display = 'none';
+                    window.location.href = "/gratitude";
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseJSON);
+                    document.getElementById('spinnerOverlay').style.display = 'none';
+                
+                    // Clear previous error styling
+                    $('.form-control').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+                    
+                    if (xhr.status === 409 && xhr.responseJSON && xhr.responseJSON.already_submitted) {
+                        alert('You have already submitted an intake form. Redirecting to thank you page.');
+                        window.location.href = "/gratitude?already_submitted=true";
+                    } else if (xhr.responseJSON && xhr.responseJSON.details) {
+                        // Show field-specific validation errors
+                        const errors = xhr.responseJSON.details;
+                        let hasErrors = false;
+                        
+                        // Handle non-field errors (like date validation)
+                        if (errors.non_field_errors) {
+                            errors.non_field_errors.forEach(error => {
+                                if (error.includes('First contact date cannot be after last contact date')) {
+                                    // Show error on both date fields
+                                    $('#first_contact').addClass('is-invalid');
+                                    $('#last_contact').addClass('is-invalid');
+                                    $('#first_contact').after('<div class="invalid-feedback">First contact date cannot be after last contact date.</div>');
+                                } else {
+                                    $("#responseMessage").html('<div class="alert alert-danger">' + error + '</div>');
+                                }
+                            });
+                            hasErrors = true;
+                        }
+                        
+                        // Handle field-specific errors
+                        for (const field in errors) {
+                            if (field !== 'non_field_errors') {
+                                const fieldElement = $(`[name="${field}"]`);
+                                if (fieldElement.length > 0) {
+                                    fieldElement.addClass('is-invalid');
+                                    const errorMessage = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
+                                    fieldElement.after('<div class="invalid-feedback">' + errorMessage + '</div>');
+                                    hasErrors = true;
+                                }
+                            }
+                        }
+                        
+                        if (hasErrors) {
+                            // Scroll to first error field
+                            const firstError = $('.is-invalid').first();
+                            if (firstError.length > 0) {
+                                $('html, body').animate({
+                                    scrollTop: firstError.offset().top - 100
+                                }, 500);
+                            }
+                        }
+                    } else {
+                        $("#responseMessage").html('<div class="alert alert-danger">Error submitting form. Please try again.</div>');
+                    }
+                }
+            });
+        });
+    });
+});
+
+
+
+
+
+
+    
+
+    $("#exportBtn").on("click", function () {
+        if (!validateIntakeForm()) return;
+        takeScreenshotPDF();
+    });
+
+    // ✅ Dynamic tag add
+    let inputCount = 0;
+    window.addInputField = function () {
+        inputCount++;
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group mt-4';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = "Enter Additional Roblox Gamertag";
+        input.name = 'roblox_gamertag';
+        input.className = 'form-control roblox-gamertag';
+        input.style.borderRadius = 'var(--bs-border-radius)';
+
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'robloxValidationStatus mt-1';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.title = "Remove Tag";
+        deleteBtn.innerHTML = 'Remove Tag';
+        deleteBtn.style.padding = '4px 15px';
+        deleteBtn.style.backgroundColor = '#ff4444';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '6px';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.margin = '0px -12px 0px 24px';
+        deleteBtn.onclick = function () {
+            inputGroup.remove();
+        };
+
+        inputGroup.appendChild(input);
+        inputGroup.appendChild(statusDiv);
+        inputGroup.appendChild(deleteBtn);
+        document.getElementById('inputContainer').appendChild(inputGroup);
+    };
+
+    const closeBtn = document.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            document.querySelector('.modal-overlay').style.display = 'none';
+        });
+    }
+});
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+<script>
+    flatpickr("#first_contact", {
+        dateFormat: "m-d-Y",
+        allowInput: true
+    });
+
+    flatpickr("#last_contact", {
+        dateFormat: "m-d-Y",
+        allowInput: true
+    });
+</script>
+
+</body>
+</html>
+
+

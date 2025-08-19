@@ -3,7 +3,8 @@ from django.urls import path
 from roblex_app.views import IntakeFormAPIView, intake_form_view,SubmitIntakeIfValidAPIView,UserDetailCreateView,\
 QuestionListAPIView, SubmitAnswerAPIView,landing_page,SendEmailAPIView,EmailTemplateAPIView,\
 CreateDocumentSubmissionAPIView, DocumentWebhookAPIView, CheckDocumentStatusAPIView, CheckIntakeStatusAPIView, \
-LandingPageLeadCreateAPIView, LandingPageLeadListAPIView, LandingPageLeadDetailAPIView, LandingPageLeadEmailAPIView
+LandingPageLeadCreateAPIView, LandingPageLeadListAPIView, LandingPageLeadDetailAPIView, LandingPageLeadEmailAPIView, \
+roblox_intake_form_view, RobloxIntakeFormAPIView
 
 from .views import validate_roblox_username,get_client_ip,email_view,retainer_form,thanks,about_us_view,consent_box_view,disclaimer_view,\
 participating_firms_view,privacy_policy_view,terms_of_service_view,validate_xbox_gamertag,validate_playstation_gamertag
@@ -11,6 +12,11 @@ urlpatterns = [
     path('', landing_page, name='landing-page'),
     # path('index/', index_page, name='index-page'),
     path('intake-form/<int:user_detail_id>/', intake_form_view, name='intake-form-page'), 
+    
+    # Standalone Roblox Intake Form (no UserDetail required)
+    path('roblox-intake/', roblox_intake_form_view, name='roblox-intake-form-page'),
+    path('api/roblox-intake/', RobloxIntakeFormAPIView.as_view(), name='roblox-intake-form-api'),
+    
     # path('api/intake-form/<int:user_detail_id>/', SubmitIntakeIfValidAPIView.as_view(), name='submit-intake-form'),
     path('api/intake-form/', IntakeFormAPIView.as_view(), name='intake-form'),
     path('api/validate-roblox/', validate_roblox_username, name='validate_roblox'),

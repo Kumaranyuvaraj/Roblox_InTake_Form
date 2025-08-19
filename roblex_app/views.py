@@ -1558,3 +1558,80 @@ class LandingPageLeadEmailAPIView(APIView):
                 'error': 'Error queuing bulk emails',
                 'details': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ====================
+# Standalone Roblox Intake Form Views (No UserDetail required)
+# ====================
+
+def roblox_intake_form_view(request):
+    """
+    Renders the standalone Roblox intake form page (not linked to UserDetail)
+    Accessible at /roblox-intake/
+    """
+    return render(request, 'roblox_intake_form.html')
+
+
+class RobloxIntakeFormAPIView(APIView):
+    """
+    API endpoint for standalone Roblox intake form submission (without UserDetail requirement)
+    Uses the existing IntakeFormSerializer but sets user_detail=None
+    """
+    
+    def post(self, request):
+        try:
+            # Use the existing IntakeFormSerializer
+            serializer = IntakeFormSerializer(data=request.data)
+            
+            if serializer.is_valid():
+                # Get law firm based on domain
+                law_firm = self.get_law_firm_from_domain(request.get_host())
+                
+                # Save without user_detail (it's nullable)
+                intake_form = serializer.save(
+                    user_detail=None,  # No UserDetail association
+                    law_firm=law_firm,  # Set based on domain
+                    submitted_at=timezone.now()
+                )
+                
+                return Response({
+                    "message": "Roblox intake form submitted successfully.",
+                    "intake_id": intake_form.id,
+                    "data": IntakeFormSerializer(intake_form).data
+                }, status=status.HTTP_201_CREATED)
+            
+            return Response({
+                "error": "Validation failed",
+                "details": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            return Response({
+                "error": f"Internal server error: {str(e)}"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def get_law_firm_from_domain(self, domain):
+        """
+        Extract law firm from request subdomain or default
+        """
+        try:
+            # Get subdomain from host header
+            host = domain
+            subdomain = host.split('.')[0] if '.' in host else 'default'
+            
+            # Handle localhost and dev environments
+            if 'localhost' in host or '127.0.0.1' in host:
+                subdomain = 'default'
+            
+            law_firm = LawFirm.objects.filter(subdomain=subdomain, is_active=True).first()
+            
+            # Fallback to default law firm if subdomain not found
+            if not law_firm:
+                law_firm = LawFirm.objects.filter(subdomain='default', is_active=True).first()
+            
+            return law_firm
+            
+        except Exception as e:
+            print(f"Error getting law firm from request: {e}")
+            # Return default law firm as fallback
+            return LawFirm.objects.filter(subdomain='default', is_active=True).first()
