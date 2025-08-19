@@ -1548,6 +1548,7 @@ $("#intakeForm").on("submit", function (e) {
 
     if (!validateIntakeForm()) return;
 
+    // Show loading state initially
     document.getElementById('spinnerOverlay').style.display = 'flex';
 
     const formData = {};
@@ -1592,7 +1593,13 @@ $("#intakeForm").on("submit", function (e) {
     });
 
     fetchIPAndTimestamp(() => {
+        // Hide spinner before taking screenshot to avoid capturing it in PDF
+        document.getElementById('spinnerOverlay').style.display = 'none';
+        
         takeScreenshotPDF((pdfData) => {
+            // Show spinner again during AJAX submission
+            document.getElementById('spinnerOverlay').style.display = 'flex';
+            
             $.ajax({
                 url: "/api/roblox-intake/",
                 type: "POST",
