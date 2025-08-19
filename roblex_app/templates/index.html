@@ -415,16 +415,16 @@
                            <select id="question_9" class="question-dropdown"
                                 data-question-text="Did your child play Roblox?"></select> -->
                             
-                            <label>Do you have an attorney for a Roblox Assault claim?</label>
+                            <label>Do you have an attorney for a Roblox Assault claim? *</label>
                            <select id="question_10" class="question-dropdown"
-                                data-question-text="Do you have an attorney for a Roblox Assault claim?"></select>
+                                data-question-text="Do you have an attorney for a Roblox Assault claim? *"></select>
 
                         </div>
                          <div class="input-group">
-                            <label>Are you currently over the age of 18?</label>
+                            <label>Are you currently over the age of 18? *</label>
                             <!-- <input type="text" id="" placeholder=" " data-question-text="When did your child begin playing Roblox?" required> -->
                              <select id="question_11" class="question-dropdown"
-                                data-question-text="Are you currently over the age of 18?"></select>
+                                data-question-text="Are you currently over the age of 18? *"></select>
 
                         </div>
 
@@ -435,136 +435,100 @@
                         </div> -->
 
                         <div class="input-group">
-                            <label>	Did you or your child come in contact with an online predator through Roblox?</label>
+                            <label>	Did you or your child come in contact with an online predator through Roblox? *</label>
                             <select id="question_16" class="question-dropdown"
-                                data-question-text="Did you or your child come in contact with an online predator through Roblox?"></select>
+                                data-question-text="Did you or your child come in contact with an online predator through Roblox? *"></select>
                         </div>
                           
                         <div class="input-group">
-                            <label> Were you or your child under the age of 18 at the time the incidents began?</label>
+                            <label> Were you or your child under the age of 18 at the time the incidents began? *</label>
                             <select id="question_12" class="question-dropdown"
-                                data-question-text="Were you or your child under the age of 18 at the time the incidents began?"></select>
+                                data-question-text="Were you or your child under the age of 18 at the time the incidents began? *"></select>
 
                         </div>
 
-                        <!-- <div class="input-group">
-                            <label>
+                 
+
+                        <div class="input-group dropdown w-100">
+                            <label class="form-label fw-semibold mb-2">
                                 After the encounter with the online predator, did you or your child experience any of the following (Please select all that apply):
                             </label>
 
-                            <div class="checkbox-group" id="question_13">
-                                <div class="checkbox-item">
-                                <input type="checkbox" id="sexual_contact" name="question_13" value="sexual_contact">
-                                <label for="sexual_contact">Sexual contact (rape or attempted rape)</label>
-                                </div>
-                                
-                                <div class="checkbox-item">
-                                <input type="checkbox" id="touching" name="question_13" value="touching">
-                                <label for="touching">Sexual touching or inappropriate physical contact</label>
-                                </div>
+                            <button class="btn btn-outline-primary dropdown-toggle dd-btn d-flex justify-content-between align-items-center w-100"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <span class="dropdown-label text-truncate">--Select--</span>
+                                <img src="../static/img/down_arrow.jpg" alt="" class="custom-arrow ms-2">
+                            </button>
 
-                                <div class="checkbox-item">
-                                <input type="checkbox" id="photos_videos" name="question_13" value="photos_videos">
-                                <label for="photos_videos">Request for sexual photos/videos</label>
-                                </div>
-
-                                <div class="checkbox-item">
-                                <input type="checkbox" id="manipulated" name="question_13" value="manipulated">
-                                <label for="manipulated">Manipulated/pressured into a sexual relationship</label>
-                                </div>
-
-                                <div class="checkbox-item">
-                                <input type="checkbox" id="travel" name="question_13" value="travel">
-                                <label for="travel">Travel to performing sexual acts</label>
-                                </div>
-
-                                <div class="checkbox-item">
-                                <input type="checkbox" id="grooming" name="question_13" value="grooming">
-                                <label for="grooming">Grooming or messaging child multiple times in a sexual/inappropriate way</label>
-                                </div>
+                            <ul id="question_13" class="dropdown-menu p-2 w-100"
+                                style="max-height: 250px; overflow-y: auto;">
+                                <li>
+                                <label class="dropdown-item">
+                                    <input id="sexual_contact" name="question_13" type="checkbox"
+                                        value="Sexual contact (rape or attempted rape)"
+                                        class="form-check-input me-2"/>
+                                    Sexual contact (rape or attempted rape)
+                                </label>
+                                </li>
+                                <li>
+                                <label class="dropdown-item">
+                                    <input id="touching" name="question_13" type="checkbox"
+                                        value="Sexual touching or inappropriate physical contact"
+                                        class="form-check-input me-2"/>
+                                    Sexual touching or inappropriate physical contact
+                                </label>
+                                </li>
+                                <li>
+                                <label class="dropdown-item">
+                                    <input id="photos_videos" name="question_13" type="checkbox"
+                                        value="Request for sexual photos/videos"
+                                        class="form-check-input me-2"/>
+                                    Request for sexual photos/videos
+                                </label>
+                                </li>
+                                <li>
+                                <label class="dropdown-item">
+                                    <input id="manipulated" name="question_13" type="checkbox"
+                                        value="Manipulated/pressured into a sexual relationship"
+                                        class="form-check-input me-2"/>
+                                    Manipulated/pressured into a sexual relationship
+                                </label>
+                                </li>
+                                <li>
+                                <label class="dropdown-item">
+                                    <input id="travel" name="question_13" type="checkbox"
+                                        value="Travel to performing sexual acts"
+                                        class="form-check-input me-2"/>
+                                    Travel to performing sexual acts
+                                </label>
+                                </li>
+                                <li>
+                                <label class="dropdown-item">
+                                    <input id="grooming" name="question_13" type="checkbox"
+                                        value="Grooming or messaging child multiple times in a sexual/inappropriate way"
+                                        class="form-check-input me-2"/>
+                                    Grooming or messaging child multiple times in a sexual/inappropriate way
+                                </label>
+                                </li>
+                            </ul>
                             </div>
-                        </div> -->
-
-                        <div class="input-group dropdown w-100">
-  <label class="form-label fw-semibold mb-2">
-    After the encounter with the online predator, did you or your child experience any of the following (Please select all that apply):
-  </label>
-
-  <button class="btn btn-outline-primary dropdown-toggle dd-btn d-flex justify-content-between align-items-center w-100"
-          type="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false">
-    <span class="dropdown-label text-truncate">--Select--</span>
-    <img src="../static/img/down_arrow.jpg" alt="" class="custom-arrow ms-2">
-  </button>
-
-  <ul id="question_13" class="dropdown-menu p-2 w-100"
-      style="max-height: 250px; overflow-y: auto;">
-    <li>
-      <label class="dropdown-item">
-        <input id="sexual_contact" name="question_13" type="checkbox"
-               value="Sexual contact (rape or attempted rape)"
-               class="form-check-input me-2"/>
-        Sexual contact (rape or attempted rape)
-      </label>
-    </li>
-    <li>
-      <label class="dropdown-item">
-        <input id="touching" name="question_13" type="checkbox"
-               value="Sexual touching or inappropriate physical contact"
-               class="form-check-input me-2"/>
-        Sexual touching or inappropriate physical contact
-      </label>
-    </li>
-    <li>
-      <label class="dropdown-item">
-        <input id="photos_videos" name="question_13" type="checkbox"
-               value="Request for sexual photos/videos"
-               class="form-check-input me-2"/>
-        Request for sexual photos/videos
-      </label>
-    </li>
-    <li>
-      <label class="dropdown-item">
-        <input id="manipulated" name="question_13" type="checkbox"
-               value="Manipulated/pressured into a sexual relationship"
-               class="form-check-input me-2"/>
-        Manipulated/pressured into a sexual relationship
-      </label>
-    </li>
-    <li>
-      <label class="dropdown-item">
-        <input id="travel" name="question_13" type="checkbox"
-               value="Travel to performing sexual acts"
-               class="form-check-input me-2"/>
-        Travel to performing sexual acts
-      </label>
-    </li>
-    <li>
-      <label class="dropdown-item">
-        <input id="grooming" name="question_13" type="checkbox"
-               value="Grooming or messaging child multiple times in a sexual/inappropriate way"
-               class="form-check-input me-2"/>
-        Grooming or messaging child multiple times in a sexual/inappropriate way
-      </label>
-    </li>
-  </ul>
-</div>
 
 
 
                         <div class="input-group">
-                            <label>After the incident(s), was the abuse or injury reported to any of the following:</label>
+                            <label>After the incident(s), was the abuse or injury reported to any of the following: *</label>
                             <select id="question_14" class="question-dropdown"
-                                data-question-text="After the incident(s), was the abuse or injury reported  to any of the following:"></select>
+                                data-question-text="After the incident(s), was the abuse or injury reported  to any of the following: *"></select>
 
                         </div>
 
 
                         <div class="input-group">
-                            <label>To the best of your knowledge, was the perpetrator an adult?</label>
+                            <label>To the best of your knowledge, was the perpetrator an adult? *</label>
                             <select id="question_15" class="question-dropdown"
-                                data-question-text="To the best of your knowledge, was the perpetrator an adult?"></select>
+                                data-question-text="To the best of your knowledge, was the perpetrator an adult? *"></select>
 
                         </div>
                         <!-- <div class="input-group">
