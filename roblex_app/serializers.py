@@ -8,6 +8,8 @@ class IntakeFormSerializer(serializers.ModelSerializer):
     guardian_first_name = serializers.CharField(required=True)
     guardian_last_name = serializers.CharField(required=True)
     # question = serializers.CharField(required=True)
+
+    available_slots = serializers.CharField(required=False,allow_blank=True)
     description_predators = serializers.CharField(required=False, allow_blank=True)
     description_medical_psychological = serializers.CharField(required=False,allow_blank=True)
     description_economic_loss = serializers.CharField(required=False,allow_blank=True)

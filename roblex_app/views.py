@@ -415,21 +415,46 @@ class QuestionListAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Submit answer to a question
+# class SubmitAnswerAPIView(APIView):
+#     def post(self, request):
+#         serializer = UserAnswerSerializer(data=request.data)
+#         if serializer.is_valid():
+#             # prevent duplicate entries
+#             user = serializer.validated_data['user']
+#             question = serializer.validated_data['question']
+
+#             UserAnswer.objects.update_or_create(
+#                 user=user, question=question,
+#                 defaults={'selected_option': serializer.validated_data['selected_option']}
+#             )
+
+#             return Response({"message": "Answer submitted."}, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class SubmitAnswerAPIView(APIView):
     def post(self, request):
-        serializer = UserAnswerSerializer(data=request.data)
-        if serializer.is_valid():
-            # prevent duplicate entries
-            user = serializer.validated_data['user']
-            question = serializer.validated_data['question']
+        user = request.data.get("user")
+        question_id = request.data.get("question")
+        selected_option = request.data.get("selected_option")
 
-            UserAnswer.objects.update_or_create(
-                user=user, question=question,
-                defaults={'selected_option': serializer.validated_data['selected_option']}
+        question = Question.objects.get(id=question_id)
+
+        # remove old answer (if re-submitting)
+        UserAnswer.objects.filter(user_id=user, question=question).delete()
+
+        if selected_option:
+            UserAnswer.objects.create(
+                user_id=user,
+                question=question,
+                selected_option_id=selected_option
             )
 
-            return Response({"message": "Answer submitted."}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Answer submitted."}, status=status.HTTP_201_CREATED)
+
+
+
+
 
 
 def get_client_ip(request):

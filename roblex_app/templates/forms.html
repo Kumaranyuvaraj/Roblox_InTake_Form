@@ -586,10 +586,55 @@
                         <label>Discord Profile Name (if applicable)</label>
                         <input type="text" name="discord_profile" class="form-control" placeholder="Enter Discord Gamertag">
                     </div>
+
+                    <div class="col-12">
+                        <h5 class="pt-4 pb-2">Do you talk to a law firm?</h5>
+                    </div>
+                    <!-- <fieldset>
+                        <legend class="visually-hidden">Select Yes or No</legend>
+                        <div class="d-flex gap-4 align-items-center" role="radiogroup" aria-label="Talk to a law firm?">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="talkLawFirm" id="radioYes" value="yes" aria-controls="yesContent noContent" />
+                                <label class="form-check-label" for="radioYes">Yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="talkLawFirm" id="radioNo" value="no" aria-controls="yesContent noContent" />
+                                <label class="form-check-label" for="radioNo">No</label>
+                            </div>
+                        </div>
+                    </fieldset> -->
+
+                    <fieldset>
+                        <legend class="visually-hidden">Select Yes or No</legend>
+                        <div class="d-flex gap-4 align-items-center" role="radiogroup" aria-label="Talk to a law firm?">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="talkLawFirm" id="radioYes" value="yes" />
+                                <label class="form-check-label" for="radioYes">Yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="talkLawFirm" id="radioNo" value="no" />
+                                <label class="form-check-label" for="radioNo">No</label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div id="yesContent" class="mt-3 d-none">
+                        <h6>John Smith</h6>
+                        <p class="mb-0">1234 Cedarcrest Road</p>
+                        <p class="mb-0">Suite 320</p>
+                        <p class="mb-0">Acworth, GA 30101</p>
+                        <p class="mb-0"><a href="mailto:info@nextkeylitigation.com">info@nextkeylitigation.com</a></p>
+                        <p class="mb-0">Phone: +1-234-567-8900</p>
+
+                            
+                        </p>
+                    </div>
+
+
+                
                 
 
-
-
+                <div id="noContent" class="mt-3 d-none">
                     <div class="mb-3 row mt-3">
                         <div class="col-12">
                             <label>Brief Description of Sexual Predator's Conduct (lying about age, avatar customization,
@@ -935,7 +980,7 @@
                     </div>
 
 
-                    
+                </div>
 
                        
                         <div class="col-12 d-flex justify-content-center pb-3">
@@ -1038,37 +1083,6 @@ $(document).ready(function () {
 
    
 
-    // let robloxValidationStatus = {};
-
-    // // ✅ Roblox username validation
-    // $(document).on("blur", ".roblox-gamertag", function () {
-    //     const $input = $(this);
-    //     const username = $input.val().trim();
-    //     const $statusDiv = $input.siblings(".robloxValidationStatus");
-    //     if (!username) return;
-    //     $statusDiv.html("Validating...");
-    //     robloxValidationStatus[$input.index()] = false;
-
-    //     $.ajax({
-    //         url: "/api/validate-roblox/",
-    //         type: "POST",
-    //         contentType: "application/json",
-    //         data: JSON.stringify({ username }),
-    //         success: function (response) {
-    //         const message = response?.success || "Gamertag found.";
-        
-
-    //         $statusDiv.html(`<div class="text-success">${message}</div>`);
-    //         robloxValidationStatus[$input.index()] = true;
-    //         },
-    //         error: function (xhr) {
-    //             const message = xhr.responseJSON?.error || "Gamertag not found.";
-    //             // $statusDiv.html(`<div class="des-mg-tp">${message}</div>`);
-    //             $statusDiv.html(`<div class="position-absolute text-danger msg-min-width top0">${message}</div>`);
-    //             robloxValidationStatus[$input.index()] = false;
-    //         }
-    //     });
-    // });
 
 
     let robloxValidationStatus = {};
@@ -1743,6 +1757,34 @@ $("#intakeForm").on("submit", function (e) {
         });
     }
 });
+
+ document.addEventListener('DOMContentLoaded', function () {
+    const radios = document.querySelectorAll('input[name="talkLawFirm"]');
+    const yesContent = document.getElementById('yesContent');
+    const noContent = document.getElementById('noContent');
+    const requiredFields = noContent.querySelectorAll('textarea, input');
+
+    function updateVisibility() {
+        const selected = document.querySelector('input[name="talkLawFirm"]:checked');
+        const val = selected ? selected.value : null;
+
+        // Show/hide
+        yesContent.classList.toggle('d-none', val !== 'yes');
+        noContent.classList.toggle('d-none', val !== 'no');
+
+        // Manage required attribute
+        requiredFields.forEach(field => {
+            if (val === 'no') {
+                field.setAttribute('required', true);
+            } else {
+                field.removeAttribute('required');
+            }
+        });
+    }
+
+    radios.forEach(r => r.addEventListener('change', updateVisibility));
+    updateVisibility(); // initialize
+});
 </script>
 
 
@@ -1815,6 +1857,29 @@ $("#intakeForm").on("submit", function (e) {
       );
     });
 </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const radios = document.querySelectorAll('input[name="talkLawFirm"]');
+    const yesContent = document.getElementById('yesContent');
+    const noContent = document.getElementById('noContent');
+
+
+    function updateVisibility() {
+    const selected = document.querySelector('input[name="talkLawFirm"]:checked');
+    const val = selected ? selected.value : null;
+    yesContent.classList.toggle('d-none', val !== 'yes');
+    noContent.classList.toggle('d-none', val !== 'no');
+    }
+
+
+    radios.forEach(r => r.addEventListener('change', updateVisibility));
+    // Initialize visibility on load (both hidden until user chooses)
+    updateVisibility();
+    });
+</script>
+
 
 
 

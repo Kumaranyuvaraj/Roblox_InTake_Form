@@ -152,6 +152,8 @@ class IntakeForm(models.Model):
     discord_profile = models.CharField(max_length=100,null=True, blank=True)
     xbox_gamertag = models.CharField(max_length=100,null=True, blank=True)
     ps_gamertag = models.CharField(max_length=100,null=True, blank=True)
+
+    available_slots = models.CharField(max_length=100,null=True,blank=False)
    
     description_predators = models.TextField(max_length=200,null=True,blank=False)
     description_medical_psychological = models.TextField(max_length=200,null=True,blank=False)
@@ -346,7 +348,7 @@ class UserAnswer(models.Model):
     selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('user', 'question')
+        unique_together = ('user', 'question', 'selected_option')
 
 class EmailTemplate(models.Model):
     """Dynamic email template model for various email types"""

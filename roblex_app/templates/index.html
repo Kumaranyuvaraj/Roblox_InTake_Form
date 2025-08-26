@@ -513,7 +513,7 @@
                                 </label>
                                 </li>
                             </ul>
-                            </div>
+                        </div>
 
 
 
@@ -521,7 +521,6 @@
                             <label>After the incident(s), was the abuse or injury reported to any of the following: *</label>
                             <select id="question_14" class="question-dropdown"
                                 data-question-text="After the incident(s), was the abuse or injury reported  to any of the following: *"></select>
-
                         </div>
 
 
@@ -1769,30 +1768,73 @@ window.addEventListener("scroll", function () {
         }
    
 
-        document.addEventListener("DOMContentLoaded", () => {
-        const dropdown = document.querySelector(".dropdown");
-        const buttonLabel = dropdown.querySelector(".dropdown-label");
-        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
-
-        function updateLabel() {
-            const selected = [...checkboxes]
-            .filter(c => c.checked)
-            .map(c => c.value);
-
-            buttonLabel.textContent = selected.length === 0
-            ? "--Select--"
-            : selected.join(", ");
-        }
-
-        // prevent dropdown from closing on checkbox click
-        dropdown.querySelectorAll(".dropdown-item input").forEach(cb => {
-            cb.addEventListener("click", e => e.stopPropagation());
-            cb.addEventListener("change", updateLabel);
-        });
-        });
+        
 
 
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const dropdown = document.querySelector(".dropdown");
+            const buttonLabel = dropdown.querySelector(".dropdown-label");
+            const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+
+            function updateLabel() {
+                const selected = [...checkboxes]
+                    .filter(c => c.checked)
+                    .map(c => c.value);
+
+                buttonLabel.textContent = selected.length === 0
+                    ? "--Select--"
+                    : selected.join(", ");
+            }
+
+            // prevent dropdown from closing + save on change
+            dropdown.querySelectorAll(".dropdown-item input").forEach(cb => {
+                cb.addEventListener("click", e => e.stopPropagation());
+
+                cb.addEventListener("change", () => {
+                    updateLabel();
+
+                    const selected = [...checkboxes]
+                        .filter(c => c.checked)
+                        .map(c => c.value);   
+
+                    fetch("/api/answers/submit/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken") 
+                        },
+                        body: JSON.stringify({
+                            user: 1,         
+                            question: 13,     
+                            selected_options: selected
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => console.log("Saved:", data))
+                    .catch(err => console.error("Error:", err));
+                });
+            });
+
+            // CSRF helper (if using Django templates)
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    const cookies = document.cookie.split(";");
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+</script>
+
 
     <!-- Your form and input elements here -->
 

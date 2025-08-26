@@ -94,3 +94,6 @@ class LawFirmContextMiddleware:
                 response.context_data = {}
             response.context_data['current_law_firm'] = request.law_firm
         return response
+
+
+

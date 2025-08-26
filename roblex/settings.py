@@ -66,7 +66,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'roblex_app.middleware.SubdomainMiddleware',  # Add subdomain detection
     'roblex_app.middleware.LawFirmContextMiddleware',  # Add law firm context
+    
 ]
+
+
 
 ROOT_URLCONF = 'roblex.urls'
 
@@ -160,9 +163,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = config('LANGUAGE_CODE', default='en-us')
 
-TIME_ZONE = config('TIME_ZONE', default='UTC')
-
+# TIME_ZONE = config('TIME_ZONE', default='UTC')
+TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
+
 
 USE_TZ = True
 

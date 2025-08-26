@@ -12,6 +12,9 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.admin import AdminSite
 
+from django.utils import timezone
+import pytz
+
 
 class SuperuserOnlyModelAdmin(admin.ModelAdmin):
     """Base admin class that only shows models to superusers"""
@@ -329,6 +332,23 @@ class IntakeFormAdmin(LawFirmFilteredModelAdmin):
         return "Unknown"
     client_location.short_description = "Client IP"
 
+    def local_created_at(self, obj):
+        # Get request timezone (from middleware or user preference)
+        request_tz = getattr(getattr(self, 'timezone', None), 'zone', None)
+
+        if not request_tz:
+            # fallback to settings TIME_ZONE if nothing set
+            request_tz = timezone.get_default_timezone_name()
+
+        # Convert UTC -> local
+        utc_time = obj.created_at
+        local_time = utc_time.astimezone(pytz.timezone(request_tz))
+
+        return timezone.localtime(local_time).strftime("%b. %d, %Y, %I:%M %p")
+
+    local_created_at.admin_order_field = "created_at"
+    local_created_at.short_description = "Created At"
+
     list_display = [
         'id',
         'law_firm_name',
@@ -341,7 +361,8 @@ class IntakeFormAdmin(LawFirmFilteredModelAdmin):
         'document_submissions_count',
         'pdf_link',
         'date',
-        'created_at'
+        # 'created_at'
+        'local_created_at', 
     ]
 
     list_display_links = ['id', 'gamer_first_name', 'gamer_last_name']
